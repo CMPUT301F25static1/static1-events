@@ -1,2 +1,3 @@
-# static1-events
+# static1 Events
+
 Event Lottery System Android App
