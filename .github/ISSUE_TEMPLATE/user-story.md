@@ -2,7 +2,7 @@
 name: User Story
 about: Template for creating user story issues
 title: US XX.XX.XX - User Story Title
-labels: ''
+labels: 'user story'
 assignees: ''
 
 ---
