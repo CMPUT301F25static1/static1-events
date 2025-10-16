@@ -1,3 +1,3 @@
-# static1 Events
+# FishyLottery
 
 Event Lottery System Android App
