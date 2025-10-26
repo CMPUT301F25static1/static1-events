@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.static1.fishylottery.view.profile.ProfileFragment"
+        android:name="com.static1.fishylottery.view.profile.ProfileContainerFragment"
         android:label="@string/title_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile_container" />
 </navigation>
