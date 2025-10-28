@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.controller.ProfileController;
@@ -35,7 +36,7 @@ public class ProfileViewFragment extends Fragment {
         rowAdminLogin = view.findViewById(R.id.row_admin_login);
 
         setupRowLabels(view);
-        setupListeners();
+        setupListeners(view);
 
         controller.loadProfile(new ProfileController.ProfileCallback() {
             @Override
@@ -71,16 +72,18 @@ public class ProfileViewFragment extends Fragment {
         textRowTitle.setText(title);
     }
 
-    private void setupListeners() {
-        rowEditProfile.setOnClickListener(v -> openEditProfile());
+    private void setupListeners(View view) {
+        rowEditProfile.setOnClickListener(v -> openEditProfile(view));
         rowNotifications.setOnClickListener(v -> openNotifications());
         rowEventsHistory.setOnClickListener(v -> openEventsHistory());
         rowAdminLogin.setOnClickListener(v -> openAdminLogin());
     }
 
-    private void openEditProfile() {
-        Toast.makeText(getContext(), "Edit Profile clicked", Toast.LENGTH_SHORT).show();
+    private void openEditProfile(View view) {
+        Navigation.findNavController(view).navigate(R.id.action_profile_to_edit_profile);
     }
+
+
 
     private void openNotifications() {
         Toast.makeText(getContext(), "Notifications clicked", Toast.LENGTH_SHORT).show();
