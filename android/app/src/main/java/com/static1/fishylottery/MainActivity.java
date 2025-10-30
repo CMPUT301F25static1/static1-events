@@ -13,22 +13,18 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.firebase.Firebase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.static1.fishylottery.databinding.ActivityMainBinding;
-import com.static1.fishylottery.services.AuthManager;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        MainApplication app = (MainApplication) getApplication();
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -42,12 +38,12 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         // Setup the Firebase Anonymous Auth
-        authManager = new AuthManager();
-        authManager.ensureSignedIn(this::displayUid);
-    }
-
-    private void displayUid() {
-        String uid = authManager.getUserId();
+        app.getAuthManager().ensureSignedIn(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("AuthManager", "The user has been signed in");
+            }
+        });
     }
 
     @Override
@@ -57,5 +53,4 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
         return navController.navigateUp() || super.onSupportNavigateUp();
     }
-
 }
