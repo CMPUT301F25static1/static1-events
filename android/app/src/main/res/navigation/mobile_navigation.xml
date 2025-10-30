@@ -9,7 +9,13 @@
         android:id="@+id/navigation_events"
         android:name="com.static1.fishylottery.view.events.EventsFragment"
         android:label="@string/title_events"
-        tools:layout="@layout/fragment_events" />
+        tools:layout="@layout/fragment_events">
+
+        <action
+            android:id="@+id/action_hostedEvents_to_createEvent"
+            app:destination="@id/navigation_create_event"
+            />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
@@ -22,4 +28,35 @@
         android:name="com.static1.fishylottery.view.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/navigation_create_event"
+        android:name="com.static1.fishylottery.view.events.CreateEventDetailsFragment"
+        android:label="1 of 3: Event Details"
+        tools:layout="@layout/fragment_create_event_details">
+
+        <action
+            android:id="@+id/action_eventDetails_to_eventPoster"
+            app:destination="@id/navigation_create_event_poster"
+            />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_create_event_poster"
+        android:name="com.static1.fishylottery.view.events.CreateEventPosterFragment"
+        android:label="2 of 3: Event Poster"
+        tools:layout="@layout/fragment_create_event_poster"
+        >
+        <action
+            android:id="@+id/action_eventPoster_to_eventPreview"
+            app:destination="@id/navigation_create_event_preview"
+            />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_create_event_preview"
+        android:name="com.static1.fishylottery.view.events.CreateEventPreviewFragment"
+        android:label="3 of 3: Event Preview"
+        />
+
 </navigation>
