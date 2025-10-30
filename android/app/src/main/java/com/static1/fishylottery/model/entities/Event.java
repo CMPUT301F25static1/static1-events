@@ -19,7 +19,7 @@ public class Event {
     private Date createdAt;
     private Date updatedAt;
 
-    Event() {}
+    public Event() {}
 
     public String getEventId() {
         return eventId;
