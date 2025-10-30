@@ -7,6 +7,7 @@ public class Event {
     private String title;
     private String description;
     private String location;
+    private String hostedBy;
     private String status;
     private Integer capacity;
     private Integer maxWaitlistSize = null;
@@ -139,5 +140,13 @@ public class Event {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getHostedBy() {
+        return hostedBy;
+    }
+
+    public void setHostedBy(String hostedBy) {
+        this.hostedBy = hostedBy;
     }
 }

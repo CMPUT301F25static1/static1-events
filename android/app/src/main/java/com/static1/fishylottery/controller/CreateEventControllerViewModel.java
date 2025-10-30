@@ -20,13 +20,7 @@ public class CreateEventControllerViewModel extends ViewModel {
         return event;
     }
 
-    public void updateEventDetails(String title, String description) {
-        Event e = event.getValue();
-
-        if (e == null) return;
-
-        e.setTitle(title);
-        e.setDescription(description);
+    public void updateEvent(Event e) {
         event.setValue(e);
     }
 
