@@ -4,9 +4,13 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -14,13 +18,18 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.CreateEventControllerViewModel;
+import com.static1.fishylottery.viewmodel.CreateEventViewModel;
 import com.static1.fishylottery.model.entities.Event;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class CreateEventDetailsFragment extends Fragment {
@@ -35,13 +44,41 @@ public class CreateEventDetailsFragment extends Fragment {
             textInputLocation,
             textInputHost,
             textInputWaitlistMaximum,
+            textInputCapacity,
     startDate,
     startTime,
     endDate,
     endTime,
     deadlineDate,
     deadlineTime;
-    private CreateEventControllerViewModel vm;
+
+    private AutoCompleteTextView eventTypeDropdown, eventInterestsDropdown;
+    private CreateEventViewModel vm;
+
+    private boolean[] selectedInterests;
+    private List<String> selectedItems = new ArrayList<>();
+    List<String> interests = Arrays.asList(
+            "Music",
+            "Sports",
+            "Art",
+            "Technology",
+            "Travel",
+            "Food",
+            "Fitness",
+            "Education",
+            "Nature",
+            "Movies",
+            "Reading",
+            "Gaming",
+            "Science",
+            "Health",
+            "Fashion",
+            "Photography",
+            "Volunteering",
+            "Business",
+            "Culture",
+            "Socializing"
+    );
 
 
     @Override
@@ -51,13 +88,64 @@ public class CreateEventDetailsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_create_event_details, container, false);
 
-        vm = new ViewModelProvider(requireActivity()).get(CreateEventControllerViewModel.class);
+        vm = new ViewModelProvider(requireActivity()).get(CreateEventViewModel.class);
 
         Button nextButton = view.findViewById(R.id.button_next_poster);
         textInputTitle = view.findViewById(R.id.input_event_title);
         textInputDescription = view.findViewById(R.id.input_event_description);
         textInputLocation = view.findViewById(R.id.input_location);
         textInputHost = view.findViewById(R.id.input_hosted_by);
+        textInputCapacity = view.findViewById(R.id.input_capacity);
+        textInputWaitlistMaximum = view.findViewById(R.id.input_waitlist_max);
+
+        eventTypeDropdown = view.findViewById(R.id.dropdown_event_type);
+        eventInterestsDropdown = view.findViewById(R.id.dropdown_interests);
+
+        String[] eventTypes = {
+                "Music",
+                "Sports",
+                "Education",
+                "Workshop",
+                "Networking",
+                "Conference",
+                "Festival",
+                "Fundraiser",
+                "Social Gathering",
+                "Other"
+        };
+
+
+
+        ArrayAdapter<String> eventTypeAdapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                eventTypes
+        );
+
+        selectedInterests = new boolean[interests.size()];
+
+        eventInterestsDropdown.setOnClickListener(v -> {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+            builder.setTitle("Select Interests");
+            builder.setMultiChoiceItems(
+                    interests.toArray(new String[0]),
+                    selectedInterests,
+                    (dialog, which, isChecked) -> {
+                        if (isChecked) {
+                            selectedItems.add(interests.get(which));
+                        } else {
+                            selectedItems.remove(interests.get(which));
+                        }
+                    });
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                eventInterestsDropdown.setText(TextUtils.join(", ", selectedItems));
+            });
+            builder.setNegativeButton("Cancel", null);
+            builder.show();
+        });
+
+        eventTypeDropdown.setAdapter(eventTypeAdapter);
+        eventTypeDropdown.setOnClickListener(v -> eventTypeDropdown.showDropDown());
+        eventTypeDropdown.setText(eventTypes[0], false);
 
         // find views
         startDate = view.findViewById(R.id.input_start_date);
@@ -97,16 +185,30 @@ public class CreateEventDetailsFragment extends Fragment {
 
         if (event == null) return;
 
+        // Set the new values for the event object
         event.setTitle(textInputTitle.getText().toString());
         event.setDescription(textInputDescription.getText().toString());
         event.setLocation(textInputLocation.getText().toString());
         event.setHostedBy(textInputHost.getText().toString());
+        event.setEventType(eventTypeDropdown.getText().toString());
+        event.setInterests(selectedItems);
+        event.setCapacity(safeParse(textInputCapacity.getText().toString()));
+        event.setMaxWaitlistSize(safeParse(textInputWaitlistMaximum.getText().toString()));
 
-        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm a");
+        try {
+            // Set these values for the event
+            String eventStartDateString = startDate.getText().toString() + " " + startTime.getText().toString();
+            String eventEndDateString = endDate.getText().toString() + " " + endTime.getText().toString();
+            String eventRegistrationClosesString = deadlineDate.getText().toString() + " " + deadlineTime.getText().toString();
+            event.setEventStartDate(formatter.parse(eventStartDateString));
+            event.setEventEndDate(formatter.parse(eventEndDateString));
+            event.setRegistrationCloses(formatter.parse(eventRegistrationClosesString));
+        } catch (ParseException e) {
+            Log.e("Date", e.toString());
+        }
 
-        event.setCreatedAt(now);
-        event.setUpdatedAt(now);
-
+        // Update the event using the view model
         vm.updateEvent(event);
     }
 
@@ -164,5 +266,13 @@ public class CreateEventDetailsFragment extends Fragment {
         }, hour, minute, is24Hour);
 
         tp.show();
+    }
+
+    private Integer safeParse(String s) {
+        try {
+            return Integer.valueOf(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

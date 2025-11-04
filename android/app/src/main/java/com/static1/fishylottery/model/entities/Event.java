@@ -1,11 +1,14 @@
 package com.static1.fishylottery.model.entities;
 
 import java.util.Date;
+import java.util.List;
 
 public class Event {
     private String eventId;
     private String title;
     private String description;
+    private String eventType;
+    private List<String> interests;
     private String location;
     private String hostedBy;
     private String status;
@@ -148,5 +151,21 @@ public class Event {
 
     public void setHostedBy(String hostedBy) {
         this.hostedBy = hostedBy;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public List<String> getInterests() {
+        return interests;
+    }
+
+    public void setInterests(List<String> interests) {
+        this.interests = interests;
     }
 }
