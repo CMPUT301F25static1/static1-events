@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:padding="16dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Audience"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <RadioGroup
+            android:id="@+id/rgAudience"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/rbSelected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selected" />
+
+            <RadioButton
+                android:id="@+id/rbWaitlist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Waitlist" />
+
+            <RadioButton
+                android:id="@+id/rbCancelled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancelled" />
+
+            <RadioButton
+                android:id="@+id/rbChosen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chosen (UIDs comma-separated)" />
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/etChosenUids"
+            android:hint="uidA, uidB (only if Chosen)"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/etTitle"
+            android:hint="Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/etMessage"
+            android:hint="Message"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:gravity="top"
+            android:inputType="textMultiLine" />
+
+        <Button
+            android:id="@+id/btnSend"
+            android:text="Send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</ScrollView>
