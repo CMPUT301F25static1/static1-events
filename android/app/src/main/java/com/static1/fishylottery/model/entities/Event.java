@@ -23,6 +23,8 @@ public class Event implements Serializable {
     private Date lotteryDate;
     private Date createdAt;
     private Date updatedAt;
+    private Date registrationOpens;
+
 
     public Event() {}
 
@@ -153,6 +155,17 @@ public class Event implements Serializable {
     public void setHostedBy(String hostedBy) {
         this.hostedBy = hostedBy;
     }
+
+    public Date getRegistrationOpens() { return registrationOpens; }
+    public void setRegistrationOpens(Date registrationOpens) { this.registrationOpens = registrationOpens; }
+
+    public boolean isWithinRegistrationWindow(Date now) {
+        if (now == null) now = new Date();
+        if (registrationOpens != null && now.before(registrationOpens)) return false;
+        if (registrationCloses != null && now.after(registrationCloses)) return false;
+        return true;
+    }
+
 
     public String getEventType() {
         return eventType;
