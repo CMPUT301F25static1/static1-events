@@ -22,6 +22,8 @@ import java.util.UUID;
 public class CreateEventViewModel extends ViewModel {
     private final MutableLiveData<Event> event = new MutableLiveData<>(new Event());
     private final MutableLiveData<Uri> imageUri = new MutableLiveData<>();
+    private final MutableLiveData<String> validationError = new MutableLiveData<>();
+
     private final EventRepository eventsRepository = new EventRepository();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
 
@@ -30,14 +32,57 @@ public class CreateEventViewModel extends ViewModel {
     }
     public LiveData<Uri> getImageUri() { return imageUri; }
 
+    public LiveData<String> getValidationError() {
+        return validationError;
+    }
+
     public void updateEvent(Event e) { event.setValue(e); }
 
     public void setImageUri(Uri uri) { imageUri.setValue(uri); }
 
-    public void submit() {
+    public boolean submit() {
         Event e = event.getValue();
 
-        if (e == null) return;
+        if (e == null) {
+            validationError.setValue("No event to save.");
+            return false;
+        }
+
+        // required text fields
+        if (isBlank(e.getTitle())) {
+            validationError.setValue("Please enter a title.");
+            return false;
+        }
+        if (isBlank(e.getLocation())) {
+            validationError.setValue("Please enter a location.");
+            return false;
+        }
+
+        // date/time logic
+        Date start = e.getEventStartDate();
+        Date end = e.getEventEndDate();
+        Date regClose = e.getRegistrationCloses();
+
+        // all three must be set
+        if (start == null || end == null || regClose == null) {
+            validationError.setValue("Please select start, end, and registration deadline.");
+            return false;
+        }
+
+        // start must be strictly before end
+        if (!start.before(end)) {
+            validationError.setValue("Start time must be before end time.");
+            return false;
+        }
+
+        // registration deadline must be before the event start
+        if (!regClose.before(start)) {
+            validationError.setValue("Registration deadline must be before the event start.");
+            return false;
+        }
+
+        // clear any old error
+        validationError.setValue(null);
 
         // Set the organizer ID
         // TODO: Set the profile now
@@ -51,7 +96,7 @@ public class CreateEventViewModel extends ViewModel {
         if (imageUri == null) {
             // No image, just upload event directly
             eventsRepository.addEvent(e);
-            return;
+            return true;
         }
 
         uploadImage(imageUri.getValue(), imageUrl -> {
@@ -61,6 +106,8 @@ public class CreateEventViewModel extends ViewModel {
 
             eventsRepository.addEvent(e);
         });
+
+        return true;
     }
 
     private void uploadImage(Uri imageUri, OnCompleteListener<String> callback) {
@@ -74,4 +121,7 @@ public class CreateEventViewModel extends ViewModel {
         default void onError(Exception e) {}
     }
 
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
 }

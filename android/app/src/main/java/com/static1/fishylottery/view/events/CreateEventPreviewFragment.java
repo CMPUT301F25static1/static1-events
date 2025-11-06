@@ -8,10 +8,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.viewmodel.CreateEventViewModel;
 import com.static1.fishylottery.services.DateUtils;
@@ -23,6 +26,7 @@ public class CreateEventPreviewFragment extends Fragment {
 
     CreateEventViewModel vm;
 
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -45,9 +49,21 @@ public class CreateEventPreviewFragment extends Fragment {
 
         Button button = view.findViewById(R.id.button_create_event);
 
+        // Show validation errors emitted by the ViewModel
+        vm.getValidationError().observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null && getView() != null) {
+                Snackbar.make(getView(), msg, Snackbar.LENGTH_LONG).show();
+            }
+        });
+
         button.setOnClickListener(v -> {
-            vm.submit();
-            Navigation.findNavController(view).popBackStack(R.id.navigation_events, false);
+            boolean ok = vm.submit();   // runs the checks; saves if valid
+            if (ok) {
+                Snackbar.make(v, "Event created!", Snackbar.LENGTH_SHORT).show();
+                // navigate here for a nav target:
+                Navigation.findNavController(view).popBackStack(R.id.navigation_events, false);
+            }
+            // If not ok, the observer above shows the error.
         });
 
         vm.getEvent().observe(getViewLifecycleOwner(), event -> {
@@ -70,5 +86,4 @@ public class CreateEventPreviewFragment extends Fragment {
 
         return view;
     }
-
 }

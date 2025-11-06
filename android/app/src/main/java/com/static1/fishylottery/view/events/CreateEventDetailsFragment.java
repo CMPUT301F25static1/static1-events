@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.format.DateFormat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +14,10 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -34,6 +38,7 @@ import java.util.Locale;
 
 public class CreateEventDetailsFragment extends Fragment {
 
+    // Date/time display formats used by the pickers
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
 
@@ -90,8 +95,18 @@ public class CreateEventDetailsFragment extends Fragment {
 
         vm = new ViewModelProvider(requireActivity()).get(CreateEventViewModel.class);
 
+        // Observe validation errors from the ViewModel and surface as a Toast
+        vm.getValidationError().observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null && !msg.isEmpty()) {
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Buttons
         Button nextButton = view.findViewById(R.id.button_next_poster);
-        textInputTitle = view.findViewById(R.id.input_event_title);
+
+        // Basic text fields
+        textInputTitle       = view.findViewById(R.id.input_event_title);
         textInputDescription = view.findViewById(R.id.input_event_description);
         textInputLocation = view.findViewById(R.id.input_location);
         textInputHost = view.findViewById(R.id.input_hosted_by);
@@ -147,15 +162,15 @@ public class CreateEventDetailsFragment extends Fragment {
         eventTypeDropdown.setOnClickListener(v -> eventTypeDropdown.showDropDown());
         eventTypeDropdown.setText(eventTypes[0], false);
 
-        // find views
-        startDate = view.findViewById(R.id.input_start_date);
-        startTime = view.findViewById(R.id.input_start_time);
-        endDate = view.findViewById(R.id.input_end_date);
-        endTime = view.findViewById(R.id.input_end_time);
+        // Date/time fields
+        startDate    = view.findViewById(R.id.input_start_date);
+        startTime    = view.findViewById(R.id.input_start_time);
+        endDate      = view.findViewById(R.id.input_end_date);
+        endTime      = view.findViewById(R.id.input_end_time);
         deadlineDate = view.findViewById(R.id.input_deadline_date);
         deadlineTime = view.findViewById(R.id.input_deadline_time);
 
-        // make them non-editable by keyboard but clickable
+        // Make date/time EditTexts non-editable by keyboard but clickable to open pickers
         setupPickerField(startDate);
         setupPickerField(startTime);
         setupPickerField(endDate);
@@ -180,6 +195,7 @@ public class CreateEventDetailsFragment extends Fragment {
         return view;
     }
 
+    /** Copies all UI values into the Event stored in the ViewModel. */
     private void updateDetails() {
         Event event = vm.getEvent().getValue();
 
@@ -212,18 +228,19 @@ public class CreateEventDetailsFragment extends Fragment {
         vm.updateEvent(event);
     }
 
+    /** Prevent soft keyboard; allow click to open pickers. */
     private void setupPickerField(EditText et) {
-        et.setFocusable(false);               // prevent keyboard
+        et.setFocusable(false);              // prevent keyboard focus
         et.setClickable(true);               // allow clicks
         et.setInputType(InputType.TYPE_NULL);
         // optional: give a content description or drawable icon
     }
 
-    // DatePicker
+    /** Opens a DatePickerDialog, initializing from current value if present. */
     private void showDatePicker(final EditText target) {
         final Calendar c = Calendar.getInstance();
 
-        // If target already has a date, try to initialize picker to it
+        // If already set, initialize picker to that date
         try {
             Date existing = dateFormat.parse(target.getText().toString());
             if (existing != null) c.setTime(existing);
@@ -276,3 +293,4 @@ public class CreateEventDetailsFragment extends Fragment {
         }
     }
 }
+
