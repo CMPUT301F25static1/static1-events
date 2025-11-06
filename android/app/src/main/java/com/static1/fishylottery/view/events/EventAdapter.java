@@ -81,8 +81,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             ivImage = itemView.findViewById(R.id.event_image);
             tvDate = itemView.findViewById(R.id.event_date);
             tvTitle = itemView.findViewById(R.id.event_title);
-            tvTime = itemView.findViewById(R.id.eventTime);
-            tvLocation = itemView.findViewById(R.id.eventLocation);
+            tvTime = itemView.findViewById(R.id.event_time);
+            tvLocation = itemView.findViewById(R.id.event_location);
 
             itemView.setOnClickListener(v -> {
                 int pos = getAdapterPosition();
