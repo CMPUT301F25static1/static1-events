@@ -50,6 +50,12 @@ public class HostedEventDetailsFragment extends Fragment {
             // TODO: Export the CSV of enrolled
         });
 
+        buttonViewQrCode.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(view).navigate(R.id.action_hostedEventDetails_to_viewQrCode, bundle);
+        });
+
         buttonViewMap.setOnClickListener(v -> {
             Navigation.findNavController(view).navigate(R.id.action_hostedEventDetails_to_signupMap);
         });
