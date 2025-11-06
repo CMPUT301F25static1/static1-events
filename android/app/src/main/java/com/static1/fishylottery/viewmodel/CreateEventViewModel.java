@@ -1,11 +1,14 @@
 package com.static1.fishylottery.viewmodel;
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.static1.fishylottery.MainApplication;
@@ -39,9 +42,15 @@ public class CreateEventViewModel extends ViewModel {
 
         if (e == null) return;
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+            Log.e("CreateEvent", "Firebase user not created");
+            return;
+        }
+
         // Set the organizer ID
-        // TODO: Set the profile now
-        e.setOrganizerId(null);
+        e.setOrganizerId(user.getUid());
 
         Date now = new Date();
         e.setCreatedAt(now);

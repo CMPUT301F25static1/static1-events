@@ -14,7 +14,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
-import com.static1.fishylottery.view.events.EventAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,7 @@ public class BrowseEventsFragment extends Fragment {
 
         eventsRepo = new EventRepository();
 
-        recyclerView = view.findViewById(R.id.recycler_browse_events); // create this in fragment_browse_events.xml
+        recyclerView = view.findViewById(R.id.recycler_browse_events);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new EventAdapter(requireContext());
@@ -47,19 +46,10 @@ public class BrowseEventsFragment extends Fragment {
     }
 
     private void getEvents() {
-        eventsRepo.fetchEvents().addOnSuccessListener(docs -> {
-            List<Event> list = new ArrayList<>();
-            for (DocumentSnapshot doc : docs.getDocuments()) {
-                Event event = doc.toObject(Event.class);
-                if (event != null) {
-                    // ensure eventId is set (some repos expect this)
-                    event.setEventId(doc.getId());
-                    list.add(event);
-                }
-            }
-            adapter.submitList(list);
+        eventsRepo.fetchAllEvents().addOnSuccessListener(events -> {
+            adapter.submitList(events);
         }).addOnFailureListener(e -> {
-            // handle error, e.g., show a Toast
+            // TODO: handle error, e.g., show a Toast
             Log.e("BrowseEvents", "Failed to fetch events", e);
         });
     }

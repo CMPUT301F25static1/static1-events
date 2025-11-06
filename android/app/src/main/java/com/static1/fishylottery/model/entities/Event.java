@@ -1,9 +1,10 @@
 package com.static1.fishylottery.model.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Event {
+public class Event implements Serializable {
     private String eventId;
     private String title;
     private String description;

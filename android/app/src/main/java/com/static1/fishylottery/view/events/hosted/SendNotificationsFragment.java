@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import com.static1.fishylottery.R;
 
-public class HostedEventDetailsSendNotificationsFragment extends Fragment {
+public class SendNotificationsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
