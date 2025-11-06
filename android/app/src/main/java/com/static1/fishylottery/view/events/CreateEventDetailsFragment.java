@@ -228,7 +228,7 @@ public class CreateEventDetailsFragment extends Fragment {
         vm.updateEvent(event);
     }
 
-    /** Prevent soft keyboard; allow click to open pickers. */
+    /** Prevent soft keyboard. allow click to open pickers. */
     private void setupPickerField(EditText et) {
         et.setFocusable(false);              // prevent keyboard focus
         et.setClickable(true);               // allow clicks
