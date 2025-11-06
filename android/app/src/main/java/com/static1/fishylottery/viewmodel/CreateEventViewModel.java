@@ -8,8 +8,10 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.static1.fishylottery.MainApplication;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.services.StorageManager;
 
 import java.util.Date;
 import java.util.UUID;
@@ -35,6 +37,17 @@ public class CreateEventViewModel extends ViewModel {
     public void submit() {
         Event e = event.getValue();
 
+        if (e == null) return;
+
+        // Set the organizer ID
+        // TODO: Set the profile now
+        e.setOrganizerId(null);
+
+        Date now = new Date();
+        e.setCreatedAt(now);
+        e.setUpdatedAt(now);
+        e.setStatus("Open");
+
         if (imageUri == null) {
             // No image, just upload event directly
             eventsRepository.addEvent(e);
@@ -43,26 +56,16 @@ public class CreateEventViewModel extends ViewModel {
 
         uploadImage(imageUri.getValue(), imageUrl -> {
             if (imageUrl != null) {
-                // Update the created at and updated at timestamps
-                Date now = new Date();
-                e.setCreatedAt(now);
-                e.setUpdatedAt(now);
                 e.setImageUrl(imageUrl);
             }
+
             eventsRepository.addEvent(e);
         });
     }
 
     private void uploadImage(Uri imageUri, OnCompleteListener<String> callback) {
-        StorageReference ref = storage.getReference()
-                .child("images/" + UUID.randomUUID() + ".jpg");
-
-        ref.putFile(imageUri)
-                .continueWithTask(task -> {
-                    if (!task.isSuccessful()) throw task.getException();
-                    return ref.getDownloadUrl();
-                })
-                .addOnSuccessListener(uri -> callback.onComplete(uri.toString()))
+        StorageManager.uploadImage(imageUri, "images/events")
+                .addOnSuccessListener(callback::onComplete)
                 .addOnFailureListener(e -> callback.onComplete(null));
     }
 

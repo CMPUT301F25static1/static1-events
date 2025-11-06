@@ -14,7 +14,7 @@ public class Event {
     private String status;
     private Integer capacity;
     private Integer maxWaitlistSize = null;
-    private Profile organizer;
+    private String organizerId;
     private String imageUrl;
     private Date eventStartDate;
     private Date eventEndDate;
@@ -81,12 +81,12 @@ public class Event {
         this.maxWaitlistSize = maxWaitlistSize;
     }
 
-    public Profile getOrganizer() {
-        return organizer;
+    public String getOrganizerId() {
+        return organizerId;
     }
 
-    public void setOrganizer(Profile organizer) {
-        this.organizer = organizer;
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
     }
 
     public String getImageUrl() {
