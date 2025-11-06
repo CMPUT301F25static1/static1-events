@@ -30,6 +30,12 @@
         </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 
+    <Button
+        android:id="@+id/button_go_to_details"
+        android:layout_width="wrap_content"
+        android:text="Go to Details"
+        android:layout_height="wrap_content"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_event"
         android:layout_width="wrap_content"
