@@ -81,7 +81,6 @@ public class CreateEventViewModel extends ViewModel {
             return false;
         }
 
-
         // clear any old error
         validationError.setValue(null);
 
@@ -107,6 +106,8 @@ public class CreateEventViewModel extends ViewModel {
 
             eventsRepository.addEvent(e);
         });
+
+        return true;
     }
 
     private void uploadImage(Uri imageUri, OnCompleteListener<String> callback) {

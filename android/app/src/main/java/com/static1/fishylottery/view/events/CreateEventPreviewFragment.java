@@ -56,19 +56,15 @@ public class CreateEventPreviewFragment extends Fragment {
             }
         });
 
-        // “Create / Publish” button
-        Button createBtn = view.findViewById(R.id.button_create_event);
-        if (createBtn != null) {
-            createBtn.setOnClickListener(v -> {
-                boolean ok = vm.submit();   // runs the checks; saves if valid
-                if (ok) {
-                    Snackbar.make(v, "Event created!", Snackbar.LENGTH_SHORT).show();
-                    // navigate here for a nav target:
-                    // Navigation.findNavController(v).navigate(R.id.action_eventPreview_to_hostedEvents);
-                }
-                // If not ok, the observer above shows the error.
-            });
-        }
+        button.setOnClickListener(v -> {
+            boolean ok = vm.submit();   // runs the checks; saves if valid
+            if (ok) {
+                Snackbar.make(v, "Event created!", Snackbar.LENGTH_SHORT).show();
+                // navigate here for a nav target:
+                Navigation.findNavController(view).popBackStack(R.id.navigation_events, false);
+            }
+            // If not ok, the observer above shows the error.
+        });
 
         vm.getEvent().observe(getViewLifecycleOwner(), event -> {
             textEventTitle.setText(event.getTitle());
