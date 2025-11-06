@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/light_blue_5"
+    >
 
     <LinearLayout
         android:padding="16dp"
@@ -12,8 +14,10 @@
         <TextView
             android:text="Audience"
             android:textStyle="bold"
+            android:textSize="25dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"/>
 
         <RadioGroup
             android:id="@+id/rgAudience"
@@ -24,50 +28,70 @@
                 android:id="@+id/rbSelected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="Selected" />
 
             <RadioButton
                 android:id="@+id/rbWaitlist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="Waitlist" />
 
             <RadioButton
                 android:id="@+id/rbCancelled"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="Cancelled" />
 
             <RadioButton
                 android:id="@+id/rbChosen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="Chosen (UIDs comma-separated)" />
         </RadioGroup>
 
         <EditText
             android:id="@+id/etChosenUids"
+            android:layout_width="378dp"
+            android:layout_height="57dp"
+            android:layout_marginTop="13dp"
+            android:background="@drawable/round_text"
             android:hint="uidA, uidB (only if Chosen)"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:inputType="text"
+            android:padding="12dp"
+            android:textSize="16sp" />
+
 
         <EditText
             android:id="@+id/etTitle"
+            android:layout_width="378dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="13dp"
+            android:background="@drawable/round_text"
             android:hint="Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:inputType="text"
+            android:padding="12dp"
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/etMessage"
-            android:hint="Message"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_width="378dp"
+            android:layout_height="175dp"
+            android:layout_marginTop="13dp"
+            android:background="@drawable/round_text"
             android:gravity="top"
-            android:inputType="textMultiLine" />
+            android:hint="Message"
+            android:inputType="textMultiLine"
+            android:padding="12dp"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnSend"
             android:text="Send"
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
