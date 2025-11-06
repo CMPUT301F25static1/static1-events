@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:fillViewport="true"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Terms and Conditions"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="By using this Event Lottery App, users agree to the following terms:\n\n• Purpose: The app allows entrants to join event waiting lists, participate in random selection ('lottery') draws, and receive notifications regarding event registration.\n\n• Privacy: Users must provide accurate personal information and consent to be contacted through in-app notifications or email.\n\n• Fair Use: Lottery outcomes are determined randomly and cannot be influenced or appealed. Organizers must treat all entrants fairly and comply with app policies.\n\n• Content &amp; Conduct: Organizers are responsible for the accuracy and appropriateness of event details and uploaded media. Inappropriate or misleading content may be removed by administrators.\n\n• Data Privacy: Personal data (name, contact info, device ID) is stored securely and used only for event registration, notification, and audit purposes.\n\n• Account Removal: Administrators may remove users, events, or content that violate these terms without prior notice.\n\n• Liability: The app and its administrators are not liable for event cancellations."
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp"
+            android:textColor="#000000" />
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="I agree to the Terms and Conditions"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/Continue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Continue"
+            android:textSize="18sp"
+            android:padding="16dp" />
+
+    </LinearLayout>
+
+</ScrollView>

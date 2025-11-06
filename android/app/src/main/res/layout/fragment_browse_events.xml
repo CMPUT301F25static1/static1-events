@@ -1,25 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/text_browse_events"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Browse Events"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:paddingBottom="8dp"/>
-
-    <!-- List of events -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_browse_events"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:scrollbars="vertical"/>
-</LinearLayout>
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvInterestsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter by interests"
+                android:textSize="16sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/interestsDropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/dropdown_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvInterestsHint"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Interests..."
+                    android:textSize="16sp"
+                    android:textColor="#BDBDBD" />
+
+                <ImageView
+                    android:id="@+id/ivInterestsArrow"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/arrow_down"
+                    android:contentDescription="Dropdown arrow" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvAvailabilityLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter by availability"
+                android:textSize="16sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/availabilityDropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:background="@drawable/dropdown_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvAvailabilityHint"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Availability..."
+                    android:textSize="16sp"
+                    android:textColor="#BDBDBD" />
+
+                <ImageView
+                    android:id="@+id/ivAvailabilityArrow"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/arrow_down"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:contentDescription="Dropdown arrow" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_browse_events"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upcoming Events"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_browse_events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:nestedScrollingEnabled="false"/>
+
+    </LinearLayout>
+
+</ScrollView>
