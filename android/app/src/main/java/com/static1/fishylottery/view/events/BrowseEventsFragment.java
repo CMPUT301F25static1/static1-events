@@ -14,7 +14,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
-import com.static1.fishylottery.view.EventAdapter;
+import com.static1.fishylottery.view.events.EventAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.static1.fishylottery.view;
+package com.static1.fishylottery.view.events;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -56,7 +56,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @NonNull
     @Override
     public EventAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.fragment_browse_event_card, parent, false);
+        View view = inflater.inflate(R.layout.item_event_card, parent, false);
         // NOTE: If your layout file is named differently, update the resource id above.
         return new ViewHolder(view);
     }
@@ -78,9 +78,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivImage = itemView.findViewById(R.id.eventImage);
-            tvDate = itemView.findViewById(R.id.eventDate);
-            tvTitle = itemView.findViewById(R.id.eventTitle);
+            ivImage = itemView.findViewById(R.id.event_image);
+            tvDate = itemView.findViewById(R.id.event_date);
+            tvTitle = itemView.findViewById(R.id.event_title);
             tvTime = itemView.findViewById(R.id.eventTime);
             tvLocation = itemView.findViewById(R.id.eventLocation);
 
@@ -116,17 +116,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 try {
                     // Glide recommended. Ensure dependency added (see note below).
-                    com.bumptech.glide.Glide.with(ivImage.getContext())
-                            .load(imageUrl)
-                            .centerCrop()
-                            .placeholder(R.drawable.placeholder) // create a placeholder drawable
-                            .into(ivImage);
+//                    com.bumptech.glide.Glide.with(ivImage.getContext())
+//                            .load(imageUrl)
+//                            .centerCrop()
+//                            .placeholder(R.drawable.circle_background_light_blue) // create a placeholder drawable
+//                            .into(ivImage);
                 } catch (NoClassDefFoundError e) {
                     // Glide not present - ignore and set placeholder
-                    ivImage.setImageResource(R.drawable.placeholder);
+                    ivImage.setImageResource(R.drawable.circle_background_light_blue);
                 }
             } else {
-                ivImage.setImageResource(R.drawable.placeholder);
+                ivImage.setImageResource(R.drawable.circle_background_light_blue);
             }
         }
 
