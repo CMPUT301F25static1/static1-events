@@ -1,9 +1,9 @@
 package com.static1.fishylottery.model.repositories;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -46,8 +46,49 @@ public class EventRepository {
         return eventsRef.document(eventId).delete();
     }
 
-    public Task<QuerySnapshot> getAll() {
-        return eventsRef.get();
+    public Task<List<Event>> fetchAllEvents() {
+        return eventsRef.get().continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    List<Event> events = new ArrayList<>();
+
+                    QuerySnapshot snapshot = task.getResult();
+
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        Event event = doc.toObject(Event.class);
+                        if (event != null) {
+                            event.setEventId(doc.getId());
+                            events.add(event);
+                        }
+                    }
+
+                    return Tasks.forResult(events);
+                });
     }
 
+    public Task<List<Event>> fetchEventsByOrganizerId(String uid) {
+        return eventsRef
+                .whereEqualTo("organizerId", uid)
+                .get()
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        return Tasks.forResult(new ArrayList<>());
+                    }
+
+                    List<Event> events = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : task.getResult().getDocuments()) {
+                        Event event = doc.toObject(Event.class);
+
+                        if (event != null) {
+                            event.setEventId(doc.getId());
+                            events.add(event);
+                        }
+                    }
+
+                    return Tasks.forResult(events);
+        });
+    }
 }
