@@ -1,0 +1,291 @@
+@startuml
+
+package "View Layer" {
+  package "Activities" {
+    class MainActivity {
+      - binding: ActivityMainBinding
+      - eventRepo: EventRepository
+      - qrScanLauncher: ActivityResultLauncher
+      - navController: NavController
+      + onCreate()
+      + onOptionsItemSelected()
+      + openEventDetailsWithQrCode()
+    }
+
+    class QrScanActivity {
+      - previewView: PreviewView
+      - cameraExecutor: ExecutorService
+      - scanned: boolean
+      + onCreate()
+      + startCamera()
+      + processBarcodes()
+    }
+  }
+
+  package "Fragments" {
+    class MyEventsFragment {
+      + onCreateView()
+    }
+
+    class EventDetailsFragment {
+      - viewModel: EventDetailsViewModel
+      - currentEvent: Event
+      - UI elements
+      + newInstance()
+      + onCreateView()
+      - setupRecyclerViews()
+      - loadEventData()
+      - observeData()
+    }
+  }
+
+  package "Adapters" {
+    class EventAdapter {
+      - items: List<Event>
+      - onEventClickListener
+      + submitList()
+      + bind()
+    }
+
+    class EntrantAdapter {
+      - entrants: List<Profile>
+      - listType: ListType
+      + updateData()
+      + bind()
+    }
+
+    class NotificationsAdapter {
+      - items: List<AppNotification>
+      + submit()
+    }
+  }
+}
+
+package "ViewModel Layer" {
+  class EventDetailsViewModel {
+    - eventRepository: EventRepository
+    - profileRepository: ProfileRepository
+    - event: MutableLiveData<Event>
+    - waitingList: MutableLiveData<List<Profile>>
+    - invitedList: MutableLiveData<List<Profile>>
+    - enrolledList: MutableLiveData<List<Profile>>
+    + getEvent()
+    + setEvent()
+    + loadEventEntrants()
+    + removeFromInvitedList()
+    + getWaitingList()
+    + getInvitedList()
+    + getEnrolledList()
+  }
+
+  class NotificationsViewModel {
+    - repo: NotificationRepository
+    - inbox: MutableLiveData<List<AppNotification>>
+    - error: MutableLiveData<String>
+    + getInbox()
+    + start()
+    + stop()
+  }
+
+  class SendNotificationViewModel {
+    - sender: NotificationSender
+    - sending: MutableLiveData<Boolean>
+    - error: MutableLiveData<String>
+    - success: MutableLiveData<Boolean>
+    + parseUids()
+    + send()
+  }
+
+  class CreateEventViewModel {
+    - event: MutableLiveData<Event>
+    - imageUri: MutableLiveData<Uri>
+    - validationError: MutableLiveData<String>
+    - eventsRepository: EventRepository
+    + getEvent()
+    + setImageUri()
+    + submit()
+    - uploadImage()
+  }
+}
+
+package "Controller Layer" {
+  class WaitlistController {
+    - db: FirebaseFirestore
+    - repository: WaitlistEntryRepository
+    - event: Event
+    + signup()
+    + leaveWaitlist()
+    + acceptInvite()
+    - doAcceptInTransaction()
+  }
+
+  class ProfileController {
+    - authManager: AuthManager
+    - profileRepository: ProfileRepository
+    - fragmentManager: FragmentManager
+    + loadInitialProfile()
+    + loadProfile()
+    + uploadProfile()
+    + showProfileView()
+    + showCreateProfile()
+  }
+}
+
+package "Repository Layer" {
+  class EventRepository {
+    - db: FirebaseFirestore
+    - eventsRef: CollectionReference
+    + addEvent()
+    + updateEvent()
+    + deleteEvent()
+    + getEventById()
+    + fetchAllEvents()
+    + fetchEventsByOrganizerId()
+  }
+
+  class NotificationRepository {
+    - db: FirebaseFirestore
+    + listenToUserInbox()
+    + sendToUser()
+  }
+
+  class ProfileRepository {
+    - db: FirebaseFirestore
+    - profilesRef: CollectionReference
+    + addProfile()
+    + updateProfile()
+    + deleteProfile()
+    + getProfileById()
+  }
+
+  class NotificationSender {
+    - db: FirebaseFirestore
+    + send()
+    + sendChosenWin()
+    + sendNotChosen()
+    - sendToUids()
+    - extractUids()
+  }
+
+  class WaitlistEntryRepository {
+    - db: FirebaseFirestore
+    + addToWaitlist()
+    + updateWaitlist()
+    + removeFromWaitlist()
+  }
+}
+
+package "Service Layer" {
+  class AuthManager {
+    - auth: FirebaseAuth
+    + ensureSignedIn()
+    + getUserId()
+  }
+
+  class DateUtils {
+    + formatDateRange()
+    + formatTimeRange()
+    + formatDateTime()
+  }
+
+  class QrUtils {
+    // QR utility methods
+  }
+
+  class StorageManager {
+    + uploadImage()
+    + deleteImage()
+  }
+}
+
+package "Application" {
+  class MainApplication {
+    - authManager: AuthManager
+    + onCreate()
+    + getAuthManager()
+  }
+}
+
+package "Entities" <<Database>> {
+  class Event {
+    - eventId: String
+    - title: String
+    - description: String
+    - location: String
+    - capacity: int
+    - organizerId: String
+    - eventStartDate: Date
+    - eventEndDate: Date
+    - registrationCloses: Date
+    + getters/setters
+  }
+
+  class Profile {
+    - uid: String
+    - fullName: String
+    + getters/setters
+  }
+
+  class AppNotification {
+    - eventId: String
+    - senderId: String
+    - title: String
+    - message: String
+    - type: String
+    - createdAt: Date
+    - read: boolean
+    + getters/setters
+  }
+
+  class WaitlistEntry {
+    - profile: Profile
+    - status: String
+    - joinedAt: Date
+    + getters/setters
+  }
+}
+
+' Main Relationships
+MainActivity --> EventDetailsViewModel
+MainActivity --> NotificationsViewModel
+MainActivity --> CreateEventViewModel
+QrScanActivity --> EventDetailsViewModel
+
+EventDetailsFragment --> EventDetailsViewModel
+MyEventsFragment --> EventAdapter
+
+EventDetailsViewModel --> WaitlistController
+EventDetailsViewModel --> EventRepository
+EventDetailsViewModel --> ProfileRepository
+
+NotificationsViewModel --> NotificationRepository
+SendNotificationViewModel --> NotificationSender
+CreateEventViewModel --> EventRepository
+CreateEventViewModel --> StorageManager
+
+WaitlistController --> WaitlistEntryRepository
+WaitlistController --> EventRepository
+ProfileController --> ProfileRepository
+ProfileController --> AuthManager
+
+EventRepository --> AuthManager
+ProfileRepository --> AuthManager
+
+NotificationSender --> NotificationRepository
+
+MainActivity --o EventAdapter
+MainActivity --o NotificationsAdapter
+EventDetailsFragment --o EntrantAdapter
+
+QrScanActivity ..> QrUtils
+CreateEventViewModel ..> DateUtils
+
+MainApplication --* AuthManager
+
+' Entity relationships
+EventRepository ..> Event
+ProfileRepository ..> Profile
+NotificationRepository ..> AppNotification
+WaitlistEntryRepository ..> WaitlistEntry
+
+@enduml
