@@ -1,17 +1,20 @@
 package com.static1.fishylottery.model.entities;
 
 import java.util.Date;
+import java.util.List;
 
 public class Event {
     private String eventId;
     private String title;
     private String description;
+    private String eventType;
+    private List<String> interests;
     private String location;
     private String hostedBy;
     private String status;
     private Integer capacity;
     private Integer maxWaitlistSize = null;
-    private Profile organizer;
+    private String organizerId;
     private String imageUrl;
     private Date eventStartDate;
     private Date eventEndDate;
@@ -78,12 +81,12 @@ public class Event {
         this.maxWaitlistSize = maxWaitlistSize;
     }
 
-    public Profile getOrganizer() {
-        return organizer;
+    public String getOrganizerId() {
+        return organizerId;
     }
 
-    public void setOrganizer(Profile organizer) {
-        this.organizer = organizer;
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
     }
 
     public String getImageUrl() {
@@ -148,5 +151,21 @@ public class Event {
 
     public void setHostedBy(String hostedBy) {
         this.hostedBy = hostedBy;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public List<String> getInterests() {
+        return interests;
+    }
+
+    public void setInterests(List<String> interests) {
+        this.interests = interests;
     }
 }
