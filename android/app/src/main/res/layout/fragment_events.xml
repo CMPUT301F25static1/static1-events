@@ -7,7 +7,7 @@
     android:paddingTop="20dp"
     >
 
-    <!-- The tabs -->
+
 
     <!-- The container for sub-tab fragments -->
     <com.google.android.material.tabs.TabLayout
