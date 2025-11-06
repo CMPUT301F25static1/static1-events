@@ -5,6 +5,11 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_profile">
 
+    <action
+        android:id="@+id/action_mainActivity_to_eventDetails"
+        app:destination="@id/navigation_event_details"
+        />
+
     <fragment
         android:id="@+id/navigation_events"
         android:name="com.static1.fishylottery.view.events.EventsFragment"

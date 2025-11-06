@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -106,6 +107,7 @@ public class QrScanActivity extends AppCompatActivity {
             if (value != null && !value.isEmpty()) {
                 scanned = true;
                 runOnUiThread(() -> {
+                    Log.d("QrScanner", "Scanned QR code: " + value);
                     getIntent().putExtra("qrResult", value);
                     setResult(Activity.RESULT_OK, getIntent());
                     finish();
