@@ -30,6 +30,7 @@ public class HostedEventDetailsFragment extends Fragment {
         Button buttonViewMap = view.findViewById(R.id.button_view_map);
         Button buttonExportEnrolled = view.findViewById(R.id.button_export_enrolled);
         Button buttonSendNotifications = view.findViewById(R.id.button_send_notifications);
+        Button buttonViewQrCode = view.findViewById(R.id.button_view_qr_code);
         TextView textEventTitle = view.findViewById(R.id.text_event_details_event_title);
 
         textEventTitle.setText(event.getTitle());
@@ -48,6 +49,12 @@ public class HostedEventDetailsFragment extends Fragment {
 
         buttonExportEnrolled.setOnClickListener(v -> {
             // TODO: Export the CSV of enrolled
+        });
+
+        buttonViewQrCode.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(view).navigate(R.id.action_hostedEventDetails_to_viewQrCode, bundle);
         });
 
         buttonViewMap.setOnClickListener(v -> {
