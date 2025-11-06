@@ -36,7 +36,7 @@ public class CreateEventPreviewFragment extends Fragment {
 
         vm = new ViewModelProvider(requireActivity()).get(CreateEventControllerViewModel.class);
 
-        // Optional preview summary: look up IDs dynamically so XML can omit them
+        // optional preview summary. look up IDs dynamically so XML can omit them
         int idTitle = getResources().getIdentifier("text_preview_title", "id", requireContext().getPackageName());
         int idLoc   = getResources().getIdentifier("text_preview_location", "id", requireContext().getPackageName());
         int idWin   = getResources().getIdentifier("text_preview_window", "id", requireContext().getPackageName());

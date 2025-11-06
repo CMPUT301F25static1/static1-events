@@ -72,4 +72,12 @@
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile"
         />
+
+    <fragment
+        android:id="@+id/navigation_event_details"
+        android:name="com.static1.fishylottery.view.events.EventDetailsFragment"
+        android:label="Event Details"
+        tools:layout="@layout/fragment_event_details">
+    </fragment>
+
 </navigation>

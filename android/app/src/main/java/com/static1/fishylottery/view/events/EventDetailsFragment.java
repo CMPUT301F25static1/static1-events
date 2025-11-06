@@ -10,73 +10,113 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.EventDetailsViewModel;
 import com.static1.fishylottery.model.entities.Event;
+import com.static1.fishylottery.model.repositories.WaitlistRepository;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+
+/** Shows one event and lets an entrant join the waitlist. */
 public class EventDetailsFragment extends Fragment {
-    public static final String ARG_EVENT = "arg_event";
 
-    private EventDetailsViewModel vm;
+    public static final String ARG_EVENT = "event";
 
-    @Nullable @Override
+    private final SimpleDateFormat df =
+            new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
+
+    private TextView tvTitle, tvDesc, tvWhere, tvWhen;
+    private Button btnJoin;
+
+    private final WaitlistRepository waitlists = new WaitlistRepository();
+    private Event event;
+
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_event_details, container, false);
 
-        vm = new ViewModelProvider(this).get(EventDetailsViewModel.class);
+        tvTitle = v.findViewById(R.id.text_title);
+        tvDesc  = v.findViewById(R.id.text_desc);
+        tvWhere = v.findViewById(R.id.text_where);
+        tvWhen  = v.findViewById(R.id.text_when);
+        btnJoin = v.findViewById(R.id.button_join_waitlist);
 
-        // Receive the Event passed via Bundle
+        // Receive event from args
         Bundle args = getArguments();
         if (args != null) {
             Object obj = args.getSerializable(ARG_EVENT);
-            if (obj instanceof Event) vm.setEvent((Event) obj);
+            if (obj instanceof Event) {
+                event = (Event) obj;
+            }
         }
 
-        TextView tvTitle = v.findViewById(R.id.text_title);
-        TextView tvDesc  = v.findViewById(R.id.text_desc);
-        TextView tvWhere = v.findViewById(R.id.text_where);
-        TextView tvWhen  = v.findViewById(R.id.text_when);
-        Button   btnJoin = v.findViewById(R.id.button_join_waitlist);
-
-        SimpleDateFormat df = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
-
-        vm.getEvent().observe(getViewLifecycleOwner(), e -> {
-            if (e == null) return;
-            tvTitle.setText(e.getTitle());
-            tvDesc.setText(e.getDescription());
-            tvWhere.setText(e.getLocation());
-            String window = "";
-            if (e.getEventStartDate() != null) window += df.format(e.getEventStartDate());
-            if (e.getEventEndDate() != null)   window += " – " + df.format(e.getEventEndDate());
-            tvWhen.setText(window);
-
-            btnJoin.setEnabled(vm.canJoinNow());
-        });
-
-        vm.getError().observe(getViewLifecycleOwner(),
-                msg -> { if (msg != null) Snackbar.make(v, msg, Snackbar.LENGTH_LONG).show(); });
-
-        btnJoin.setOnClickListener(click -> {
-            // TODO replace with your real profile id; for now we use a stable placeholder
-            String profileId = "demo-profile";  // e.g., FirebaseAuth.getInstance().getUid()
-            var task = vm.joinWaitlist(profileId);
-            if (task != null) {
-                task.addOnSuccessListener(unused ->
-                        Snackbar.make(v, "Joined waitlist!", Snackbar.LENGTH_LONG).show()
-                ).addOnFailureListener(err ->
-                        Snackbar.make(v, "Failed: " + err.getMessage(), Snackbar.LENGTH_LONG).show()
-                );
-            }
-        });
+        bindUi();
+        btnJoin.setOnClickListener(this::joinWaitlist);
 
         return v;
     }
+
+    private void bindUi() {
+        if (event == null) {
+            btnJoin.setEnabled(false);
+            return;
+        }
+        tvTitle.setText(nullTo(event.getTitle(), "(untitled)"));
+        tvDesc.setText(nullTo(event.getDescription(), "—"));
+        tvWhere.setText(nullTo(event.getLocation(), "—"));
+        tvWhen.setText(formatWindow(
+                event.getEventStartDate(),
+                event.getEventEndDate(),
+                event.getRegistrationCloses()));
+
+        // Enable only if registration deadline is in the future (or not set)
+        Date deadline = event.getRegistrationCloses();
+        boolean canJoin = (deadline == null) || deadline.after(new Date());
+        btnJoin.setEnabled(canJoin);
+        if (!canJoin) btnJoin.setText("Registration closed");
+    }
+
+    private void joinWaitlist(View anchor) {
+        if (event == null || event.getEventId() == null) {
+            Snackbar.make(anchor, "Missing event id.", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                : null;
+        if (uid == null) {
+            Snackbar.make(anchor, "Please sign in first.", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        btnJoin.setEnabled(false);
+        waitlists.joinWaitlist(event.getEventId(), uid)   // <-- fix: correct repo method
+                .addOnSuccessListener(unused ->
+                        Snackbar.make(anchor, "Joined waitlist!", Snackbar.LENGTH_LONG).show())
+                .addOnFailureListener(e -> {
+                    btnJoin.setEnabled(true);
+                    Snackbar.make(anchor, "Failed: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                });
+    }
+
+    private String formatWindow(Date start, Date end, Date regClose) {
+        String s = (start == null) ? "—" : df.format(start);
+        String e = (end   == null) ? "—" : df.format(end);
+        String r = (regClose == null) ? "—" : df.format(regClose);
+        return "Start: " + s + "\nEnd: " + e + "\nRegistration closes: " + r;
+    }
+
+    private static String nullTo(String s, String fallback) {
+        return s == null ? fallback : s;
+    }
 }
+
 
