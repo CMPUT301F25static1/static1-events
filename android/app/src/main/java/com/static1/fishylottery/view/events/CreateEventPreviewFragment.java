@@ -5,53 +5,49 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.CreateEventControllerViewModel;
-import com.static1.fishylottery.model.entities.Event;
+import com.static1.fishylottery.viewmodel.CreateEventViewModel;
+import com.static1.fishylottery.services.DateUtils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
+/**
+ * Fragment view for showing the preview step of the event creation process for organizers.
+ */
 public class CreateEventPreviewFragment extends Fragment {
 
-    private CreateEventControllerViewModel vm;
-    private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yy  h:mm a", Locale.getDefault());
+    CreateEventViewModel vm;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        vm = new ViewModelProvider(requireActivity()).get(CreateEventViewModel.class);
 
         View view = inflater.inflate(R.layout.fragment_create_event_preview, container, false);
 
-        vm = new ViewModelProvider(requireActivity()).get(CreateEventControllerViewModel.class);
+        TextView textEventTitle = view.findViewById(R.id.text_event_title);
+        TextView textEventDescription = view.findViewById(R.id.text_event_description);
+        TextView textEventDate = view.findViewById(R.id.text_event_date);
+        TextView textEventTime = view.findViewById(R.id.text_event_time);
+        TextView textEventLocation = view.findViewById(R.id.text_event_location);
+        TextView textRegistrationCloses = view.findViewById(R.id.text_event_registration);
+        TextView textHostedBy = view.findViewById(R.id.text_hosted_by);
+        TextView textMaxAttendees = view.findViewById(R.id.text_max_attendees);
+        TextView textMaxWaitlistSize = view.findViewById(R.id.text_max_waitlist);
 
-        // Optional preview summary: look up IDs dynamically so XML can omit them
-        int idTitle = getResources().getIdentifier("text_preview_title", "id", requireContext().getPackageName());
-        int idLoc   = getResources().getIdentifier("text_preview_location", "id", requireContext().getPackageName());
-        int idWin   = getResources().getIdentifier("text_preview_window", "id", requireContext().getPackageName());
+        ImageView eventPosterImage = view.findViewById(R.id.image_event_poster);
 
-        final TextView tvTitle    = idTitle != 0 ? view.findViewById(idTitle) : null;
-        final TextView tvLocation = idLoc   != 0 ? view.findViewById(idLoc)   : null;
-        final TextView tvWindow   = idWin   != 0 ? view.findViewById(idWin)   : null;
-
-        vm.getEvent().observe(getViewLifecycleOwner(), e -> {
-            if (e == null) return;
-            if (tvTitle != null)    tvTitle.setText(e.getTitle());
-            if (tvLocation != null) tvLocation.setText(e.getLocation());
-            if (tvWindow != null)   tvWindow.setText(formatWindow(
-                    e.getEventStartDate(), e.getEventEndDate(), e.getRegistrationCloses()));
-        });
+        Button button = view.findViewById(R.id.button_create_event);
 
         // Show validation errors emitted by the ViewModel
         vm.getValidationError().observe(getViewLifecycleOwner(), msg -> {
@@ -74,13 +70,24 @@ public class CreateEventPreviewFragment extends Fragment {
             });
         }
 
-        return view;
-    }
+        vm.getEvent().observe(getViewLifecycleOwner(), event -> {
+            textEventTitle.setText(event.getTitle());
+            textEventDescription.setText(event.getDescription());
+            textEventDate.setText(DateUtils.formatDateRange(event.getEventStartDate(), event.getEventEndDate()));
+            textEventTime.setText(DateUtils.formatTimeRange(event.getEventStartDate(), event.getEventEndDate()));
+            textEventLocation.setText(event.getLocation());
+            textHostedBy.setText(event.getHostedBy());
+            textRegistrationCloses.setText(DateUtils.formatDateTime(event.getRegistrationCloses()));
 
-    private String formatWindow(Date start, Date end, Date regClose) {
-        String s = (start == null ? "-" : df.format(start));
-        String e = (end   == null ? "-" : df.format(end));
-        String r = (regClose == null ? "-" : df.format(regClose));
-        return "Start: " + s + "\nEnd: " + e + "\nRegistration closes: " + r;
+            String maxAttendees = "Max Attendees: " + (event.getCapacity() != null ? event.getCapacity().toString() : "None");
+            String maxWaitlistSize = "Max Waitlist: " + (event.getMaxWaitlistSize() != null ? event.getMaxWaitlistSize().toString() : "None");
+
+            textMaxAttendees.setText(maxAttendees);
+            textMaxWaitlistSize.setText(maxWaitlistSize);
+        });
+
+        vm.getImageUri().observe(getViewLifecycleOwner(), eventPosterImage::setImageURI);
+
+        return view;
     }
 }

@@ -5,9 +5,13 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.format.DateFormat;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,13 +22,18 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.CreateEventControllerViewModel;
+import com.static1.fishylottery.viewmodel.CreateEventViewModel;
 import com.static1.fishylottery.model.entities.Event;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class CreateEventDetailsFragment extends Fragment {
@@ -33,31 +42,58 @@ public class CreateEventDetailsFragment extends Fragment {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
 
-    // Text inputs
+
     private EditText
             textInputTitle,
             textInputDescription,
             textInputLocation,
-            textInputHost;
+            textInputHost,
+            textInputWaitlistMaximum,
+            textInputCapacity,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    deadlineDate,
+    deadlineTime;
 
-    // Date/time inputs (as EditTexts that show pickers)
-    private EditText
-            startDate, startTime,
-            endDate, endTime,
-            deadlineDate, deadlineTime;
+    private AutoCompleteTextView eventTypeDropdown, eventInterestsDropdown;
+    private CreateEventViewModel vm;
 
-    private CreateEventControllerViewModel vm;
+    private boolean[] selectedInterests;
+    private List<String> selectedItems = new ArrayList<>();
+    List<String> interests = Arrays.asList(
+            "Music",
+            "Sports",
+            "Art",
+            "Technology",
+            "Travel",
+            "Food",
+            "Fitness",
+            "Education",
+            "Nature",
+            "Movies",
+            "Reading",
+            "Gaming",
+            "Science",
+            "Health",
+            "Fashion",
+            "Photography",
+            "Volunteering",
+            "Business",
+            "Culture",
+            "Socializing"
+    );
 
-    @Nullable
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
 
         View view = inflater.inflate(R.layout.fragment_create_event_details, container, false);
 
-        vm = new ViewModelProvider(requireActivity())
-                .get(CreateEventControllerViewModel.class);
+        vm = new ViewModelProvider(requireActivity()).get(CreateEventViewModel.class);
 
         // Observe validation errors from the ViewModel and surface as a Toast
         vm.getValidationError().observe(getViewLifecycleOwner(), msg -> {
@@ -72,8 +108,59 @@ public class CreateEventDetailsFragment extends Fragment {
         // Basic text fields
         textInputTitle       = view.findViewById(R.id.input_event_title);
         textInputDescription = view.findViewById(R.id.input_event_description);
-        textInputLocation    = view.findViewById(R.id.input_location);
-        textInputHost        = view.findViewById(R.id.input_hosted_by);
+        textInputLocation = view.findViewById(R.id.input_location);
+        textInputHost = view.findViewById(R.id.input_hosted_by);
+        textInputCapacity = view.findViewById(R.id.input_capacity);
+        textInputWaitlistMaximum = view.findViewById(R.id.input_waitlist_max);
+
+        eventTypeDropdown = view.findViewById(R.id.dropdown_event_type);
+        eventInterestsDropdown = view.findViewById(R.id.dropdown_interests);
+
+        String[] eventTypes = {
+                "Music",
+                "Sports",
+                "Education",
+                "Workshop",
+                "Networking",
+                "Conference",
+                "Festival",
+                "Fundraiser",
+                "Social Gathering",
+                "Other"
+        };
+
+
+
+        ArrayAdapter<String> eventTypeAdapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                eventTypes
+        );
+
+        selectedInterests = new boolean[interests.size()];
+
+        eventInterestsDropdown.setOnClickListener(v -> {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+            builder.setTitle("Select Interests");
+            builder.setMultiChoiceItems(
+                    interests.toArray(new String[0]),
+                    selectedInterests,
+                    (dialog, which, isChecked) -> {
+                        if (isChecked) {
+                            selectedItems.add(interests.get(which));
+                        } else {
+                            selectedItems.remove(interests.get(which));
+                        }
+                    });
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                eventInterestsDropdown.setText(TextUtils.join(", ", selectedItems));
+            });
+            builder.setNegativeButton("Cancel", null);
+            builder.show();
+        });
+
+        eventTypeDropdown.setAdapter(eventTypeAdapter);
+        eventTypeDropdown.setOnClickListener(v -> eventTypeDropdown.showDropDown());
+        eventTypeDropdown.setText(eventTypes[0], false);
 
         // Date/time fields
         startDate    = view.findViewById(R.id.input_start_date);
@@ -91,7 +178,7 @@ public class CreateEventDetailsFragment extends Fragment {
         setupPickerField(deadlineDate);
         setupPickerField(deadlineTime);
 
-        // Picker click listeners
+        // click listeners
         startDate.setOnClickListener(v -> showDatePicker(startDate));
         endDate.setOnClickListener(v -> showDatePicker(endDate));
         deadlineDate.setOnClickListener(v -> showDatePicker(deadlineDate));
@@ -102,10 +189,7 @@ public class CreateEventDetailsFragment extends Fragment {
 
         nextButton.setOnClickListener(v -> {
             updateDetails();
-            if (vm.submit()) {
-                Navigation.findNavController(v)
-                        .navigate(R.id.action_eventDetails_to_eventPoster);
-            }
+            Navigation.findNavController(view).navigate(R.id.action_eventDetails_to_eventPoster);
         });
 
         return view;
@@ -114,30 +198,33 @@ public class CreateEventDetailsFragment extends Fragment {
     /** Copies all UI values into the Event stored in the ViewModel. */
     private void updateDetails() {
         Event event = vm.getEvent().getValue();
+
         if (event == null) return;
 
-        // Basic text
-        event.setTitle(String.valueOf(textInputTitle.getText()));
-        event.setDescription(String.valueOf(textInputDescription.getText()));
-        event.setLocation(String.valueOf(textInputLocation.getText()));
-        event.setHostedBy(String.valueOf(textInputHost.getText()));
+        // Set the new values for the event object
+        event.setTitle(textInputTitle.getText().toString());
+        event.setDescription(textInputDescription.getText().toString());
+        event.setLocation(textInputLocation.getText().toString());
+        event.setHostedBy(textInputHost.getText().toString());
+        event.setEventType(eventTypeDropdown.getText().toString());
+        event.setInterests(selectedItems);
+        event.setCapacity(safeParse(textInputCapacity.getText().toString()));
+        event.setMaxWaitlistSize(safeParse(textInputWaitlistMaximum.getText().toString()));
 
-        // Date+time pairs
-        Date start = combineDateTime(startDate, startTime);
-        Date end   = combineDateTime(endDate, endTime);
-        Date regCloses = combineDateTime(deadlineDate, deadlineTime);
-
-        event.setEventStartDate(start);
-        event.setEventEndDate(end);
-        event.setRegistrationCloses(regCloses);
-
-        // audit timestamps
-        Date now = new Date();
-        if (event.getCreatedAt() == null) {
-            event.setCreatedAt(now);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm a");
+        try {
+            // Set these values for the event
+            String eventStartDateString = startDate.getText().toString() + " " + startTime.getText().toString();
+            String eventEndDateString = endDate.getText().toString() + " " + endTime.getText().toString();
+            String eventRegistrationClosesString = deadlineDate.getText().toString() + " " + deadlineTime.getText().toString();
+            event.setEventStartDate(formatter.parse(eventStartDateString));
+            event.setEventEndDate(formatter.parse(eventEndDateString));
+            event.setRegistrationCloses(formatter.parse(eventRegistrationClosesString));
+        } catch (ParseException e) {
+            Log.e("Date", e.toString());
         }
-        event.setUpdatedAt(now);
 
+        // Update the event using the view model
         vm.updateEvent(event);
     }
 
@@ -146,6 +233,7 @@ public class CreateEventDetailsFragment extends Fragment {
         et.setFocusable(false);              // prevent keyboard focus
         et.setClickable(true);               // allow clicks
         et.setInputType(InputType.TYPE_NULL);
+        // optional: give a content description or drawable icon
     }
 
     /** Opens a DatePickerDialog, initializing from current value if present. */
@@ -154,7 +242,7 @@ public class CreateEventDetailsFragment extends Fragment {
 
         // If already set, initialize picker to that date
         try {
-            Date existing = dateFormat.parse(String.valueOf(target.getText()));
+            Date existing = dateFormat.parse(target.getText().toString());
             if (existing != null) c.setTime(existing);
         } catch (Exception ignored) {}
 
@@ -162,63 +250,45 @@ public class CreateEventDetailsFragment extends Fragment {
         int m = c.get(Calendar.MONTH);
         int d = c.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog dp = new DatePickerDialog(
-                requireContext(),
-                (view, year, month, dayOfMonth) -> {
-                    Calendar chosen = Calendar.getInstance();
-                    chosen.set(year, month, dayOfMonth);
-                    target.setText(dateFormat.format(chosen.getTime()));
-                },
-                y, m, d
-        );
+        DatePickerDialog dp = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+            Calendar chosen = Calendar.getInstance();
+            chosen.set(year, month, dayOfMonth);
+            target.setText(dateFormat.format(chosen.getTime()));
+        }, y, m, d);
+
         dp.show();
     }
 
-    /** Opens a TimePickerDialog, initializing from current value if present. */
+    // TimePicker
     private void showTimePicker(final EditText target) {
         final Calendar c = Calendar.getInstance();
 
-        // If already set, initialize picker to that time
+        // initialize from existing value if parseable
         try {
-            Date existing = timeFormat.parse(String.valueOf(target.getText()));
-            if (existing != null) c.setTime(existing);
+            Date existing = timeFormat.parse(target.getText().toString());
+            if (existing != null) {
+                c.setTime(existing);
+            }
         } catch (Exception ignored) {}
 
-        int h = c.get(Calendar.HOUR_OF_DAY);
-        int m = c.get(Calendar.MINUTE);
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
 
-        boolean is24Hour = DateFormat.is24HourFormat(requireContext());
+        boolean is24Hour = android.text.format.DateFormat.is24HourFormat(requireContext());
+        TimePickerDialog tp = new TimePickerDialog(requireContext(), (view, h, m) -> {
+            Calendar chosen = Calendar.getInstance();
+            chosen.set(Calendar.HOUR_OF_DAY, h);
+            chosen.set(Calendar.MINUTE, m);
+            target.setText(timeFormat.format(chosen.getTime()));
+        }, hour, minute, is24Hour);
 
-        TimePickerDialog tp = new TimePickerDialog(
-                requireContext(),
-                (view, hourOfDay, minute) -> {
-                    Calendar chosen = Calendar.getInstance();
-                    chosen.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    chosen.set(Calendar.MINUTE, minute);
-                    target.setText(timeFormat.format(chosen.getTime()));
-                },
-                h, m, is24Hour
-        );
         tp.show();
     }
 
-    /** Combines a date EditText and time EditText to a single Date (or null if unparsable). */
-    @Nullable
-    private Date combineDateTime(EditText dateEt, EditText timeEt) {
+    private Integer safeParse(String s) {
         try {
-            Date d = dateFormat.parse(String.valueOf(dateEt.getText()));
-            Date t = timeFormat.parse(String.valueOf(timeEt.getText()));
-            if (d == null || t == null) return null;
-
-            Calendar cd = Calendar.getInstance(); cd.setTime(d);
-            Calendar ct = Calendar.getInstance(); ct.setTime(t);
-
-            cd.set(Calendar.HOUR_OF_DAY, ct.get(Calendar.HOUR_OF_DAY));
-            cd.set(Calendar.MINUTE,     ct.get(Calendar.MINUTE));
-            cd.set(Calendar.SECOND, 0);
-            cd.set(Calendar.MILLISECOND, 0);
-            return cd.getTime();
-        } catch (Exception ignored) {
+            return Integer.valueOf(s);
+        } catch (NumberFormatException e) {
             return null;
         }
     }

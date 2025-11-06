@@ -1,43 +1,48 @@
-package com.static1.fishylottery.controller;
+package com.static1.fishylottery.viewmodel;
 
-import android.util.Log;
+import android.net.Uri;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.static1.fishylottery.MainApplication;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.services.StorageManager;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
- * ViewModel for creating events and sharing data between the organizer's event screens.
+ * ViewModel for creating the events and sharing data between the organizer's event creation views
  */
-public class CreateEventControllerViewModel extends ViewModel {
-
+public class CreateEventViewModel extends ViewModel {
     private final MutableLiveData<Event> event = new MutableLiveData<>(new Event());
+    private final MutableLiveData<Uri> imageUri = new MutableLiveData<>();
     private final MutableLiveData<String> validationError = new MutableLiveData<>();
+
     private final EventRepository eventsRepository = new EventRepository();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
 
     public LiveData<Event> getEvent() {
         return event;
     }
-
-    public void updateEvent(Event e) {
-        event.setValue(e);
-    }
+    public LiveData<Uri> getImageUri() { return imageUri; }
 
     public LiveData<String> getValidationError() {
         return validationError;
     }
 
-    /**
-     * Validate the event’s registration window and basic required fields.
-     * Returns true if valid; otherwise sets validationError and returns false.
-     */
+    public void updateEvent(Event e) { event.setValue(e); }
+
+    public void setImageUri(Uri uri) { imageUri.setValue(uri); }
+
     public boolean submit() {
         Event e = event.getValue();
+
         if (e == null) {
             validationError.setValue("No event to save.");
             return false;
@@ -80,8 +85,39 @@ public class CreateEventControllerViewModel extends ViewModel {
         // clear any old error
         validationError.setValue(null);
 
-        eventsRepository.addEvent(e);
-        return true;
+        // Set the organizer ID
+        // TODO: Set the profile now
+        e.setOrganizerId(null);
+
+        Date now = new Date();
+        e.setCreatedAt(now);
+        e.setUpdatedAt(now);
+        e.setStatus("Open");
+
+        if (imageUri == null) {
+            // No image, just upload event directly
+            eventsRepository.addEvent(e);
+            return true;
+        }
+
+        uploadImage(imageUri.getValue(), imageUrl -> {
+            if (imageUrl != null) {
+                e.setImageUrl(imageUrl);
+            }
+
+            eventsRepository.addEvent(e);
+        });
+    }
+
+    private void uploadImage(Uri imageUri, OnCompleteListener<String> callback) {
+        StorageManager.uploadImage(imageUri, "images/events")
+                .addOnSuccessListener(callback::onComplete)
+                .addOnFailureListener(e -> callback.onComplete(null));
+    }
+
+    public interface OnCompleteListener<T> {
+        void onComplete(T result);
+        default void onError(Exception e) {}
     }
 
     private boolean isBlank(String s) {
