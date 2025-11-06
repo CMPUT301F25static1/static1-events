@@ -5,6 +5,11 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_profile">
 
+    <action
+        android:id="@+id/action_mainActivity_to_eventDetails"
+        app:destination="@id/navigation_event_details"
+        />
+
     <fragment
         android:id="@+id/navigation_events"
         android:name="com.static1.fishylottery.view.events.EventsFragment"
@@ -104,6 +109,10 @@
             android:id="@+id/action_hostedEventDetails_to_signupMap"
             app:destination="@id/navigation_signup_map"
             />
+
+        <action
+            android:id="@+id/action_hostedEventDetails_to_viewQrCode"
+            app:destination="@id/navigation_view_qr_code"/>
     </fragment>
 
     <fragment
@@ -132,4 +141,10 @@
         android:name="com.static1.fishylottery.view.events.EventDetailsFragment"
         android:label="Event Details"
         tools:layout="@layout/fragment_event_details"/>
+
+    <fragment
+        android:id="@+id/navigation_view_qr_code"
+        android:name="com.static1.fishylottery.view.events.hosted.ViewQrCodeFragment"
+        android:label="Event QR Code"
+        tools:layout="@layout/fragment_view_qr_code"/>
 </navigation>
