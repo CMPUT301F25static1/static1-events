@@ -91,7 +91,7 @@ public class CreateEventViewModel extends ViewModel {
 
         if (user == null) {
             Log.e("CreateEvent", "Firebase user not created");
-            return;
+            return false;
         }
 
         // Set the organizer ID

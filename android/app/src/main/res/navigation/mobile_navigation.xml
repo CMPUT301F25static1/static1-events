@@ -20,6 +20,11 @@
             android:id="@+id/action_hostedEvents_to_hostedEventDetails"
             app:destination="@id/navigation_hosted_event_details"
             />
+
+        <action
+            android:id="@+id/action_events_to_eventDetails"
+            app:destination="@id/navigation_event_details"
+            />
     </fragment>
 
     <fragment
@@ -121,4 +126,10 @@
         android:label="Signup Map"
         tools:layout="@layout/fragment_signup_map"
         />
+
+    <fragment
+        android:id="@+id/navigation_event_details"
+        android:name="com.static1.fishylottery.view.events.EventDetailsFragment"
+        android:label="Event Details"
+        tools:layout="@layout/fragment_event_details"/>
 </navigation>

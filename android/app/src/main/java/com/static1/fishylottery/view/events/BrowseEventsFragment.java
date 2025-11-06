@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,8 +37,9 @@ public class BrowseEventsFragment extends Fragment {
 
         adapter = new EventAdapter(requireContext());
         adapter.setOnEventClickListener(event -> {
-            // open event detail - implement navigation here
-            // e.g., use Navigation component or startActivity with eventId
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(view).navigate(R.id.action_events_to_eventDetails, bundle);
         });
         recyclerView.setAdapter(adapter);
 

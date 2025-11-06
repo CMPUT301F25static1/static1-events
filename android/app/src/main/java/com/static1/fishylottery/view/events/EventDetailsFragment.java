@@ -20,7 +20,8 @@ import com.static1.fishylottery.model.entities.Event;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 public class EventDetailsFragment extends Fragment {
-    public static final String ARG_EVENT = "arg_event";
+    public static final String ARG_EVENT = "event";
+    private Event event;
 
     private EventDetailsViewModel vm;
 
@@ -32,11 +33,11 @@ public class EventDetailsFragment extends Fragment {
 
         vm = new ViewModelProvider(this).get(EventDetailsViewModel.class);
 
-        // Receive the Event passed via Bundle
-        Bundle args = getArguments();
-        if (args != null) {
-            Object obj = args.getSerializable(ARG_EVENT);
-            if (obj instanceof Event) vm.setEvent((Event) obj);
+        if (getArguments() != null) {
+            event = (Event) getArguments().getSerializable(ARG_EVENT);
+            if (event != null) {
+                vm.setEvent(event);
+            }
         }
 
         TextView tvTitle = v.findViewById(R.id.text_title);
