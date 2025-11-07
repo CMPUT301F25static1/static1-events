@@ -22,8 +22,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Filter by interests"
+                android:textStyle="bold"
                 android:textSize="16sp"
-                android:textColor="#757575"
+                android:textColor="@color/grey"
                 android:layout_marginBottom="8dp" />
 
             <LinearLayout
@@ -61,8 +62,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Filter by availability"
+                android:textStyle="bold"
                 android:textSize="16sp"
-                android:textColor="#757575"
+                android:textColor="@color/grey"
                 android:layout_marginBottom="8dp" />
 
             <LinearLayout
