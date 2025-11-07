@@ -112,7 +112,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:scrollbars="vertical"
-            android:nestedScrollingEnabled="false"/>
+            android:nestedScrollingEnabled="true"/>
 
     </LinearLayout>
 
