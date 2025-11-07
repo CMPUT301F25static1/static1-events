@@ -1,4 +1,4 @@
-package com.static1.fishylottery.controller;
+package com.static1.fishylottery.viewmodel;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -15,6 +15,10 @@ import com.static1.fishylottery.model.repositories.NotificationRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Notifications view model which manages that data that is passed to and from the view.
+ * Contains methods to listen to the notification inbox and show the content in a live list.
+ */
 public class NotificationsViewModel extends ViewModel {
 
     private final NotificationRepository repo = new NotificationRepository();
@@ -25,7 +29,9 @@ public class NotificationsViewModel extends ViewModel {
         return inbox;
     }
 
-    /** Called by NotificationsFragment.onStart() */
+    /**
+     * Called by NotificationsFragment.onStart()
+     */
     public void start(@NonNull String uid) {
         stop();
 
@@ -48,7 +54,9 @@ public class NotificationsViewModel extends ViewModel {
         });
     }
 
-    /** Called by NotificationsFragment.onStop() */
+    /**
+     * Called by NotificationsFragment.onStop()
+     */
     public void stop() {
         if (reg != null) {
             reg.remove();
@@ -56,6 +64,14 @@ public class NotificationsViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Responds to a notification by passing the notification ID and whether or not the user
+     * accepted or declines the event.
+     *
+     * @param uid The uid of the profile that received the notification.
+     * @param notifId The unique notification ID in Firebase.
+     * @param accept True is accepted, false is declined.
+     */
     public void respondToInvitation(String uid, String notifId, boolean accept) {
         repo.respondToInvitation(uid, notifId, accept);
     }

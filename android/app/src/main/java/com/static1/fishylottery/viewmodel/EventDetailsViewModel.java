@@ -1,4 +1,4 @@
-package com.static1.fishylottery.controller;
+package com.static1.fishylottery.viewmodel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

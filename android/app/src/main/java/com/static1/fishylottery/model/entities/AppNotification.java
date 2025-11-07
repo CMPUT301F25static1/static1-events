@@ -3,11 +3,16 @@ package com.static1.fishylottery.model.entities;
 import com.google.firebase.firestore.ServerTimestamp;
 import java.util.Date;
 
+/**
+ * Represents a notification that can be sent to a user containing important information about
+ * an event with a customer title, message, a type, status, and way of handling the response
+ * (if applicable).
+ */
 public class AppNotification {
 
     private String id;        // Firestore doc id (filled client-side)
-    private String eventId;   // optional
-    private String senderId;  // optional
+    private String eventId;
+    private String senderId;
     private String title;
     private String message;
     private String type;      // e.g., "info" or "invitation"
@@ -17,10 +22,8 @@ public class AppNotification {
     @ServerTimestamp
     private Date createdAt;
 
-    /** REQUIRED empty constructor for Firestore */
-    public AppNotification() { }
+    public AppNotification() { } // required for Firestore
 
-    /** ✅ FULL CONSTRUCTOR — this fixes your error */
     public AppNotification(String eventId,
                            String senderId,
                            String title,

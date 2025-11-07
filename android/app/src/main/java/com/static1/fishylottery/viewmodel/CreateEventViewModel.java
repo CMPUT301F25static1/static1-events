@@ -30,19 +30,51 @@ public class CreateEventViewModel extends ViewModel {
     private final EventRepository eventsRepository = new EventRepository();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
 
+    /**
+     * Live data showing the event object.
+     *
+     * @return Live data event object.
+     */
     public LiveData<Event> getEvent() {
         return event;
     }
+
+    /**
+     * Live data showing the imageURI so that the image can be previewed when updated.
+     *
+     * @return The image URI
+     */
     public LiveData<Uri> getImageUri() { return imageUri; }
 
+    /**
+     * Live data showing a message for a validation error (if any)
+     *
+     * @return Live data string.
+     */
     public LiveData<String> getValidationError() {
         return validationError;
     }
 
+    /**
+     * Updates the event if it has changed which is used with the form in create events details.
+     *
+     * @param e The event to update.
+     */
     public void updateEvent(Event e) { event.setValue(e); }
 
+    /**
+     * Set the imageUri live data to the current imageUri.
+     *
+     * @param uri The image URI
+     */
     public void setImageUri(Uri uri) { imageUri.setValue(uri); }
 
+    /**
+     * Submits the data that is updated in the Event object to Firebase while also performing
+     * validation to ensure inputs are correct.
+     *
+     * @return boolean indicated success or failure.
+     */
     public boolean submit() {
         Event e = event.getValue();
 
@@ -119,15 +151,21 @@ public class CreateEventViewModel extends ViewModel {
         return true;
     }
 
+
+    /**
+     * Completion listener when the processes is finished.
+     *
+     * @param <T> The type of the returned value upon completion.
+     */
+    public interface OnCompleteListener<T> {
+        void onComplete(T result);
+        default void onError(Exception e) {}
+    }
+
     private void uploadImage(Uri imageUri, OnCompleteListener<String> callback) {
         StorageManager.uploadImage(imageUri, "images/events")
                 .addOnSuccessListener(callback::onComplete)
                 .addOnFailureListener(e -> callback.onComplete(null));
-    }
-
-    public interface OnCompleteListener<T> {
-        void onComplete(T result);
-        default void onError(Exception e) {}
     }
 
     private boolean isBlank(String s) {

@@ -13,8 +13,12 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.static1.fishylottery.model.entities.AppNotification;
 
+/**
+ * The notification wrapper repository responsible for uploading, fetching, and removing notification
+ * objects from the Firebase. This maps the Firebase objects to Java objects so they can be used
+ * in other contexts and data structures.
+ */
 public class NotificationRepository {
-
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /** Shortcut to user notifications collection */
@@ -24,9 +28,13 @@ public class NotificationRepository {
                 .collection("notifications");
     }
 
-    // ----------------------------------------------------------------------
-    // ✅ LISTEN REAL-TIME FOR INBOX (used by NotificationsViewModel)
-    // ----------------------------------------------------------------------
+    /**
+     * Listens for real-time input from a user's inbox given their uid.
+     *
+     * @param uid The UID/profileId of the user.
+     * @param listener A listener callback to trigger when there is an update.
+     * @return The snapshot listener.
+     */
     public ListenerRegistration listenToInbox(
             @NonNull String uid,
             @NonNull EventListener<QuerySnapshot> listener
@@ -36,17 +44,23 @@ public class NotificationRepository {
                 .addSnapshotListener(listener);
     }
 
-    // ----------------------------------------------------------------------
-    // ✅ ADD NOTIFICATION
-    // ----------------------------------------------------------------------
+    /**
+     * Adds a new notification to the repository
+     * @param uid The profile ID of the user to send the notification to.
+     * @param notif The notification object.
+     * @return A document reference to the newly created notification.
+     */
     public Task<DocumentReference> addNotification(@NonNull String uid,
                                                    @NonNull AppNotification notif) {
         return col(uid).add(notif);
     }
 
-    // ----------------------------------------------------------------------
-    // ✅ MARK AS READ
-    // ----------------------------------------------------------------------
+    /**
+     * Marks the notification as read in the Firebase.
+     * @param uid The uid of the profile
+     * @param notifId The notification ID for the document.
+     * @return A task indicating success or failure of the action.
+     */
     public Task<Void> markRead(@NonNull String uid,
                                @NonNull String notifId) {
 
@@ -55,9 +69,14 @@ public class NotificationRepository {
                 .update("read", true);
     }
 
-    // ----------------------------------------------------------------------
-    // ✅ RESPOND TO INVITATION
-    // ----------------------------------------------------------------------
+    /**
+     * Records the response of an invitation type notification.
+     *
+     * @param uid The UID of the profile who is receiving the notification.
+     * @param notifId The notification ID of the Firestore document.
+     * @param accept A boolean indicating if they accept or decline in tbe invite.
+     * @return A task indicating success or failure.
+     */
     public Task<Void> respondToInvitation(@NonNull String uid,
                                           @NonNull String notifId,
                                           boolean accept) {
@@ -67,17 +86,5 @@ public class NotificationRepository {
         return col(uid)
                 .document(notifId)
                 .update("status", status);
-    }
-
-    // ----------------------------------------------------------------------
-    // ✅ REQUIRED BY NotificationSender
-    // ✅ RESTORED EXACTLY HOW YOUR PROJECT EXPECTS
-    // ----------------------------------------------------------------------
-    public Task<Void> sendToProfile(@NonNull String uid,
-                                    @NonNull AppNotification notif) {
-
-        return col(uid)
-                .document()  // auto-generate document ID
-                .set(notif);
     }
 }

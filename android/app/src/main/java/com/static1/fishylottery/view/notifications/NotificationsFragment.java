@@ -16,8 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.NotificationsViewModel;
-import com.static1.fishylottery.model.entities.AppNotification;
+import com.static1.fishylottery.viewmodel.NotificationsViewModel;
 
 public class NotificationsFragment extends Fragment {
 
