@@ -25,7 +25,6 @@ public class Event implements Serializable {
     private Date updatedAt;
     private Date registrationOpens;
 
-
     public Event() {}
 
     public String getEventId() {
