@@ -57,8 +57,7 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.EntrantV
 
         public EntrantViewHolder(@NonNull View itemView) {
             super(itemView);
-            textEntrantName = itemView.findViewById(R.id.text_entrant_name);
-            btnAction = itemView.findViewById(R.id.btn_action);
+            textEntrantName = itemView.findViewById(R.id.text_entrant_name);;
         }
 
         public void bind(Profile entrant, ListType listType) {

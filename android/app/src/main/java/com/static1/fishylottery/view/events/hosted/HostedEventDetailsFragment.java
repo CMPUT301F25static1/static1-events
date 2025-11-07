@@ -37,7 +37,9 @@ public class HostedEventDetailsFragment extends Fragment {
         //textEventTitle.setText(event.getTitle());
 
         buttonViewWaitlist.setOnClickListener(v -> {
-            Navigation.findNavController(view).navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(view).navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist, bundle);
         });
 
         buttonSendNotifications.setOnClickListener(v -> {
