@@ -1,16 +1,19 @@
 package com.static1.fishylottery.view.events;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.static1.fishylottery.R;
@@ -32,6 +35,7 @@ public class EventDetailsFragment extends Fragment {
             new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
 
     private TextView tvTitle, tvDesc, tvWhere, tvWhen;
+    private ImageView ivEventPoster;
     private Button btnJoin;
 
     private final WaitlistRepository waitlists = new WaitlistRepository();
@@ -44,6 +48,7 @@ public class EventDetailsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_event_details, container, false);
 
+        ivEventPoster = v.findViewById(R.id.image_event_poster);
         tvTitle = v.findViewById(R.id.text_title);
         tvDesc  = v.findViewById(R.id.text_desc);
         tvWhere = v.findViewById(R.id.text_where);
@@ -77,6 +82,14 @@ public class EventDetailsFragment extends Fragment {
                 event.getEventStartDate(),
                 event.getEventEndDate(),
                 event.getRegistrationCloses()));
+
+        String imageUrl = event.getImageUrl();
+
+        Log.d("EventDetails", "The image URL is: " + imageUrl);
+
+        if (imageUrl != null) {
+            Glide.with(this).load(imageUrl).into(ivEventPoster);
+        }
 
         // Enable only if registration deadline is in the future (or not set)
         Date deadline = event.getRegistrationCloses();

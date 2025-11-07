@@ -1,5 +1,12 @@
 package com.static1.fishylottery.model.entities;
 
+import com.google.firebase.firestore.Exclude;
+
+/**
+ * Represents a user in the app that has associated information such as a name, email,
+ * phone number. It can belong to a waitlist and each profile in Firestore also has linked
+ * notifications that will be sent to them in app.
+ */
 public class Profile {
     private String uid;
     private String firstName;
@@ -55,6 +62,7 @@ public class Profile {
         this.phone = phone;
     }
 
+    @Exclude
     public String getFullName() {
         return firstName + " " + lastName;
     }

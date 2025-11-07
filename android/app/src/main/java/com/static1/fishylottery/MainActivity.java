@@ -30,8 +30,12 @@ import com.static1.fishylottery.view.events.QrScanActivity;
 
 import java.util.Objects;
 
+/**
+ * This is the main activity and entry point for the entire application.
+ * Other than some other utility views like the QR code scanner, every screen in the tab is a
+ * fragment that exists within this Activity.
+ */
 public class MainActivity extends AppCompatActivity {
-
     private ActivityMainBinding binding;
     private ActivityResultLauncher<Intent> qrScanLauncher;
     private EventRepository eventRepo;

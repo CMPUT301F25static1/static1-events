@@ -5,6 +5,11 @@ import com.google.firebase.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * Specifies an item in a waitlist which most importantly contains the user's profile and
+ * their status on the waitlist. Also have information about when they joined, accepted, or were
+ * selected for the event.
+ */
 public class WaitlistEntry {
 
     private String status; // waiting | invited | accepted | declined
