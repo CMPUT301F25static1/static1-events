@@ -1,35 +1,48 @@
 @startuml
 
+' ============================================================================
+' VIEW LAYER
+' ============================================================================
+
 package "View Layer" {
+
+  ' --------------------------------------------------------------------------
+  ' Activities
+  ' --------------------------------------------------------------------------
   package "Activities" {
+
     class MainActivity {
       - binding: ActivityMainBinding
       - eventRepo: EventRepository
       - qrScanLauncher: ActivityResultLauncher
       - navController: NavController
+      --
       + onCreate()
       + onOptionsItemSelected()
       + openEventDetailsWithQrCode()
     }
 
     note top of MainActivity
-      -Main entry point of the app
-      -Handles navigation and QR scanning
-      -Uses ViewModelProvider for ViewModels
+      - Main entry point of the app
+      - Handles navigation and QR scanning
+      - Uses ViewModelProvider for ViewModels
     end note
 
     class QrScanActivity {
       - previewView: PreviewView
       - cameraExecutor: ExecutorService
       - scanned: boolean
+      --
       + onCreate()
       + startCamera()
       + processBarcodes()
     }
+
     note "QR Code Integration" as QRNote
     QRNote .. MainActivity
     QRNote .. QrScanActivity
-    note right
+
+    note right of QRNote
       Custom URI scheme: {bundleId}://events?id={eventId}
       ML Kit Barcode scanning for QR processing
       Camera permissions handled automatically
@@ -37,7 +50,11 @@ package "View Layer" {
     end note
   }
 
+  ' --------------------------------------------------------------------------
+  ' Fragments
+  ' --------------------------------------------------------------------------
   package "Fragments" {
+
     class MyEventsFragment {
       + onCreateView()
     }
@@ -46,6 +63,7 @@ package "View Layer" {
       - viewModel: EventDetailsViewModel
       - currentEvent: Event
       - UI elements
+      --
       + newInstance()
       + onCreateView()
       - setupRecyclerViews()
@@ -54,10 +72,15 @@ package "View Layer" {
     }
   }
 
+  ' --------------------------------------------------------------------------
+  ' Adapters
+  ' --------------------------------------------------------------------------
   package "Adapters" {
+
     class EventAdapter {
       - items: List<Event>
       - onEventClickListener
+      --
       + submitList()
       + bind()
     }
@@ -65,18 +88,25 @@ package "View Layer" {
     class EntrantAdapter {
       - entrants: List<Profile>
       - listType: ListType
+      --
       + updateData()
       + bind()
     }
 
     class NotificationsAdapter {
       - items: List<AppNotification>
+      --
       + submit()
     }
   }
 }
 
+' ============================================================================
+' VIEWMODEL LAYER
+' ============================================================================
+
 package "ViewModel Layer" {
+
   class EventDetailsViewModel {
     - eventRepository: EventRepository
     - profileRepository: ProfileRepository
@@ -84,6 +114,7 @@ package "ViewModel Layer" {
     - waitingList: MutableLiveData<List<Profile>>
     - invitedList: MutableLiveData<List<Profile>>
     - enrolledList: MutableLiveData<List<Profile>>
+    --
     + getEvent()
     + setEvent()
     + loadEventEntrants()
@@ -97,6 +128,7 @@ package "ViewModel Layer" {
     - repo: NotificationRepository
     - inbox: MutableLiveData<List<AppNotification>>
     - error: MutableLiveData<String>
+    --
     + getInbox()
     + start()
     + stop()
@@ -107,6 +139,7 @@ package "ViewModel Layer" {
     - sending: MutableLiveData<Boolean>
     - error: MutableLiveData<String>
     - success: MutableLiveData<Boolean>
+    --
     + parseUids()
     + send()
   }
@@ -116,6 +149,7 @@ package "ViewModel Layer" {
     - imageUri: MutableLiveData<Uri>
     - validationError: MutableLiveData<String>
     - eventsRepository: EventRepository
+    --
     + getEvent()
     + setImageUri()
     + submit()
@@ -123,21 +157,29 @@ package "ViewModel Layer" {
   }
 }
 
+' ============================================================================
+' CONTROLLER LAYER
+' ============================================================================
+
 package "Controller Layer" {
+
   class WaitlistController {
     - db: FirebaseFirestore
     - repository: WaitlistEntryRepository
     - event: Event
+    --
     + signup()
     + leaveWaitlist()
     + acceptInvite()
     - doAcceptInTransaction()
   }
-  note right
+
+  note right of WaitlistController
     Three participant states:
     - Waiting: On waitlist
     - Invited: Can accept/decline
     - Enrolled: Accepted invitation
+
     Transactional updates for data consistency
   end note
 
@@ -145,6 +187,7 @@ package "Controller Layer" {
     - authManager: AuthManager
     - profileRepository: ProfileRepository
     - fragmentManager: FragmentManager
+    --
     + loadInitialProfile()
     + loadProfile()
     + uploadProfile()
@@ -153,10 +196,16 @@ package "Controller Layer" {
   }
 }
 
+' ============================================================================
+' REPOSITORY LAYER
+' ============================================================================
+
 package "Repository Layer" {
+
   class EventRepository {
     - db: FirebaseFirestore
     - eventsRef: CollectionReference
+    --
     + addEvent()
     + updateEvent()
     + deleteEvent()
@@ -167,6 +216,7 @@ package "Repository Layer" {
 
   class NotificationRepository {
     - db: FirebaseFirestore
+    --
     + listenToUserInbox()
     + sendToUser()
   }
@@ -174,51 +224,59 @@ package "Repository Layer" {
   class ProfileRepository {
     - db: FirebaseFirestore
     - profilesRef: CollectionReference
+    --
     + addProfile()
     + updateProfile()
     + deleteProfile()
     + getProfileById()
   }
 
-
   class NotificationSender {
     - db: FirebaseFirestore
+    --
     + send()
     + sendChosenWin()
     + sendNotChosen()
     - sendToUids()
     - extractUids()
   }
-  note right
+
+  note right of NotificationSender
     Real-time inbox using Firestore listeners
     Multiple audience types:
     - Selected, Waitlist, Cancelled, Chosen
+
     Auto-cleanup on ViewModel clearance
   end note
 
   class WaitlistEntryRepository {
     - db: FirebaseFirestore
+    --
     + addToWaitlist()
     + updateWaitlist()
     + removeFromWaitlist()
   }
 }
 
+' ============================================================================
+' SERVICE LAYER
+' ============================================================================
+
 package "Service Layer" {
 
   class AuthManager {
     - auth: FirebaseAuth
+    --
     + ensureSignedIn()
     + getUserId()
-
   }
-  note right
-      Anonymous authentication by default
-      Auto-signs in users on app start
-      No profile required initially
-      UID used for data partitioning
-    end note
 
+  note right of AuthManager
+    Anonymous authentication by default
+    Auto-signs in users on app start
+    No profile required initially
+    UID used for data partitioning
+  end note
 
   class DateUtils {
     + formatDateRange()
@@ -227,14 +285,15 @@ package "Service Layer" {
   }
 
   class QrUtils {
-    // QR utility methods
+    ' QR utility methods
   }
 
   class StorageManager {
     + uploadImage()
     + deleteImage()
   }
-  note right
+
+  note right of StorageManager
     Multi-step validation:
     - Required fields check
     - Date logic validation
@@ -243,15 +302,26 @@ package "Service Layer" {
   end note
 }
 
+' ============================================================================
+' APPLICATION
+' ============================================================================
+
 package "Application" {
+
   class MainApplication {
     - authManager: AuthManager
+    --
     + onCreate()
     + getAuthManager()
   }
 }
 
+' ============================================================================
+' ENTITIES
+' ============================================================================
+
 package "Entities" <<Database>> {
+
   class Event {
     - eventId: String
     - title: String
@@ -262,12 +332,14 @@ package "Entities" <<Database>> {
     - eventStartDate: Date
     - eventEndDate: Date
     - registrationCloses: Date
+    --
     + getters/setters
   }
 
   class Profile {
     - uid: String
     - fullName: String
+    --
     + getters/setters
   }
 
@@ -279,6 +351,7 @@ package "Entities" <<Database>> {
     - type: String
     - createdAt: Date
     - read: boolean
+    --
     + getters/setters
   }
 
@@ -286,49 +359,55 @@ package "Entities" <<Database>> {
     - profile: Profile
     - status: String
     - joinedAt: Date
+    --
     + getters/setters
   }
 }
 
-' Main Relationships
+' ============================================================================
+' RELATIONSHIPS
+' ============================================================================
+
+' View to ViewModel
 MainActivity --> EventDetailsViewModel
 MainActivity --> NotificationsViewModel
 MainActivity --> CreateEventViewModel
 QrScanActivity --> EventDetailsViewModel
-
 EventDetailsFragment --> EventDetailsViewModel
-MyEventsFragment --> EventAdapter
 
+' View to Adapter
+MyEventsFragment --> EventAdapter
+MainActivity --o EventAdapter
+MainActivity --o NotificationsAdapter
+EventDetailsFragment --o EntrantAdapter
+
+' ViewModel to Repository/Controller
 EventDetailsViewModel --> WaitlistController
 EventDetailsViewModel --> EventRepository
 EventDetailsViewModel --> ProfileRepository
-
 NotificationsViewModel --> NotificationRepository
 SendNotificationViewModel --> NotificationSender
 CreateEventViewModel --> EventRepository
 CreateEventViewModel --> StorageManager
 
+' Controller to Repository/Service
 WaitlistController --> WaitlistEntryRepository
 WaitlistController --> EventRepository
 ProfileController --> ProfileRepository
 ProfileController --> AuthManager
 
+' Repository to Service
 EventRepository --> AuthManager
 ProfileRepository --> AuthManager
-
 NotificationSender --> NotificationRepository
 
-MainActivity --o EventAdapter
-MainActivity --o NotificationsAdapter
-EventDetailsFragment --o EntrantAdapter
-
+' Service/Utility Usage
 QrScanActivity ..> QrUtils
 CreateEventViewModel ..> DateUtils
-
 MainApplication --* AuthManager
 
-' Entity relationships
-EventRepository ..> Event
+' Repository to Entity
+EventRepository --> Event
 ProfileRepository ..> Profile
 NotificationRepository ..> AppNotification
 WaitlistEntryRepository ..> WaitlistEntry
