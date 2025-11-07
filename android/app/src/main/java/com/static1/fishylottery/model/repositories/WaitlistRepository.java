@@ -13,6 +13,8 @@ import com.google.firebase.firestore.SetOptions;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 
+import org.checkerframework.checker.units.qual.N;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,9 @@ import java.util.Map;
  */
 public class WaitlistRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private static final String EVENTS = "events";
+    private static final String WAITLIST = "waitlist";
 
     /**
      * An entrant can join a waitlist with the event and the created waitlist entry containing the
@@ -39,9 +44,9 @@ public class WaitlistRepository {
             return Tasks.forResult(null);
         }
 
-        DocumentReference ref = db.collection("events")
+        DocumentReference ref = db.collection(EVENTS)
                 .document(eventId)
-                .collection("waitlist")
+                .collection(WAITLIST)
                 .document(profileId);
 
         return ref.set(entry, SetOptions.merge());
@@ -61,9 +66,9 @@ public class WaitlistRepository {
             throw new IllegalArgumentException("eventId is null");
         }
 
-        return db.collection("events")
+        return db.collection(EVENTS)
                 .document(eventId)
-                .collection("waitlist")
+                .collection(WAITLIST)
                 .get()
                 .continueWith(task -> {
                     if (!task.isSuccessful()) {
@@ -84,5 +89,32 @@ public class WaitlistRepository {
 
                     return list;
                 });
+    }
+
+    public Task<WaitlistEntry> getWaitlistEntry(@NonNull Event event) {
+        return db.collection(EVENTS)
+                .document(event.getEventId())
+                .get().continueWith(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    DocumentSnapshot doc = task.getResult();
+
+                    if (!doc.exists()) {
+                        return null;
+                    }
+
+                    WaitlistEntry entry = doc.toObject(WaitlistEntry.class);
+
+                });
+    }
+
+    public Task<Void> leaveWaitlist(@NonNull Event event, @NonNull String uid) {
+        return db.collection(EVENTS)
+                .document(event.getEventId())
+                .collection(WAITLIST)
+                .document(uid)
+                .delete();
     }
 }
