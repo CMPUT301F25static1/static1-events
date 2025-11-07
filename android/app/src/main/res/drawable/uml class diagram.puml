@@ -26,6 +26,15 @@ package "View Layer" {
       + startCamera()
       + processBarcodes()
     }
+    note "QR Code Integration" as QRNote
+    QRNote .. MainActivity
+    QRNote .. QrScanActivity
+    note right
+      Custom URI scheme: {bundleId}://events?id={eventId}
+      ML Kit Barcode scanning for QR processing
+      Camera permissions handled automatically
+      Returns to MainActivity with result
+    end note
   }
 
   package "Fragments" {
@@ -124,6 +133,13 @@ package "Controller Layer" {
     + acceptInvite()
     - doAcceptInTransaction()
   }
+  note right
+    Three participant states:
+    - Waiting: On waitlist
+    - Invited: Can accept/decline
+    - Enrolled: Accepted invitation
+    Transactional updates for data consistency
+  end note
 
   class ProfileController {
     - authManager: AuthManager
@@ -164,6 +180,7 @@ package "Repository Layer" {
     + getProfileById()
   }
 
+
   class NotificationSender {
     - db: FirebaseFirestore
     + send()
@@ -172,6 +189,12 @@ package "Repository Layer" {
     - sendToUids()
     - extractUids()
   }
+  note right
+    Real-time inbox using Firestore listeners
+    Multiple audience types:
+    - Selected, Waitlist, Cancelled, Chosen
+    Auto-cleanup on ViewModel clearance
+  end note
 
   class WaitlistEntryRepository {
     - db: FirebaseFirestore
@@ -182,11 +205,20 @@ package "Repository Layer" {
 }
 
 package "Service Layer" {
+
   class AuthManager {
     - auth: FirebaseAuth
     + ensureSignedIn()
     + getUserId()
+
   }
+  note right
+      Anonymous authentication by default
+      Auto-signs in users on app start
+      No profile required initially
+      UID used for data partitioning
+    end note
+
 
   class DateUtils {
     + formatDateRange()
@@ -202,6 +234,13 @@ package "Service Layer" {
     + uploadImage()
     + deleteImage()
   }
+  note right
+    Multi-step validation:
+    - Required fields check
+    - Date logic validation
+    - Image upload to Firebase Storage
+    - Automatic organizer ID assignment
+  end note
 }
 
 package "Application" {
