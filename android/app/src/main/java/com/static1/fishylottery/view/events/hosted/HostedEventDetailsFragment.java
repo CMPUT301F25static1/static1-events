@@ -30,6 +30,8 @@ public class HostedEventDetailsFragment extends Fragment {
         Button buttonViewMap = view.findViewById(R.id.button_view_map);
         Button buttonExportEnrolled = view.findViewById(R.id.button_export_enrolled);
         Button buttonSendNotifications = view.findViewById(R.id.button_send_notifications);
+        Button buttonViewQrCode = view.findViewById(R.id.button_view_qr_code);
+
         //TextView textEventTitle = view.findViewById(R.id.text_event_details_event_title);
 
         //textEventTitle.setText(event.getTitle());
