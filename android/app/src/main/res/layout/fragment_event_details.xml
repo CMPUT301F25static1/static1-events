@@ -7,28 +7,28 @@
 
     <TextView
         android:id="@+id/text_title"
-        android:textStyle="bold"
+        android:layout_width="380dp"
+        android:layout_height="395dp"
         android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/text_desc"
-        android:layout_marginTop="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="380dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp" />
 
     <TextView
         android:id="@+id/text_where"
-        android:layout_marginTop="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="383dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="8dp" />
 
     <TextView
         android:id="@+id/text_when"
-        android:layout_marginTop="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="383dp"
+        android:layout_height="76dp"
+        android:layout_marginTop="8dp" />
 
     <Button
         android:id="@+id/button_join_waitlist"
