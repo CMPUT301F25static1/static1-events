@@ -14,6 +14,12 @@
         android:textStyle="bold"
         android:paddingBottom="8dp"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Coming Soon"
+        android:paddingBottom="8dp"/>
+
     <!-- List of events -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_my_events"
