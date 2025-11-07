@@ -12,6 +12,9 @@ import androidx.navigation.Navigation;
 
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
+import com.static1.fishylottery.services.DateUtils;
+
+import java.time.format.DateTimeFormatter;
 
 public class HostedEventDetailsFragment extends Fragment {
     private Event event;
@@ -32,12 +35,21 @@ public class HostedEventDetailsFragment extends Fragment {
         Button buttonSendNotifications = view.findViewById(R.id.button_send_notifications);
         Button buttonViewQrCode = view.findViewById(R.id.button_view_qr_code);
 
-        //TextView textEventTitle = view.findViewById(R.id.text_event_details_event_title);
+        View eventDetailsCard = view.findViewById(R.id.event_details_info);
+        TextView textEventTitle = eventDetailsCard.findViewById(R.id.eventTitle);
+        TextView textEventDate = eventDetailsCard.findViewById(R.id.eventDate);
+        TextView textEventTime = eventDetailsCard.findViewById(R.id.eventTime);
+        TextView textEventLocation = eventDetailsCard.findViewById(R.id.eventLocation);
 
-        //textEventTitle.setText(event.getTitle());
+        textEventTitle.setText(event.getTitle());
+        textEventLocation.setText(event.getLocation());
+        textEventDate.setText(DateUtils.formatDateRange(event.getEventStartDate(), event.getEventEndDate()));
+        textEventTime.setText(DateUtils.formatTimeRange(event.getEventStartDate(), event.getEventEndDate()));
 
         buttonViewWaitlist.setOnClickListener(v -> {
-            Navigation.findNavController(view).navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(view).navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist, bundle);
         });
 
         buttonSendNotifications.setOnClickListener(v -> {
