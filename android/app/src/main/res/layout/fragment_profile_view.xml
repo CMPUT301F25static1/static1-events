@@ -18,11 +18,22 @@
             android:gravity="center_vertical"
             android:padding="16dp">
 
-            <View
+            <FrameLayout
                 android:id="@+id/image_profile_placeholder"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
-                android:background="@drawable/circle_background_light_blue" />
+                android:background="@drawable/circle_background_light_blue">
+
+                <TextView
+                    android:id="@+id/text_initials"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="CM"
+                    android:textColor="@color/teal_700"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -43,9 +54,17 @@
                     android:id="@+id/text_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"
                     android:textColor="#555555"
-                    android:layout_marginTop="4dp" />
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/text_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#555555"
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
 
