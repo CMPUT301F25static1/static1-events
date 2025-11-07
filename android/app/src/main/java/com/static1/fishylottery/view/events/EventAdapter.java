@@ -60,7 +60,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @NonNull
     @Override
     public EventAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.item_event_card, parent, false);
+        View view = inflater.inflate(R.layout.content_event, parent, false);
         return new ViewHolder(view);
     }
 
@@ -81,11 +81,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivImage = itemView.findViewById(R.id.event_image);
-            tvDate = itemView.findViewById(R.id.event_date);
-            tvTitle = itemView.findViewById(R.id.event_title);
-            tvTime = itemView.findViewById(R.id.event_time);
-            tvLocation = itemView.findViewById(R.id.event_location);
+            ivImage = itemView.findViewById(R.id.eventImage);
+            tvDate = itemView.findViewById(R.id.eventDate);
+            tvTitle = itemView.findViewById(R.id.eventTitle);
+            tvTime = itemView.findViewById(R.id.eventTime);
+            tvLocation = itemView.findViewById(R.id.eventLocation);
 
             itemView.setOnClickListener(v -> {
                 int pos = getAdapterPosition();
