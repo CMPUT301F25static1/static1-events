@@ -6,13 +6,13 @@ import static org.mockito.Mockito.*;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.static1.fishylottery.model.entities.AppNotification;
 import com.static1.fishylottery.model.repositories.NotificationRepository;
+import com.static1.fishylottery.viewmodel.NotificationsViewModel;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +45,7 @@ public class NotificationsViewModelTest {
     @Before
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        viewModel = new NotificationsViewModel(repo);
+        viewModel = new NotificationsViewModel();
     }
 
     @Test
@@ -82,7 +82,7 @@ public class NotificationsViewModelTest {
         }).when(repo).listenToInbox(eq("TEST_UID"), any());
 
         // Attach inbox listener
-        viewModel.startListening("TEST_UID");
+        viewModel.getInbox();
 
         // Fire snapshot event
         cb[0].onEvent(snap, (FirebaseFirestoreException) null);

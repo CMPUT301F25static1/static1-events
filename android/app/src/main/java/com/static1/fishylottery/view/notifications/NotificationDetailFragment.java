@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.NotificationsViewModel;
+import com.static1.fishylottery.viewmodel.NotificationsViewModel;
 
 import java.text.DateFormat;
 import java.util.Date;

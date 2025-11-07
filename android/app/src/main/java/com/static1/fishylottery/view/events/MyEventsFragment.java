@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.EventDetailsViewModel;
+import com.static1.fishylottery.viewmodel.EventDetailsViewModel;
 import com.static1.fishylottery.model.entities.Event;
 
 import java.io.Serializable;

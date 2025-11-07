@@ -24,6 +24,14 @@ import java.util.Map;
 public class WaitlistRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * An entrant can join a waitlist with the event and the created waitlist entry containing the
+     * profile of who is joining the waitlist.
+     *
+     * @param event The event the waitlist belongs to.
+     * @param entry Information about the entrant profile and status.
+     * @return A task indicating success or failure.
+     */
     public Task<Void> joinWaitlist(@NonNull Event event, @NonNull WaitlistEntry entry) {
         String eventId = event.getEventId();
         String profileId = entry.getProfile().getUid();
@@ -39,6 +47,12 @@ public class WaitlistRepository {
         return ref.set(entry, SetOptions.merge());
     }
 
+    /**
+     * Get the full waitlist of everyone on it for a specified event.
+     *
+     * @param event The event object.
+     * @return A list of waitlist entries.
+     */
     public Task<List<WaitlistEntry>> getWaitlist(@NonNull Event event) {
 
         String eventId = event.getEventId();

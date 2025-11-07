@@ -17,11 +17,8 @@ import com.static1.fishylottery.model.entities.AppNotification;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.NotificationRepository;
-import com.static1.fishylottery.model.repositories.NotificationSender;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +73,7 @@ public class SendNotificationsViewModel extends ViewModel {
                 String uid = entry.getProfile().getUid();
 
                 // Send the notification to the user
-                notificationRepository.sendToProfile(uid, notification)
+                notificationRepository.addNotification(uid, notification)
                         .continueWithTask(task2 -> {
                             if (!task2.isSuccessful()) {
                                 throw task2.getException();
