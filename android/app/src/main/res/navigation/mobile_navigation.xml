@@ -160,6 +160,4 @@
         android:name="com.static1.fishylottery.view.events.hosted.ViewQrCodeFragment"
         android:label="Event QR Code"
         tools:layout="@layout/fragment_view_qr_code"/>
-        tools:layout="@layout/fragment_edit_profile" />
-
 </navigation>
