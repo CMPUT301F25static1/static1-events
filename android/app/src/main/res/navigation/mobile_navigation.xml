@@ -131,9 +131,9 @@
 
     <fragment
         android:id="@+id/navigation_hosted_event_details_waitlist"
-        android:name="com.static1.fishylottery.view.events.hosted.HostedEventDetailsWaitlistFragment"
+        android:name="com.static1.fishylottery.view.events.hosted.WaitlistFragment"
         android:label="Waitlist"
-        tools:layout="@layout/fragment_hosted_event_details_waitlist"
+        tools:layout="@layout/fragment_waitlist"
         />
 
     <fragment

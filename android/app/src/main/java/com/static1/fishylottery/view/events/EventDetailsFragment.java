@@ -8,10 +8,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
@@ -21,6 +23,7 @@ import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
+import com.static1.fishylottery.viewmodel.EventDetailsViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,9 +40,8 @@ public class EventDetailsFragment extends Fragment {
     private TextView tvTitle, tvDesc, tvWhere, tvWhen;
     private ImageView ivEventPoster;
     private Button btnJoin;
-
-    private final WaitlistRepository waitlists = new WaitlistRepository();
     private Event event;
+    private EventDetailsViewModel viewModel;
 
     @Nullable
     @Override
@@ -47,6 +49,8 @@ public class EventDetailsFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_event_details, container, false);
+
+        viewModel = new ViewModelProvider(this).get(EventDetailsViewModel.class);
 
         ivEventPoster = v.findViewById(R.id.image_event_poster);
         tvTitle = v.findViewById(R.id.text_title);
@@ -65,7 +69,17 @@ public class EventDetailsFragment extends Fragment {
         }
 
         bindUi();
-        btnJoin.setOnClickListener(this::joinWaitlist);
+        btnJoin.setOnClickListener(l -> {
+            viewModel.joinWaitlist(event);
+        });
+
+        viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+        });
+
+        viewModel.isLoading().observe(getViewLifecycleOwner(), loading -> {
+            btnJoin.setEnabled(!loading);
+        });
 
         return v;
     }
@@ -96,38 +110,6 @@ public class EventDetailsFragment extends Fragment {
         boolean canJoin = (deadline == null) || deadline.after(new Date());
         btnJoin.setEnabled(canJoin);
         if (!canJoin) btnJoin.setText("Registration closed");
-    }
-
-    private void joinWaitlist(View anchor) {
-        if (event == null || event.getEventId() == null) {
-            Snackbar.make(anchor, "Missing event id.", Snackbar.LENGTH_LONG).show();
-            return;
-        }
-
-        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
-                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
-                : null;
-        if (uid == null) {
-            Snackbar.make(anchor, "Please sign in first.", Snackbar.LENGTH_LONG).show();
-            return;
-        }
-
-        WaitlistEntry entry = new WaitlistEntry();
-        Profile profile = new Profile(); // TODO: We need to get the full profile with the name and stuff
-        profile.setUid(uid);
-
-        entry.setJoinedAt(new Date());
-        entry.setProfile(profile);
-        entry.setStatus("waiting");
-
-        btnJoin.setEnabled(false);
-        waitlists.joinWaitlist(event, entry)
-                .addOnSuccessListener(unused ->
-                        Snackbar.make(anchor, "Joined waitlist!", Snackbar.LENGTH_LONG).show())
-                .addOnFailureListener(e -> {
-                    btnJoin.setEnabled(true);
-                    Snackbar.make(anchor, "Failed: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
-                });
     }
 
     private String formatWindow(Date start, Date end, Date regClose) {

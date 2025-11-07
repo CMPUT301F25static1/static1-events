@@ -59,7 +59,7 @@ public class MyEventsFragment extends Fragment {
         @Nullable
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.fragment_hosted_event_details_waitlist, container, false);
+            View view = inflater.inflate(R.layout.fragment_waitlist, container, false);
 
             initializeViews(view);
             setupRecyclerViews();
@@ -73,11 +73,10 @@ public class MyEventsFragment extends Fragment {
             eventTitle = view.findViewById(R.id.text_event_title);
             eventDescription = view.findViewById(R.id.text_event_description);
             eventLocation = view.findViewById(R.id.text_event_location);
-            eventCapacity = view.findViewById(R.id.text_event_capacity);
 
-            waitingListRecycler = view.findViewById(R.id.recycler_waiting_list);
-            invitedListRecycler = view.findViewById(R.id.recycler_invited_list);
-            enrolledListRecycler = view.findViewById(R.id.recycler_enrolled_list);
+//            waitingListRecycler = view.findViewById(R.id.recycler_waiting_list);
+//            invitedListRecycler = view.findViewById(R.id.recycler_invited_list);
+//            enrolledListRecycler = view.findViewById(R.id.recycler_enrolled_list);
 
             btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
         }
