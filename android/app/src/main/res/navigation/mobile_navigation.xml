@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_profile">
+    app:startDestination="@id/navigation_profile">
 
     <action
         android:id="@+id/action_mainActivity_to_eventDetails"
         app:destination="@id/navigation_event_details"
         />
 
+    <!-- EVENTS -->
     <fragment
         android:id="@+id/navigation_events"
         android:name="com.static1.fishylottery.view.events.EventsFragment"
@@ -30,27 +31,42 @@
             android:id="@+id/action_events_to_eventDetails"
             app:destination="@id/navigation_event_details"
             />
+            app:destination="@id/navigation_create_event" />
     </fragment>
 
+    <!-- ✅ NOTIFICATIONS LIST -->
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.static1.fishylottery.view.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_notifications">
 
+        <!-- ✅ ACTION → DETAIL SCREEN -->
+        <action
+            android:id="@+id/action_navigation_notifications_to_notificationDetailFragment"
+            app:destination="@id/notificationDetailFragment" />
+    </fragment>
+
+    <!-- ✅ NOTIFICATION DETAIL SCREEN -->
+    <fragment
+        android:id="@+id/notificationDetailFragment"
+        android:name="com.static1.fishylottery.view.notifications.NotificationDetailFragment"
+        android:label="Notification Detail"
+        tools:layout="@layout/fragment_notification_detail" />
+
+    <!-- PROFILE -->
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.static1.fishylottery.view.profile.ProfileContainerFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile_container">
-      
-      <action
-            android:id="@+id/action_profile_to_edit_profile"
-            app:destination="@id/navigation_edit_profile"
-            />
 
+        <action
+            android:id="@+id/action_profile_to_edit_profile"
+            app:destination="@id/navigation_edit_profile" />
     </fragment>
 
+    <!-- CREATE EVENT -->
     <fragment
         android:id="@+id/navigation_create_event"
         android:name="com.static1.fishylottery.view.events.CreateEventDetailsFragment"
@@ -59,28 +75,26 @@
 
         <action
             android:id="@+id/action_eventDetails_to_eventPoster"
-            app:destination="@id/navigation_create_event_poster"
-            />
+            app:destination="@id/navigation_create_event_poster" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_create_event_poster"
         android:name="com.static1.fishylottery.view.events.CreateEventPosterFragment"
         android:label="2 of 3: Event Poster"
-        tools:layout="@layout/fragment_create_event_poster"
-        >
+        tools:layout="@layout/fragment_create_event_poster">
+
         <action
             android:id="@+id/action_eventPoster_to_eventPreview"
-            app:destination="@id/navigation_create_event_preview"
-            />
+            app:destination="@id/navigation_create_event_preview" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_create_event_preview"
         android:name="com.static1.fishylottery.view.events.CreateEventPreviewFragment"
-        android:label="3 of 3: Event Preview"
-        />
-      
+        android:label="3 of 3: Event Preview" />
+
+    <!-- EDIT PROFILE -->
     <fragment
         android:id="@+id/navigation_edit_profile"
         android:name="com.static1.fishylottery.view.profile.EditProfileFragment"
@@ -147,4 +161,6 @@
         android:name="com.static1.fishylottery.view.events.hosted.ViewQrCodeFragment"
         android:label="Event QR Code"
         tools:layout="@layout/fragment_view_qr_code"/>
+        tools:layout="@layout/fragment_edit_profile" />
+
 </navigation>
