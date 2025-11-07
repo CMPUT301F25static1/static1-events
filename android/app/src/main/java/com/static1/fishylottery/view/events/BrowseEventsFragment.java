@@ -13,10 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.static1.fishylottery.R;
+import com.static1.fishylottery.ServiceLocator;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BrowseEventsFragment extends Fragment {
@@ -30,7 +30,8 @@ public class BrowseEventsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_browse_events, container, false);
 
-        eventsRepo = new EventRepository();
+        // Use ServiceLocator so tests can swap the repository
+        eventsRepo = ServiceLocator.getEventRepository();
 
         recyclerView = view.findViewById(R.id.recycler_browse_events);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
