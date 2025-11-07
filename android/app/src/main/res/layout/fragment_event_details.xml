@@ -1,40 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:background="@drawable/light_blue_8"
+android:layout_height="match_parent">
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="?actionBarSize">
+
+    <!-- Event Image -->
+    <ImageView
+        android:id="@+id/image_event_poster"
+        android:layout_width="378dp"
+        android:layout_height="392dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_dashboard_black_24dp" />
+
+    <!-- Event Title -->
     <TextView
         android:id="@+id/text_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Event Title"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+    <!-- Date -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_calendar_24dp" />
+
+        <TextView
+            android:id="@+id/text_when"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Day and Date"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+    </LinearLayout>
+
+    <!-- Location -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_location_24dp" />
+
+        <TextView
+            android:id="@+id/text_where"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Event location"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+    </LinearLayout>
+
+    <!-- Map preview -->
+    <ImageView
+        android:id="@+id/image_map_preview"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/location" />
+
+    <!-- Event Description -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Hosted By"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+    <TextView
+        android:id="@+id/text_hosted_by"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Name of host"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Event Description"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
     <TextView
         android:id="@+id/text_desc"
-        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Event description"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <!-- Registration -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Registration"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
     <TextView
-        android:id="@+id/text_where"
-        android:layout_marginTop="8dp"
+        android:id="@+id/text_event_registration"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Registration details"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
     <TextView
-        android:id="@+id/text_when"
-        android:layout_marginTop="8dp"
+        android:id="@+id/text_max_attendees"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:text="Max Attendees: 0"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <!-- Bottom button -->
+    <TextView
+        android:id="@+id/text_max_waitlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Max Waitlist:"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
     <Button
         android:id="@+id/button_join_waitlist"
-        android:text="Join Waitlist"
-        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="JOIN WAITLIST"
+        android:layout_marginBottom="30dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
 </LinearLayout>
 
+</ScrollView>

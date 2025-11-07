@@ -15,7 +15,7 @@
 
         <include
             layout="@layout/content_event"
-            android:id="@+id/eventCard"
+            android:id="@+id/event_details_info"
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

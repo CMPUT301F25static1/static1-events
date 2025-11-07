@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 import androidx.fragment.app.Fragment;
@@ -16,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.services.DateUtils;
 
 
 public class HostedEventDetailsFragment extends Fragment {
@@ -28,8 +30,6 @@ public class HostedEventDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
         if (getArguments() != null) {
             Object arg = getArguments().getSerializable("event");
             if (arg instanceof Event) {
@@ -41,42 +41,56 @@ public class HostedEventDetailsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_hosted_event_details, container, false);
 
 
-        Button buttonViewWaitlist = view.findViewById(R.id.button_view_waitlist);
-        Button buttonRunLottery = view.findViewById(R.id.button_run_lottery);
-        Button buttonViewMap = view.findViewById(R.id.button_view_map);
-        Button buttonExportEnrolled = view.findViewById(R.id.button_export_enrolled);
+        Button buttonViewWaitlist      = view.findViewById(R.id.button_view_waitlist);
+        Button buttonRunLottery        = view.findViewById(R.id.button_run_lottery);
+        Button buttonViewMap           = view.findViewById(R.id.button_view_map);
+        Button buttonExportEnrolled    = view.findViewById(R.id.button_export_enrolled);
         Button buttonSendNotifications = view.findViewById(R.id.button_send_notifications);
-        Button buttonViewQrCode = view.findViewById(R.id.button_view_qr_code);
-        Button buttonRunDraw = view.findViewById(R.id.button_run_draw);
+        Button buttonViewQrCode        = view.findViewById(R.id.button_view_qr_code);
+        Button buttonRunDraw           = view.findViewById(R.id.button_run_draw); // new
 
 
-        // View Waitlist
-        buttonViewWaitlist.setOnClickListener(v ->
-                Navigation.findNavController(view)
-                        .navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist));
+        // ---- Populate event card (kept from main) ----
+        View eventDetailsCard      = view.findViewById(R.id.event_details_info);
+        TextView textEventTitle    = eventDetailsCard.findViewById(R.id.eventTitle);
+        TextView textEventDate     = eventDetailsCard.findViewById(R.id.eventDate);
+        TextView textEventTime     = eventDetailsCard.findViewById(R.id.eventTime);
+        TextView textEventLocation = eventDetailsCard.findViewById(R.id.eventLocation);
 
 
-        // Send Notifications
+        if (event != null) {
+            textEventTitle.setText(event.getTitle());
+            textEventLocation.setText(event.getLocation());
+            textEventDate.setText(
+                    DateUtils.formatDateRange(event.getEventStartDate(), event.getEventEndDate()));
+            textEventTime.setText(
+                    DateUtils.formatTimeRange(event.getEventStartDate(), event.getEventEndDate()));
+        }
+
+
+        // ---- Clicks kept from main (pass event bundle where needed) ----
+        buttonViewWaitlist.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(view)
+                    .navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist, bundle);
+        });
+
+
         buttonSendNotifications.setOnClickListener(v ->
                 Navigation.findNavController(view)
                         .navigate(R.id.action_hostedEventsDetails_to_hostedEventDetailsSendNotifications));
 
 
-        // Run Lottery (still separate / future behavior if needed)
-        buttonRunLottery.setOnClickListener(v -> {
-            // TODO: Hook this up if you differentiate "lottery" vs "drawEntrants"
-            Snackbar.make(v, "Run Lottery not implemented yet.", Snackbar.LENGTH_SHORT).show();
-        });
+        // Placeholder “Run Lottery” (separate from draw)
+        buttonRunLottery.setOnClickListener(v ->
+                Snackbar.make(v, "Run Lottery not implemented.", Snackbar.LENGTH_LONG).show());
 
 
-        // Export Enrolled (placeholder)
-        buttonExportEnrolled.setOnClickListener(v -> {
-            // TODO: Export the CSV of enrolled
-            Snackbar.make(v, "Export not implemented yet.", Snackbar.LENGTH_SHORT).show();
-        });
+        buttonExportEnrolled.setOnClickListener(v ->
+                Snackbar.make(v, "Export not implemented yet.", Snackbar.LENGTH_LONG).show());
 
 
-        // View QR Code
         buttonViewQrCode.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putSerializable("event", event);
@@ -85,41 +99,37 @@ public class HostedEventDetailsFragment extends Fragment {
         });
 
 
-        // View Map
         buttonViewMap.setOnClickListener(v ->
                 Navigation.findNavController(view)
                         .navigate(R.id.action_hostedEventDetails_to_signupMap));
 
 
-        // Run Draw
-        if (event == null || event.getEventId() == null) {
-            // No event info: disable draw
-            buttonRunDraw.setEnabled(false);
-            buttonRunDraw.setOnClickListener(v ->
-                    Snackbar.make(v, "No event loaded.", Snackbar.LENGTH_SHORT).show());
-        } else if (event.getSelectCount() == null || event.getSelectCount() <= 0) {
-            // selectCount not configured
-            buttonRunDraw.setEnabled(false);
-            buttonRunDraw.setOnClickListener(v ->
-                    Snackbar.make(v, "Set a valid number of entrants to select before running the draw.", Snackbar.LENGTH_LONG).show());
-        } else {
-            buttonRunDraw.setOnClickListener(v -> {
+        // ---- New: Run Draw logic ----
+        if (buttonRunDraw != null) {
+            if (event == null || event.getEventId() == null) {
                 buttonRunDraw.setEnabled(false);
-
-
-                eventRepository.drawEntrants(event.getEventId())
-                        .addOnSuccessListener(unused ->
-                                Snackbar.make(v,
-                                        "Draw complete. Selected entrants have been recorded.",
-                                        Snackbar.LENGTH_LONG).show())
-                        .addOnFailureListener(err -> {
-                            String msg = (err != null && err.getMessage() != null)
-                                    ? err.getMessage()
-                                    : "Draw failed.";
-                            Snackbar.make(v, msg, Snackbar.LENGTH_LONG).show();
-                            buttonRunDraw.setEnabled(true);
-                        });
-            });
+                buttonRunDraw.setOnClickListener(v ->
+                        Snackbar.make(v, "No event loaded.", Snackbar.LENGTH_LONG).show());
+            } else if (event.getSelectCount() == null || event.getSelectCount() <= 0) {
+                buttonRunDraw.setEnabled(false);
+                buttonRunDraw.setOnClickListener(v ->
+                        Snackbar.make(v, "Set a valid number of entrants to select.", Snackbar.LENGTH_LONG).show());
+            } else {
+                buttonRunDraw.setOnClickListener(v -> {
+                    buttonRunDraw.setEnabled(false);
+                    eventRepository
+                            .drawEntrants(event.getEventId(), event.getSelectCount())
+                            .addOnSuccessListener(unused ->
+                                    Snackbar.make(v, "Draw complete. Selected entrants recorded.",
+                                            Snackbar.LENGTH_LONG).show())
+                            .addOnFailureListener(err -> {
+                                String msg = (err != null && err.getMessage() != null)
+                                        ? err.getMessage() : "Draw failed.";
+                                Snackbar.make(v, msg, Snackbar.LENGTH_LONG).show();
+                                buttonRunDraw.setEnabled(true);
+                            });
+                });
+            }
         }
 
 

@@ -4,11 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -16,8 +13,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Transaction;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
-import com.static1.fishylottery.model.entities.WaitlistEntry;
-import com.static1.fishylottery.model.repositories.WaitlistEntryRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +33,6 @@ public class WaitlistController {
     private static final String TAG = "WaitlistController";
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final WaitlistEntryRepository repository = new WaitlistEntryRepository();
 
     // Optional: keep an event attribute (can be null). Methods accept Event param but controller can also store it.
     private Event event;

@@ -15,6 +15,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
+import com.static1.fishylottery.model.entities.Profile;
+import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 
 import java.text.SimpleDateFormat;
@@ -97,8 +99,16 @@ public class EventDetailsFragment extends Fragment {
             return;
         }
 
+        WaitlistEntry entry = new WaitlistEntry();
+        Profile profile = new Profile(); // TODO: We need to get the full profile with the name and stuff
+        profile.setUid(uid);
+
+        entry.setJoinedAt(new Date());
+        entry.setProfile(profile);
+        entry.setStatus("waiting");
+
         btnJoin.setEnabled(false);
-        waitlists.joinWaitlist(event.getEventId(), uid)   // <-- fix: correct repo method
+        waitlists.joinWaitlist(event, entry)
                 .addOnSuccessListener(unused ->
                         Snackbar.make(anchor, "Joined waitlist!", Snackbar.LENGTH_LONG).show())
                 .addOnFailureListener(e -> {
