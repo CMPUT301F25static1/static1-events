@@ -82,7 +82,14 @@ public class ProfileController {
     }
 
     public void uploadProfile(Profile profile, ProfileUploadCallback callback) {
-        profile.setUid(authManager.getUserId());
+        String uid = authManager.getUserId();
+
+        if (uid == null) {
+            callback.onError(new Exception("The profile UID is null"));
+            return;
+        }
+
+        profile.setUid(uid);
 
         profileRepository.addProfile(profile)
                         .addOnSuccessListener(s -> {

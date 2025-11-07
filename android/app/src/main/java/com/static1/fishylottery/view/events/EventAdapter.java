@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 
@@ -30,8 +32,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     // formatting
     private final SimpleDateFormat dateFmt = new SimpleDateFormat("EEE, MMM d", Locale.getDefault());
     private final SimpleDateFormat timeFmt = new SimpleDateFormat("h:mm a", Locale.getDefault());
+    private Context context;
 
     public EventAdapter(Context context) {
+        this.context = context;
         this.inflater = LayoutInflater.from(context);
     }
 
@@ -115,11 +119,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 try {
                     // Glide recommended. Ensure dependency added (see note below).
-//                    com.bumptech.glide.Glide.with(ivImage.getContext())
-//                            .load(imageUrl)
-//                            .centerCrop()
-//                            .placeholder(R.drawable.circle_background_light_blue) // create a placeholder drawable
-//                            .into(ivImage);
+                    com.bumptech.glide.Glide.with(ivImage.getContext())
+                            .load(imageUrl)
+                            .centerCrop()
+                            .placeholder(R.drawable.circle_background_light_blue) // create a placeholder drawable
+                            .into(ivImage);
                 } catch (NoClassDefFoundError e) {
                     // Glide not present - ignore and set placeholder
                     ivImage.setImageResource(R.drawable.circle_background_light_blue);

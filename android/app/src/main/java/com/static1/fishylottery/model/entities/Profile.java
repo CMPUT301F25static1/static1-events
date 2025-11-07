@@ -1,5 +1,7 @@
 package com.static1.fishylottery.model.entities;
 
+import com.google.firebase.firestore.Exclude;
+
 public class Profile {
     private String uid;
     private String firstName;
@@ -55,6 +57,7 @@ public class Profile {
         this.phone = phone;
     }
 
+    @Exclude
     public String getFullName() {
         return firstName + " " + lastName;
     }
