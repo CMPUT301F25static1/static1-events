@@ -31,7 +31,6 @@
             android:id="@+id/action_events_to_eventDetails"
             app:destination="@id/navigation_event_details"
             />
-            app:destination="@id/navigation_create_event" />
     </fragment>
 
     <!-- ✅ NOTIFICATIONS LIST -->
@@ -161,6 +160,4 @@
         android:name="com.static1.fishylottery.view.events.hosted.ViewQrCodeFragment"
         android:label="Event QR Code"
         tools:layout="@layout/fragment_view_qr_code"/>
-        tools:layout="@layout/fragment_edit_profile" />
-
 </navigation>
