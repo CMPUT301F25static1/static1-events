@@ -18,7 +18,11 @@ public class ProfileController {
     private final ProfileRepository profileRepository;
     private final FragmentManager fragmentManager;
     private final int containerId;
-    public ProfileController(AuthManager authManager, ProfileRepository profileRepository, FragmentManager fragmentManager, int containerId) {
+
+    public ProfileController(AuthManager authManager,
+                             ProfileRepository profileRepository,
+                             FragmentManager fragmentManager,
+                             int containerId) {
         this.authManager = authManager;
         this.profileRepository = profileRepository;
         this.fragmentManager = fragmentManager;
@@ -48,7 +52,6 @@ public class ProfileController {
                 .addOnSuccessListener(profile -> {
                     if (profile == null) {
                         Log.i("Profile", "No Profile yet");
-
                         showCreateProfile();
                     } else {
                         showProfileView(profile);
@@ -60,6 +63,7 @@ public class ProfileController {
                 });
 
     }
+
     public void loadProfile(ProfileCallback callback) {
         String uid = authManager.getUserId();
 
@@ -92,12 +96,8 @@ public class ProfileController {
         profile.setUid(uid);
 
         profileRepository.addProfile(profile)
-                        .addOnSuccessListener(s -> {
-                            callback.onComplete();
-                        })
-                .addOnFailureListener(e -> {
-                    callback.onError(new Exception("Error occured"));
-                });
+                .addOnSuccessListener(s -> callback.onComplete())
+                .addOnFailureListener(e -> callback.onError(new Exception("Error occurred")));
     }
 
     public void deleteProfile(Profile profile) {
@@ -107,29 +107,22 @@ public class ProfileController {
     public boolean hasProfile() {
         String uid = authManager.getUserId();
 
-        if (uid == null) {
-            return false;
-        }
+        if (uid == null) return false;
 
         Task<Profile> task = profileRepository.getProfileById(uid);
-
-        if (task.isSuccessful()) {
-            return task.getResult() != null;
-        } else {
-            return false;
-        }
+        return task.isSuccessful() && task.getResult() != null;
     }
 
     public void showProfileView(Profile profile) {
         Fragment fragment = new ProfileViewFragment();
         fragmentManager.beginTransaction()
                 .replace(containerId, fragment)
-                .commit();
+                .commitAllowingStateLoss();  // ✅ FIX
     }
 
     public void showCreateProfile() {
         fragmentManager.beginTransaction()
                 .replace(containerId, new CreateProfileFragment())
-                .commit();
+                .commitAllowingStateLoss();  // ✅ FIX
     }
 }

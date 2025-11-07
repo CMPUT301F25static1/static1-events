@@ -5,11 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.services.DateUtils;
@@ -40,6 +42,13 @@ public class HostedEventDetailsFragment extends Fragment {
         TextView textEventDate = eventDetailsCard.findViewById(R.id.eventDate);
         TextView textEventTime = eventDetailsCard.findViewById(R.id.eventTime);
         TextView textEventLocation = eventDetailsCard.findViewById(R.id.eventLocation);
+        ImageView imageView = eventDetailsCard.findViewById(R.id.eventImage);
+
+        String imageUrl = event.getImageUrl();
+
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Glide.with(this).load(imageUrl).into(imageView);
+        }
 
         textEventTitle.setText(event.getTitle());
         textEventLocation.setText(event.getLocation());
@@ -53,7 +62,9 @@ public class HostedEventDetailsFragment extends Fragment {
         });
 
         buttonSendNotifications.setOnClickListener(v -> {
-            Navigation.findNavController(view).navigate(R.id.action_hostedEventsDetails_to_hostedEventDetailsSendNotifications);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(view).navigate(R.id.action_hostedEventsDetails_to_hostedEventDetailsSendNotifications, bundle);
         });
 
         buttonRunLottery.setOnClickListener(v -> {
