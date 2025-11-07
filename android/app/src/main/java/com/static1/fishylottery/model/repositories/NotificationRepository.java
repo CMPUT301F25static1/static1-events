@@ -3,41 +3,81 @@ package com.static1.fishylottery.model.repositories;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.static1.fishylottery.model.entities.AppNotification;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 public class NotificationRepository {
-    private final FirebaseFirestore db;
 
-    public NotificationRepository() {
-        this.db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    /** Shortcut to user notifications collection */
+    private CollectionReference col(String uid) {
+        return db.collection("profiles")
+                .document(uid)
+                .collection("notifications");
     }
 
-    /** Live inbox for a user (ordered newest-first). Call remove() on the returned registration to stop. */
-    public ListenerRegistration listenToUserInbox(@NonNull String uid,
-                                                  @NonNull EventListener<QuerySnapshot> listener) {
-        return db.collection("users").document(uid)
-                .collection("notifications")
+    // ----------------------------------------------------------------------
+    // ✅ LISTEN REAL-TIME FOR INBOX (used by NotificationsViewModel)
+    // ----------------------------------------------------------------------
+    public ListenerRegistration listenToInbox(
+            @NonNull String uid,
+            @NonNull EventListener<QuerySnapshot> listener
+    ) {
+        return col(uid)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .addSnapshotListener(listener);
     }
 
-    /** Write a single notification to a user's inbox. */
-    public Task<DocumentReference> sendToUser(@NonNull String uid, @NonNull AppNotification n) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("eventId", n.getEventId());
-        data.put("senderId", n.getSenderId());
-        data.put("title", n.getTitle());
-        data.put("message", n.getMessage());
-        data.put("type", n.getType());
-        data.put("createdAt", n.getCreatedAt() != null ? n.getCreatedAt() : new Date());
-        data.put("read", n.isRead());
-        return db.collection("users").document(uid)
-                .collection("notifications")
-                .add(data);
+    // ----------------------------------------------------------------------
+    // ✅ ADD NOTIFICATION
+    // ----------------------------------------------------------------------
+    public Task<DocumentReference> addNotification(@NonNull String uid,
+                                                   @NonNull AppNotification notif) {
+        return col(uid).add(notif);
+    }
+
+    // ----------------------------------------------------------------------
+    // ✅ MARK AS READ
+    // ----------------------------------------------------------------------
+    public Task<Void> markRead(@NonNull String uid,
+                               @NonNull String notifId) {
+
+        return col(uid)
+                .document(notifId)
+                .update("read", true);
+    }
+
+    // ----------------------------------------------------------------------
+    // ✅ RESPOND TO INVITATION
+    // ----------------------------------------------------------------------
+    public Task<Void> respondToInvitation(@NonNull String uid,
+                                          @NonNull String notifId,
+                                          boolean accept) {
+
+        String status = accept ? "accepted" : "declined";
+
+        return col(uid)
+                .document(notifId)
+                .update("status", status);
+    }
+
+    // ----------------------------------------------------------------------
+    // ✅ REQUIRED BY NotificationSender
+    // ✅ RESTORED EXACTLY HOW YOUR PROJECT EXPECTS
+    // ----------------------------------------------------------------------
+    public Task<Void> sendToProfile(@NonNull String uid,
+                                    @NonNull AppNotification notif) {
+
+        return col(uid)
+                .document()  // auto-generate document ID
+                .set(notif);
     }
 }

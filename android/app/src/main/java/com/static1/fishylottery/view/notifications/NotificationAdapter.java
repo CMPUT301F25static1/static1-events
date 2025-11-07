@@ -16,8 +16,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.VH> {
+
+    public interface OnNotificationClick {
+        void onClick(AppNotification n);
+    }
+
+    private OnNotificationClick clickListener;
     private final List<AppNotification> items = new ArrayList<>();
     private final DateFormat fmt = DateFormat.getDateTimeInstance();
+
+    // ✅ Required by test
+    public OnNotificationClick getClickListener() {
+        return clickListener;
+    }
+
+    public void setOnNotificationClick(OnNotificationClick l) {
+        this.clickListener = l;
+    }
 
     public void submit(List<AppNotification> newItems) {
         items.clear();
@@ -25,25 +40,35 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         notifyDataSetChanged();
     }
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification, parent, false);
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_notification, parent, false);
         return new VH(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
         AppNotification n = items.get(pos);
+
         h.title.setText(n.getTitle());
         h.message.setText(n.getMessage());
         h.date.setText(n.getCreatedAt() != null ? fmt.format(n.getCreatedAt()) : "");
+
+        h.itemView.setOnClickListener(v -> {
+            if (clickListener != null) clickListener.onClick(n);
+        });
     }
 
     @Override
-    public int getItemCount() { return items.size(); }
+    public int getItemCount() {
+        return items.size();
+    }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView title, message, date;
+
         VH(@NonNull View v) {
             super(v);
             title = v.findViewById(R.id.tvTitle);
