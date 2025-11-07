@@ -12,6 +12,12 @@ package "View Layer" {
       + openEventDetailsWithQrCode()
     }
 
+    note top of MainActivity
+      -Main entry point of the app
+      -Handles navigation and QR scanning
+      -Uses ViewModelProvider for ViewModels
+    end note
+
     class QrScanActivity {
       - previewView: PreviewView
       - cameraExecutor: ExecutorService
