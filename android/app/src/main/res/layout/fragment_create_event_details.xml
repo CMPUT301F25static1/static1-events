@@ -237,7 +237,7 @@
 
         <!-- Capacity -->
         <TextView
-            android:text="Waitlist capacity (none if blank)"
+            android:text="Event capacity (none if blank)"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_marginTop="20sp"
@@ -275,30 +275,6 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_waitlist_max"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- NEW: Number of entrants to select -->
-        <TextView
-            android:text="Number of entrants to select"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginTop="20sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/input_select_n_layout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Number of entrants to select (none if blank)">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/input_select_n"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number" />

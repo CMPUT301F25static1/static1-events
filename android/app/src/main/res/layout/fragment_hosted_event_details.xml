@@ -233,19 +233,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
-
-
-        <!-- NEW: Run Draw button for US 02.05.02 -->
-        <Button
-            android:id="@+id/button_run_draw"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Run Draw" />
-
-
     </LinearLayout>
-
-
 </ScrollView>
 

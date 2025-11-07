@@ -24,7 +24,6 @@ public class Event implements Serializable {
     private Date createdAt;
     private Date updatedAt;
     private Date registrationOpens;
-    private Integer selectCount;
 
     public Event() {}
 
@@ -181,12 +180,5 @@ public class Event implements Serializable {
 
     public void setInterests(List<String> interests) {
         this.interests = interests;
-    }
-
-    public Integer getSelectCount () {
-        return selectCount;
-    }
-    public void setSelectCount(Integer selectCount) {
-        this.selectCount = selectCount;
     }
 }

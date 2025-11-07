@@ -16,6 +16,7 @@ import com.static1.fishylottery.model.entities.Event;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,10 +169,10 @@ public class EventRepository {
     /**
      * System chooses a specified number of entrants for the event.
      * Logic:
-     * - Read event.selectCount from the event document.
+     * - Read event.capacity from the event document.
      * - If selectCount <= 0 -> error (cannot draw).
      * - Read events/{eventId}/waitlist/*
-     * - Shuffle and select min(selectCount, waitlistSize).
+     * - Shuffle and select min(capacity, waitlistSize).
      * - For each selected:
      *      - Write events/{eventId}/selectedEntrants/{profileId}
      *      - Mark their waitlist doc with selected = true
@@ -195,12 +196,18 @@ public class EventRepository {
                 throw new IllegalStateException("Event not found");
             }
 
-            Long selectCountLong = eventSnap.getLong("selectCount");
-            int n = (selectCountLong == null) ? 0 : selectCountLong.intValue();
+            Event event = eventSnap.toObject(Event.class);
+
+            if (event == null) {
+                throw new IllegalStateException("Could not parse the event");
+            }
+
+            Integer capacity = event.getCapacity();
+            int n = (capacity == null) ? 0 : capacity;
 
             if (n <= 0) {
                 return Tasks.forException(
-                        new IllegalStateException("selectCount must be > 0 to run draw"));
+                        new IllegalStateException("capacity must be > 0 to run draw"));
             }
 
             // 2) Load waitlist
@@ -242,6 +249,8 @@ public class EventRepository {
                     // Mark waitlist doc as selected
                     Map<String, Object> mark = new HashMap<>();
                     mark.put("selected", true);
+                    mark.put("status", "invited");
+                    mark.put("invitedAt", new Date());
                     batch.set(d.getReference(), mark, SetOptions.merge());
                 }
 

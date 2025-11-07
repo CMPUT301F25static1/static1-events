@@ -122,7 +122,6 @@ public class CreateEventDetailsFragment extends Fragment {
         textInputHost = view.findViewById(R.id.input_hosted_by);
         textInputCapacity = view.findViewById(R.id.input_capacity);
         textInputWaitlistMaximum = view.findViewById(R.id.input_waitlist_max);
-        textInputSelectCount = view.findViewById(R.id.input_select_n);
 
 
         eventTypeDropdown = view.findViewById(R.id.dropdown_event_type);
@@ -233,14 +232,6 @@ public class CreateEventDetailsFragment extends Fragment {
         event.setInterests(new ArrayList<>(selectedItems));
         event.setCapacity(safeParse(textInputCapacity.getText().toString()));
         event.setMaxWaitlistSize(safeParse(textInputWaitlistMaximum.getText().toString()));
-
-
-        // Number of entrants to select (N). Null/blank => no fixed selection count.
-        if (textInputSelectCount != null) {
-            Integer selectCount = safeParse(textInputSelectCount.getText().toString());
-            event.setSelectCount(selectCount);
-        }
-
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm a", Locale.getDefault());
         try {

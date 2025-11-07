@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
@@ -52,8 +53,6 @@ public class HostedEventDetailsFragment extends Fragment {
         Button buttonExportEnrolled = view.findViewById(R.id.button_export_enrolled);
         Button buttonSendNotifications = view.findViewById(R.id.button_send_notifications);
         Button buttonViewQrCode     = view.findViewById(R.id.button_view_qr_code);
-        Button buttonRunDraw        = view.findViewById(R.id.button_run_draw); // new
-
 
         // Event details card
         View eventDetailsCard   = view.findViewById(R.id.event_details_info);
@@ -115,50 +114,41 @@ public class HostedEventDetailsFragment extends Fragment {
                 Snackbar.make(v, "Export not implemented yet.", Snackbar.LENGTH_LONG).show()
         );
 
-
-        // Keep old Run Lottery button as a placeholder
-        if (buttonRunLottery != null) {
-            buttonRunLottery.setOnClickListener(v ->
-                    Snackbar.make(v, "Run lottery not implemented.", Snackbar.LENGTH_LONG).show()
-            );
-        }
-
-
-        // --- Run Draw button logic ---
-        if (buttonRunDraw != null) {
-            if (event == null || event.getEventId() == null) {
-                buttonRunDraw.setEnabled(false);
-                buttonRunDraw.setOnClickListener(v ->
-                        Snackbar.make(v, "No event loaded.", Snackbar.LENGTH_LONG).show()
-                );
-            } else {
-                Integer n = event.getSelectCount();
-                if (n == null || n <= 0) {
-                    buttonRunDraw.setEnabled(false);
-                    buttonRunDraw.setOnClickListener(v ->
-                            Snackbar.make(v, "Set a valid number of entrants to select.", Snackbar.LENGTH_LONG).show()
-                    );
-                } else {
-                    buttonRunDraw.setOnClickListener(v -> {
-                        buttonRunDraw.setEnabled(false);
-                        eventRepository.drawEntrants(event.getEventId())
-                                .addOnSuccessListener(unused -> {
-                                    Snackbar.make(v, "Draw complete. Selected entrants recorded.", Snackbar.LENGTH_LONG).show();
-                                    buttonRunDraw.setEnabled(true);
-                                })
-                                .addOnFailureListener(err -> {
-                                    String msg = (err != null && err.getMessage() != null)
-                                            ? err.getMessage()
-                                            : "Draw failed.";
-                                    Snackbar.make(v, msg, Snackbar.LENGTH_LONG).show();
-                                    buttonRunDraw.setEnabled(true);
-                                });
-                    });
-                }
-            }
-        }
-
+        setupRunLotteryButton(buttonRunLottery);
 
         return view;
+    }
+
+    private void setupRunLotteryButton(Button button) {
+        if (event == null || event.getEventId() == null) {
+            button.setEnabled(false);
+            button.setOnClickListener(v ->
+                    Toast.makeText(requireContext(), "No event loaded.", Toast.LENGTH_LONG).show()
+            );
+        } else {
+            Integer n = event.getCapacity();
+            if (n == null || n <= 0) {
+                button.setEnabled(false);
+                button.setOnClickListener(v ->
+                        Toast.makeText(requireContext(), "Set a valid number of entrants to select.", Toast.LENGTH_LONG).show()
+                );
+            } else {
+                button.setOnClickListener(v -> {
+                    button.setEnabled(false);
+                    eventRepository.drawEntrants(event.getEventId())
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(requireContext(), "Draw complete. Selected entrants recorded.", Toast.LENGTH_LONG).show();
+                                button.setEnabled(true);
+                            })
+                            .addOnFailureListener(err -> {
+                                String msg = (err != null && err.getMessage() != null)
+                                        ? err.getMessage()
+                                        : "Draw failed.";
+                                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show();
+                                button.setEnabled(true);
+                            });
+                });
+            }
+        }
     }
 }
