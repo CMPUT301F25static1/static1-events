@@ -74,7 +74,6 @@ public class MyEventsFragment extends Fragment {
             eventDescription = view.findViewById(R.id.text_event_description);
             eventLocation = view.findViewById(R.id.text_event_location);
             eventCapacity = view.findViewById(R.id.text_event_capacity);
-            btnBack = view.findViewById(R.id.btn_back);
 
             waitingListRecycler = view.findViewById(R.id.recycler_waiting_list);
             invitedListRecycler = view.findViewById(R.id.recycler_invited_list);

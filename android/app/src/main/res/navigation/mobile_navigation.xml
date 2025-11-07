@@ -140,7 +140,7 @@
         android:id="@+id/navigation_hosted_event_send_notifications"
         android:name="com.static1.fishylottery.view.events.hosted.SendNotificationsFragment"
         android:label="Send Notifications"
-        tools:layout="@layout/fragment_hosted_event_details_send_notifications"
+        tools:layout="@layout/fragment_send_notifications"
         />
 
     <fragment

@@ -62,7 +62,9 @@ public class HostedEventDetailsFragment extends Fragment {
         });
 
         buttonSendNotifications.setOnClickListener(v -> {
-            Navigation.findNavController(view).navigate(R.id.action_hostedEventsDetails_to_hostedEventDetailsSendNotifications);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("event", event);
+            Navigation.findNavController(view).navigate(R.id.action_hostedEventsDetails_to_hostedEventDetailsSendNotifications, bundle);
         });
 
         buttonRunLottery.setOnClickListener(v -> {
