@@ -93,6 +93,14 @@ package "View Layer" {
       + bind()
     }
 
+    class WaitlistEntryAdapter {
+      - entries: List<WaitlistEntry>
+      - onEntryClickListener
+      --
+      + submitList()
+      + bind()
+    }
+
     class NotificationsAdapter {
       - items: List<AppNotification>
       --
@@ -135,7 +143,7 @@ package "ViewModel Layer" {
   }
 
   class SendNotificationViewModel {
-    - sender: NotificationSender
+    - repo: NotificationRepository
     - sending: MutableLiveData<Boolean>
     - error: MutableLiveData<String>
     - success: MutableLiveData<Boolean>
@@ -219,7 +227,17 @@ package "Repository Layer" {
     --
     + listenToUserInbox()
     + sendToUser()
+    + sendToUids()
+    + extractUids()
   }
+
+  note right of NotificationRepository
+    Real-time inbox using Firestore listeners
+    Multiple audience types:
+    - Selected, Waitlist, Cancelled, Chosen
+
+    Auto-cleanup on ViewModel clearance
+  end note
 
   class ProfileRepository {
     - db: FirebaseFirestore
@@ -230,24 +248,6 @@ package "Repository Layer" {
     + deleteProfile()
     + getProfileById()
   }
-
-  class NotificationSender {
-    - db: FirebaseFirestore
-    --
-    + send()
-    + sendChosenWin()
-    + sendNotChosen()
-    - sendToUids()
-    - extractUids()
-  }
-
-  note right of NotificationSender
-    Real-time inbox using Firestore listeners
-    Multiple audience types:
-    - Selected, Waitlist, Cancelled, Chosen
-
-    Auto-cleanup on ViewModel clearance
-  end note
 
   class WaitlistEntryRepository {
     - db: FirebaseFirestore
@@ -286,6 +286,7 @@ package "Service Layer" {
 
   class QrUtils {
     ' QR utility methods
+    + generateQrCode()
   }
 
   class StorageManager {
@@ -376,40 +377,39 @@ QrScanActivity --> EventDetailsViewModel
 EventDetailsFragment --> EventDetailsViewModel
 
 ' View to Adapter
-MyEventsFragment --> EventAdapter
-MainActivity --o EventAdapter
+MyEventsFragment --o EventAdapter
 MainActivity --o NotificationsAdapter
 EventDetailsFragment --o EntrantAdapter
+EventDetailsFragment --o WaitlistEntryAdapter
 
 ' ViewModel to Repository/Controller
 EventDetailsViewModel --> WaitlistController
 EventDetailsViewModel --> EventRepository
 EventDetailsViewModel --> ProfileRepository
 NotificationsViewModel --> NotificationRepository
-SendNotificationViewModel --> NotificationSender
+SendNotificationViewModel --> NotificationRepository
 CreateEventViewModel --> EventRepository
 CreateEventViewModel --> StorageManager
 
 ' Controller to Repository/Service
 WaitlistController --> WaitlistEntryRepository
 WaitlistController --> EventRepository
-ProfileController --> ProfileRepository
-ProfileController --> AuthManager
+ProfileController --o AuthManager
+ProfileController --o ProfileRepository
 
 ' Repository to Service
 EventRepository --> AuthManager
 ProfileRepository --> AuthManager
-NotificationSender --> NotificationRepository
 
 ' Service/Utility Usage
-QrScanActivity ..> QrUtils
-CreateEventViewModel ..> DateUtils
+QrScanActivity --> QrUtils
+CreateEventViewModel --> DateUtils
 MainApplication --* AuthManager
 
 ' Repository to Entity
 EventRepository --> Event
-ProfileRepository ..> Profile
-NotificationRepository ..> AppNotification
-WaitlistEntryRepository ..> WaitlistEntry
+ProfileRepository --> Profile
+NotificationRepository --> AppNotification
+WaitlistEntryRepository --> WaitlistEntry
 
 @enduml
