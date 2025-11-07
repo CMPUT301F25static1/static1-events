@@ -9,19 +9,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.NotificationsViewModel;
+import com.static1.fishylottery.viewmodel.NotificationsViewModel;
 
 public class NotificationsFragment extends Fragment {
-    private NotificationsViewModel vm;
-    private NotificationAdapter adapter;
 
-    @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+    public NotificationsViewModel vm;
+    public NotificationAdapter adapter;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_notifications, container, false);
     }
@@ -29,21 +34,36 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
+
         RecyclerView rv = v.findViewById(R.id.rvNotifications);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+
         adapter = new NotificationAdapter();
         rv.setAdapter(adapter);
 
         vm = new ViewModelProvider(this).get(NotificationsViewModel.class);
+
         vm.getInbox().observe(getViewLifecycleOwner(), items -> adapter.submit(items));
-        vm.getError().observe(getViewLifecycleOwner(), err -> { /* show Snackbar/log if needed */ });
+
+        adapter.setOnNotificationClick(n -> {
+            NavController nav = Navigation.findNavController(v);
+
+            Bundle b = new Bundle();
+            b.putString("notificationId", n.getId());
+            b.putString("title", n.getTitle());
+            b.putString("message", n.getMessage());
+            b.putLong("createdAt", n.getCreatedAt() != null ? n.getCreatedAt().getTime() : 0L);
+            b.putString("type", n.getType());
+            b.putString("status", n.getStatus());
+
+            nav.navigate(R.id.notificationDetailFragment, b);
+        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
-                ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        String uid = FirebaseAuth.getInstance().getUid();
         if (uid != null) vm.start(uid);
     }
 

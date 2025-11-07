@@ -3,41 +3,88 @@ package com.static1.fishylottery.model.repositories;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.static1.fishylottery.model.entities.AppNotification;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * The notification wrapper repository responsible for uploading, fetching, and removing notification
+ * objects from the Firebase. This maps the Firebase objects to Java objects so they can be used
+ * in other contexts and data structures.
+ */
 public class NotificationRepository {
-    private final FirebaseFirestore db;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public NotificationRepository() {
-        this.db = FirebaseFirestore.getInstance();
+    /** Shortcut to user notifications collection */
+    private CollectionReference col(String uid) {
+        return db.collection("profiles")
+                .document(uid)
+                .collection("notifications");
     }
 
-    /** Live inbox for a user (ordered newest-first). Call remove() on the returned registration to stop. */
-    public ListenerRegistration listenToUserInbox(@NonNull String uid,
-                                                  @NonNull EventListener<QuerySnapshot> listener) {
-        return db.collection("users").document(uid)
-                .collection("notifications")
+    /**
+     * Listens for real-time input from a user's inbox given their uid.
+     *
+     * @param uid The UID/profileId of the user.
+     * @param listener A listener callback to trigger when there is an update.
+     * @return The snapshot listener.
+     */
+    public ListenerRegistration listenToInbox(
+            @NonNull String uid,
+            @NonNull EventListener<QuerySnapshot> listener
+    ) {
+        return col(uid)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .addSnapshotListener(listener);
     }
 
-    /** Write a single notification to a user's inbox. */
-    public Task<DocumentReference> sendToUser(@NonNull String uid, @NonNull AppNotification n) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("eventId", n.getEventId());
-        data.put("senderId", n.getSenderId());
-        data.put("title", n.getTitle());
-        data.put("message", n.getMessage());
-        data.put("type", n.getType());
-        data.put("createdAt", n.getCreatedAt() != null ? n.getCreatedAt() : new Date());
-        data.put("read", n.isRead());
-        return db.collection("users").document(uid)
-                .collection("notifications")
-                .add(data);
+    /**
+     * Adds a new notification to the repository
+     * @param uid The profile ID of the user to send the notification to.
+     * @param notif The notification object.
+     * @return A document reference to the newly created notification.
+     */
+    public Task<DocumentReference> addNotification(@NonNull String uid,
+                                                   @NonNull AppNotification notif) {
+        return col(uid).add(notif);
+    }
+
+    /**
+     * Marks the notification as read in the Firebase.
+     * @param uid The uid of the profile
+     * @param notifId The notification ID for the document.
+     * @return A task indicating success or failure of the action.
+     */
+    public Task<Void> markRead(@NonNull String uid,
+                               @NonNull String notifId) {
+
+        return col(uid)
+                .document(notifId)
+                .update("read", true);
+    }
+
+    /**
+     * Records the response of an invitation type notification.
+     *
+     * @param uid The UID of the profile who is receiving the notification.
+     * @param notifId The notification ID of the Firestore document.
+     * @param accept A boolean indicating if they accept or decline in tbe invite.
+     * @return A task indicating success or failure.
+     */
+    public Task<Void> respondToInvitation(@NonNull String uid,
+                                          @NonNull String notifId,
+                                          boolean accept) {
+
+        String status = accept ? "accepted" : "declined";
+
+        return col(uid)
+                .document(notifId)
+                .update("status", status);
     }
 }
