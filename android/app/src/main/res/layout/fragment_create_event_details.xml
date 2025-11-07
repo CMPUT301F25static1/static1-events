@@ -62,7 +62,6 @@
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <AutoCompleteTextView
                 android:id="@+id/dropdown_interests"
                 android:layout_width="match_parent"
@@ -76,7 +75,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text= "Event Description"
+            android:text="Event Description"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_marginTop="20sp"/>
@@ -112,7 +111,6 @@
             android:layout_marginTop="15sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-
 
         <LinearLayout
             android:orientation="horizontal"
@@ -267,6 +265,7 @@
             android:layout_marginTop="20sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -276,6 +275,30 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_waitlist_max"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- NEW: Number of entrants to select -->
+        <TextView
+            android:text="Number of entrants to select"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_marginTop="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_select_n_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Number of entrants to select (none if blank)">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_select_n"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number" />
@@ -409,4 +432,5 @@
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
+
 </ScrollView>
