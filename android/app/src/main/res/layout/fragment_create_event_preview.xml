@@ -15,8 +15,8 @@
         <!-- Event Image -->
         <ImageView
             android:id="@+id/image_event_poster"
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_width="378dp"
+            android:layout_height="392dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_dashboard_black_24dp" />
 
@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Forest Camping"
+            android:text="Event Title"
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
 
         <!-- Date -->
@@ -46,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Wednesday, 6 Dec 2025"
+                android:text="Day and Date"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </LinearLayout>
 
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="6:00 am – 11:50 pm"
+                android:text="Time to time"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </LinearLayout>
 
@@ -88,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Elk Island, AB"
+                android:text="Event location"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </LinearLayout>
 
@@ -99,9 +99,7 @@
             android:layout_height="140dp"
             android:layout_marginTop="8dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/common_full_open_on_phone" />
-
-        <!-- Hosted By -->
+            android:src="@drawable/location" />
 
         <!-- Event Description -->
         <TextView
@@ -116,7 +114,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="John Doe"
+            android:text="Name of host"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
         <TextView
@@ -131,7 +129,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="We love the university life and are hosting an event..."
+            android:text="Event description"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
         <!-- Registration -->
@@ -147,7 +145,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Closes: Friday, 31 October 2025 | 5pm"
+            android:text="Registration details"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
         <TextView
@@ -162,7 +160,7 @@
             android:id="@+id/text_max_waitlist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Max Waitlist: None"
+            android:text="Max Waitlist:"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
         <Button
