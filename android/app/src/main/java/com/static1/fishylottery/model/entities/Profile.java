@@ -67,5 +67,37 @@ public class Profile {
         return firstName + " " + lastName;
     }
 
+    @Exclude
+    public String getInitials() {
+        if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) {
+            return firstName.substring(0, 1).toUpperCase() + lastName.substring(0, 1).toUpperCase();
+        } else if (firstName != null && !firstName.isEmpty()) {
+            return firstName.substring(0, 1).toUpperCase();
+        } else if (lastName != null && !lastName.isEmpty()) {
+            return lastName.substring(0, 1).toUpperCase();
+        } else {
+            return "";
+        }
+    }
+
+    @Exclude
+    public String getFormattedPhone() {
+        if (phone == null) return "";
+
+        // Remove all non-digit characters
+        String digits = phone.replaceAll("\\D", "");
+
+        // Check for 10 digits
+        if (digits.length() == 10) {
+            return String.format("(%s) %s-%s",
+                    digits.substring(0, 3),
+                    digits.substring(3, 6),
+                    digits.substring(6));
+        }
+
+        // Return original if not 10 digits
+        return phone;
+    }
+
     public Profile() {}
 }

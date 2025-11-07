@@ -8,16 +8,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.static1.fishylottery.R;
-import com.static1.fishylottery.controller.ProfileController;
-import com.static1.fishylottery.model.entities.Profile;
+import com.static1.fishylottery.viewmodel.ProfileViewModel;
 
 public class ProfileViewFragment extends Fragment {
-    private TextView textName, textEmail;
+    private TextView textName, textEmail, textInitials, textPhone;
     private View rowEditProfile, rowNotifications, rowEventsHistory, rowAdminLogin;
-    private ProfileController controller;
+    private ProfileViewModel viewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -25,10 +25,12 @@ public class ProfileViewFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_profile_view, container, false);
 
-        controller = ((ProfileContainerFragment) getParentFragment()).getController();
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 
         textName = view.findViewById(R.id.text_name);
         textEmail = view.findViewById(R.id.text_email);
+        textInitials = view.findViewById(R.id.text_initials);
+        textPhone = view.findViewById(R.id.text_phone);
 
         rowEditProfile = view.findViewById(R.id.row_edit_profile);
         rowNotifications = view.findViewById(R.id.row_notifications);
@@ -38,17 +40,13 @@ public class ProfileViewFragment extends Fragment {
         setupRowLabels(view);
         setupListeners(view);
 
-        controller.loadProfile(new ProfileController.ProfileCallback() {
-            @Override
-            public void onProfileLoaded(Profile profile) {
-                textName.setText(profile.getFullName());
-                textEmail.setText(profile.getEmail());
-            }
+        viewModel.loadProfile();
 
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(getContext(), "Error loading profile", Toast.LENGTH_SHORT).show();
-            }
+        viewModel.getProfile().observe(getViewLifecycleOwner(), profile -> {
+            textName.setText(profile.getFullName());
+            textEmail.setText(profile.getEmail());
+            textInitials.setText(profile.getInitials());
+            textPhone.setText(profile.getFormattedPhone());
         });
 
         return view;
