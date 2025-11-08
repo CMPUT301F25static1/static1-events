@@ -16,13 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
-import com.static1.fishylottery.model.entities.Profile;
-import com.static1.fishylottery.model.entities.WaitlistEntry;
-import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.viewmodel.EventDetailsViewModel;
 
 import java.text.SimpleDateFormat;
@@ -39,8 +34,7 @@ public class EventDetailsFragment extends Fragment {
 
     private TextView tvTitle, tvDesc, tvWhere, tvWhen;
     private ImageView ivEventPoster;
-    private Button btnJoin;
-    private Event event;
+    private Button buttonJoinWaitlist, buttonLeaveWaitlist;
     private EventDetailsViewModel viewModel;
 
     @Nullable
@@ -57,20 +51,28 @@ public class EventDetailsFragment extends Fragment {
         tvDesc  = v.findViewById(R.id.text_desc);
         tvWhere = v.findViewById(R.id.text_where);
         tvWhen  = v.findViewById(R.id.text_when);
-        btnJoin = v.findViewById(R.id.button_join_waitlist);
+        buttonJoinWaitlist = v.findViewById(R.id.button_join_waitlist);
+        buttonLeaveWaitlist = v.findViewById(R.id.button_leave_waitlist);
 
         // Receive event from args
         Bundle args = getArguments();
         if (args != null) {
             Object obj = args.getSerializable(ARG_EVENT);
             if (obj instanceof Event) {
-                event = (Event) obj;
+                Event event = (Event) obj;
+                viewModel.setEvent(event);
+                viewModel.loadWaitlistEntry(event);
             }
         }
 
         bindUi();
-        btnJoin.setOnClickListener(l -> {
-            viewModel.joinWaitlist(event);
+
+        buttonJoinWaitlist.setOnClickListener(l -> {
+            viewModel.joinWaitlist();
+        });
+
+        buttonLeaveWaitlist.setOnClickListener(l -> {
+            viewModel.leaveWaitlist();
         });
 
         viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
@@ -78,38 +80,55 @@ public class EventDetailsFragment extends Fragment {
         });
 
         viewModel.isLoading().observe(getViewLifecycleOwner(), loading -> {
-            btnJoin.setEnabled(!loading);
+            buttonJoinWaitlist.setEnabled(!loading);
+            buttonLeaveWaitlist.setEnabled(!loading);
         });
+
+        showJoinWaitlist();
+
+        viewModel.getWaitlistEntry().observe(getViewLifecycleOwner(), entry -> {
+            if (entry == null) {
+                showJoinWaitlist();
+            } else if (entry.getStatus().equals("waiting")) {
+                showLeaveWaitlist();
+            } else {
+                showNoButtons();
+            }
+        });
+
+        setupListeners();
 
         return v;
     }
 
     private void bindUi() {
-        if (event == null) {
-            btnJoin.setEnabled(false);
-            return;
-        }
-        tvTitle.setText(nullTo(event.getTitle(), "(untitled)"));
-        tvDesc.setText(nullTo(event.getDescription(), "—"));
-        tvWhere.setText(nullTo(event.getLocation(), "—"));
-        tvWhen.setText(formatWindow(
-                event.getEventStartDate(),
-                event.getEventEndDate(),
-                event.getRegistrationCloses()));
+        viewModel.getEvent().observe(getViewLifecycleOwner(), event -> {
+            if (event == null) {
+                buttonJoinWaitlist.setEnabled(false);
+                return;
+            }
+            tvTitle.setText(nullTo(event.getTitle(), "(untitled)"));
+            tvDesc.setText(nullTo(event.getDescription(), "—"));
+            tvWhere.setText(nullTo(event.getLocation(), "—"));
+            tvWhen.setText(formatWindow(
+                    event.getEventStartDate(),
+                    event.getEventEndDate(),
+                    event.getRegistrationCloses()));
 
-        String imageUrl = event.getImageUrl();
+            String imageUrl = event.getImageUrl();
 
-        Log.d("EventDetails", "The image URL is: " + imageUrl);
+            Log.d("EventDetails", "The image URL is: " + imageUrl);
 
-        if (imageUrl != null) {
-            Glide.with(this).load(imageUrl).into(ivEventPoster);
-        }
+            if (imageUrl != null) {
+                Glide.with(this).load(imageUrl).into(ivEventPoster);
+            }
 
-        // Enable only if registration deadline is in the future (or not set)
-        Date deadline = event.getRegistrationCloses();
-        boolean canJoin = (deadline == null) || deadline.after(new Date());
-        btnJoin.setEnabled(canJoin);
-        if (!canJoin) btnJoin.setText("Registration closed");
+            // Enable only if registration deadline is in the future (or not set)
+            Date deadline = event.getRegistrationCloses();
+            boolean canJoin = (deadline == null) || deadline.after(new Date());
+            buttonJoinWaitlist.setEnabled(canJoin);
+            if (!canJoin) buttonJoinWaitlist.setText("Registration closed");
+        });
     }
 
     private String formatWindow(Date start, Date end, Date regClose) {
@@ -121,6 +140,26 @@ public class EventDetailsFragment extends Fragment {
 
     private static String nullTo(String s, String fallback) {
         return s == null ? fallback : s;
+    }
+
+    private void setupListeners() {
+        buttonJoinWaitlist.setOnClickListener(v -> viewModel.joinWaitlist());
+        buttonLeaveWaitlist.setOnClickListener(v -> viewModel.leaveWaitlist());
+    }
+
+    private void showJoinWaitlist() {
+        buttonJoinWaitlist.setVisibility(View.VISIBLE);
+        buttonLeaveWaitlist.setVisibility(View.GONE);
+    }
+
+    private void showLeaveWaitlist() {
+        buttonJoinWaitlist.setVisibility(View.GONE);
+        buttonLeaveWaitlist.setVisibility(View.VISIBLE);
+    }
+
+    private void showNoButtons() {
+        buttonJoinWaitlist.setVisibility(View.GONE);
+        buttonLeaveWaitlist.setVisibility(View.GONE);
     }
 }
 

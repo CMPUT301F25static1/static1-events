@@ -1,16 +1,16 @@
 package com.static1.fishylottery.viewmodel;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
-import com.static1.fishylottery.model.repositories.EventRepository;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 
@@ -25,6 +25,7 @@ public class EventDetailsViewModel extends ViewModel {
     private MutableLiveData<Event> event = new MutableLiveData<>();
     private MutableLiveData<String> message = new MutableLiveData<>();
     private MutableLiveData<Boolean> loading = new MutableLiveData<>();
+    private MutableLiveData<WaitlistEntry> waitlistEntry = new MutableLiveData<>();
     private MutableLiveData<List<Profile>> waitingList = new MutableLiveData<>(new ArrayList<>());
     private MutableLiveData<List<Profile>> invitedList = new MutableLiveData<>(new ArrayList<>());
     private MutableLiveData<List<Profile>> enrolledList = new MutableLiveData<>(new ArrayList<>());
@@ -39,9 +40,23 @@ public class EventDetailsViewModel extends ViewModel {
         return event;
     }
     public LiveData<Boolean> isLoading() { return loading; }
+    public LiveData<WaitlistEntry> getWaitlistEntry() {
+        return waitlistEntry;
+    }
 
     public void setEvent(Event event) {
         this.event.setValue(event);
+    }
+
+    public void loadWaitlistEntry(Event event) {
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) return;
+
+        waitlistRepository.getWaitlistEntry(event, user.getUid()).addOnSuccessListener(entry -> {
+            waitlistEntry.setValue(entry);
+        });
     }
 
     public void loadEventEntrants(String eventId) {
@@ -80,8 +95,10 @@ public class EventDetailsViewModel extends ViewModel {
         return false;
     }
 
-    public void joinWaitlist(Event event) {
-        if (event == null || event.getEventId() == null) {
+    public void joinWaitlist() {
+        Event e = event.getValue();
+
+        if (e == null || e.getEventId() == null) {
             message.setValue("Missing event ID");
             return;
         }
@@ -109,19 +126,54 @@ public class EventDetailsViewModel extends ViewModel {
                     entry.setProfile(profile);
                     entry.setStatus("waiting");
 
-                    waitlistRepository.joinWaitlist(event, entry)
+                    waitlistRepository.addToWaitlist(e, entry)
                             .addOnSuccessListener(unused -> {
                                 loading.setValue(false);
                                 message.setValue("Joined waitlist!");
                             })
-                            .addOnFailureListener(e -> {
+                            .addOnFailureListener(exception -> {
                                 loading.setValue(false);
-                                message.setValue("Failed: " + e.getMessage());
+                                message.setValue("Failed: " + exception.getMessage());
                             });
                 })
-                .addOnFailureListener(e -> {
+                .addOnFailureListener(exception -> {
                     loading.setValue(false);
-                    message.setValue("Error loading profile: " + e.getMessage());
+                    message.setValue("Error loading profile: " + exception.getMessage());
                 });
+    }
+
+    public void leaveWaitlist() {
+        Event e = event.getValue();
+        if (e == null) {
+            return;
+        }
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+            return;
+        }
+
+        String uid = user.getUid();
+
+        waitlistRepository.deleteFromWaitlist(e, uid)
+                 .addOnSuccessListener(l -> {
+                     loading.setValue(false);
+                     message.setValue("Removed from the waitlist");
+                     waitlistEntry.setValue(null);
+                 })
+                .addOnFailureListener(exception -> {
+                    loading.setValue(false);
+                    message.setValue("Failed to leave the waitlist");
+                    Log.d("EventDetails", "Failed to delete from waitlist", exception);
+                });
+    }
+
+    public void acceptInvite() {
+        // TODO: Accept the invite by updating the status in the waitlist
+    }
+
+    public void declineInvite() {
+        // TODO: Decline the invite by updating the status in the waitlist
     }
 }

@@ -149,7 +149,16 @@ android:layout_height="match_parent">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="JOIN WAITLIST"
+        android:text="Join Waitlist"
+        android:layout_marginBottom="30dp"/>
+
+    <Button
+        android:id="@+id/button_leave_waitlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Leave Waitlist"
+        android:visibility="gone"
         android:layout_marginBottom="30dp"/>
 
     <TextView
