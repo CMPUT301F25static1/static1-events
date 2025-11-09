@@ -14,8 +14,8 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.static1.fishylottery.R;
+import com.static1.fishylottery.services.AuthManager;
 import com.static1.fishylottery.viewmodel.NotificationsViewModel;
 
 public class NotificationsFragment extends Fragment {
@@ -63,7 +63,7 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        String uid = FirebaseAuth.getInstance().getUid();
+        String uid = AuthManager.getInstance().getUserId();
         if (uid != null) vm.start(uid);
     }
 
