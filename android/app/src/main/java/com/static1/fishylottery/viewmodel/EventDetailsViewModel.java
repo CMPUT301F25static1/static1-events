@@ -90,11 +90,9 @@ public class EventDetailsViewModel extends ViewModel {
         return enrolledList;
     }
 
-    public boolean canJoinNow() {
-        // TODO
-        return false;
-    }
-
+    /**
+     * Allows the user to join the waitlist.
+     */
     public void joinWaitlist() {
         Event e = event.getValue();
 
@@ -130,6 +128,7 @@ public class EventDetailsViewModel extends ViewModel {
                             .addOnSuccessListener(unused -> {
                                 loading.setValue(false);
                                 message.setValue("Joined waitlist!");
+                                waitlistEntry.setValue(entry);
                             })
                             .addOnFailureListener(exception -> {
                                 loading.setValue(false);
@@ -142,21 +141,31 @@ public class EventDetailsViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Allows the entrant to leave a waitlist. They must already be on a waitlist.
+     * The UI buttons and success/error messages are updated by this method.
+     */
     public void leaveWaitlist() {
         Event e = event.getValue();
         if (e == null) {
             return;
         }
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        WaitlistEntry currentEntry = waitlistEntry.getValue();
 
-        if (user == null) {
+        if (currentEntry == null) {
+            message.setValue("User is not on a waitlist");
             return;
         }
 
-        String uid = user.getUid();
+        String profileId = currentEntry.getProfile().getUid();
 
-        waitlistRepository.deleteFromWaitlist(e, uid)
+        if (profileId == null) {
+            message.setValue("Failed to leave waitlist");
+            return;
+        }
+
+        waitlistRepository.deleteFromWaitlist(e, profileId)
                  .addOnSuccessListener(l -> {
                      loading.setValue(false);
                      message.setValue("Removed from the waitlist");
@@ -169,11 +178,84 @@ public class EventDetailsViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Accepts the invite for a user if they have one.
+     * User must be on a waitlist and their status is "invited"
+     */
     public void acceptInvite() {
-        // TODO: Accept the invite by updating the status in the waitlist
+        WaitlistEntry currentEntry = waitlistEntry.getValue();
+        Event currentEvent = event.getValue();
+
+        if (currentEvent == null) {
+            message.setValue("The event is not ready");
+            return;
+        }
+
+        if (currentEntry == null) {
+            message.setValue("Not on the waitlist");
+            return;
+        }
+
+        if (!"invited".equals(currentEntry.getStatus())) {
+            message.setValue("No invitation to accept");
+            return;
+        }
+
+        // We have checked the conditions, the acceptance status can now be updated
+        currentEntry.setStatus("accepted");
+        currentEntry.setAcceptedAt(new Date());
+
+        loading.setValue(true);
+
+        waitlistRepository.addToWaitlist(event.getValue(), currentEntry)
+                .addOnSuccessListener(unused -> {
+                    loading.setValue(false);
+                    message.setValue("Successfully accepted invite!");
+
+                    // Update the live data with the current entry
+                    waitlistEntry.setValue(currentEntry);
+                })
+                .addOnFailureListener(exception -> {
+                    loading.setValue(false);
+                    message.setValue("Could not accept invite");
+                    Log.e("Waitlist", "Failed to accept invite", exception);
+                });
     }
 
     public void declineInvite() {
-        // TODO: Decline the invite by updating the status in the waitlist
-    }
+        WaitlistEntry currentEntry = waitlistEntry.getValue();
+        Event currentEvent = event.getValue();
+
+        if (currentEvent == null) {
+            message.setValue("The event is not ready");
+            return;
+        }
+
+        if (currentEntry == null) {
+            message.setValue("Not on the waitlist");
+            return;
+        }
+
+        if (!"invited".equals(currentEntry.getStatus())) {
+            message.setValue("No invitation to decline");
+            return;
+        }
+
+        // Update status and timestamp
+        currentEntry.setStatus("declined");
+        currentEntry.setDeclinedAt(new Date());
+
+        loading.setValue(true);
+
+        waitlistRepository.addToWaitlist(currentEvent, currentEntry)
+                .addOnSuccessListener(unused -> {
+                    loading.setValue(false);
+                    message.setValue("Successfully declined invite!");
+                    waitlistEntry.setValue(currentEntry);
+                })
+                .addOnFailureListener(exception -> {
+                    loading.setValue(false);
+                    message.setValue("Could not decline invite");
+                    Log.e("Waitlist", "Failed to decline invite", exception);
+                });    }
 }

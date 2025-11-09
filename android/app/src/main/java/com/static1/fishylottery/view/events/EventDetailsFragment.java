@@ -32,9 +32,18 @@ public class EventDetailsFragment extends Fragment {
     private final SimpleDateFormat df =
             new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
 
-    private TextView tvTitle, tvDesc, tvWhere, tvWhen;
+    private TextView tvTitle,
+            tvDesc,
+            tvWhere,
+            tvWhen,
+            tvHostedBy,
+            tvMaxAttendees,
+            tvMaxWaitlist;
     private ImageView ivEventPoster;
-    private Button buttonJoinWaitlist, buttonLeaveWaitlist;
+    private Button buttonJoinWaitlist,
+            buttonLeaveWaitlist,
+            buttonAcceptInvite,
+            buttonDeclineInvite;
     private EventDetailsViewModel viewModel;
 
     @Nullable
@@ -51,8 +60,14 @@ public class EventDetailsFragment extends Fragment {
         tvDesc  = v.findViewById(R.id.text_desc);
         tvWhere = v.findViewById(R.id.text_where);
         tvWhen  = v.findViewById(R.id.text_when);
+        tvHostedBy = v.findViewById(R.id.text_hosted_by);
+        tvMaxAttendees = v.findViewById(R.id.text_max_attendees);
+        tvMaxWaitlist = v.findViewById(R.id.text_max_waitlist);
+
         buttonJoinWaitlist = v.findViewById(R.id.button_join_waitlist);
         buttonLeaveWaitlist = v.findViewById(R.id.button_leave_waitlist);
+        buttonAcceptInvite = v.findViewById(R.id.button_accept_invite);
+        buttonDeclineInvite = v.findViewById(R.id.button_decline_invite);
 
         // Receive event from args
         Bundle args = getArguments();
@@ -65,14 +80,20 @@ public class EventDetailsFragment extends Fragment {
             }
         }
 
-        bindUi();
-
         buttonJoinWaitlist.setOnClickListener(l -> {
             viewModel.joinWaitlist();
         });
 
         buttonLeaveWaitlist.setOnClickListener(l -> {
             viewModel.leaveWaitlist();
+        });
+
+        buttonAcceptInvite.setOnClickListener(l -> {
+            viewModel.acceptInvite();
+        });
+
+        buttonDeclineInvite.setOnClickListener(l -> {
+            viewModel.declineInvite();
         });
 
         viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
@@ -82,31 +103,26 @@ public class EventDetailsFragment extends Fragment {
         viewModel.isLoading().observe(getViewLifecycleOwner(), loading -> {
             buttonJoinWaitlist.setEnabled(!loading);
             buttonLeaveWaitlist.setEnabled(!loading);
+            buttonAcceptInvite.setEnabled(!loading);
+            buttonDeclineInvite.setEnabled(!loading);
         });
-
-        showJoinWaitlist();
 
         viewModel.getWaitlistEntry().observe(getViewLifecycleOwner(), entry -> {
-            if (entry == null) {
-                showJoinWaitlist();
-            } else if (entry.getStatus().equals("waiting")) {
-                showLeaveWaitlist();
-            } else {
-                showNoButtons();
+            String status = "no_waitlist";
+
+            if (entry != null) {
+                status = entry.getStatus();
             }
+
+            updateButtons(status);
         });
 
-        setupListeners();
-
-        return v;
-    }
-
-    private void bindUi() {
         viewModel.getEvent().observe(getViewLifecycleOwner(), event -> {
             if (event == null) {
                 buttonJoinWaitlist.setEnabled(false);
                 return;
             }
+
             tvTitle.setText(nullTo(event.getTitle(), "(untitled)"));
             tvDesc.setText(nullTo(event.getDescription(), "—"));
             tvWhere.setText(nullTo(event.getLocation(), "—"));
@@ -114,6 +130,9 @@ public class EventDetailsFragment extends Fragment {
                     event.getEventStartDate(),
                     event.getEventEndDate(),
                     event.getRegistrationCloses()));
+            tvHostedBy.setText(nullTo(event.getHostedBy(), ""));
+            tvMaxAttendees.setText("Max Attendees: " + nullTo(event.getCapacity(), "None"));
+            tvMaxWaitlist.setText("Max Waitlist: " + nullTo(event.getMaxWaitlistSize(), "None"));
 
             String imageUrl = event.getImageUrl();
 
@@ -121,6 +140,9 @@ public class EventDetailsFragment extends Fragment {
 
             if (imageUrl != null) {
                 Glide.with(this).load(imageUrl).into(ivEventPoster);
+                ivEventPoster.setVisibility(View.VISIBLE);
+            } else {
+                ivEventPoster.setVisibility(View.GONE);
             }
 
             // Enable only if registration deadline is in the future (or not set)
@@ -129,6 +151,10 @@ public class EventDetailsFragment extends Fragment {
             buttonJoinWaitlist.setEnabled(canJoin);
             if (!canJoin) buttonJoinWaitlist.setText("Registration closed");
         });
+
+        setupListeners();
+
+        return v;
     }
 
     private String formatWindow(Date start, Date end, Date regClose) {
@@ -138,28 +164,36 @@ public class EventDetailsFragment extends Fragment {
         return "Start: " + s + "\nEnd: " + e + "\nRegistration closes: " + r;
     }
 
-    private static String nullTo(String s, String fallback) {
+    private static <T> T nullTo(T s, T fallback) {
         return s == null ? fallback : s;
     }
 
     private void setupListeners() {
         buttonJoinWaitlist.setOnClickListener(v -> viewModel.joinWaitlist());
         buttonLeaveWaitlist.setOnClickListener(v -> viewModel.leaveWaitlist());
+        buttonAcceptInvite.setOnClickListener(v -> viewModel.acceptInvite());
+        buttonDeclineInvite.setOnClickListener(v -> viewModel.declineInvite());
     }
 
-    private void showJoinWaitlist() {
-        buttonJoinWaitlist.setVisibility(View.VISIBLE);
-        buttonLeaveWaitlist.setVisibility(View.GONE);
-    }
-
-    private void showLeaveWaitlist() {
+    private void updateButtons(String status) {
         buttonJoinWaitlist.setVisibility(View.GONE);
-        buttonLeaveWaitlist.setVisibility(View.VISIBLE);
-    }
-
-    private void showNoButtons() {
-        buttonJoinWaitlist.setVisibility(View.GONE);
+        buttonDeclineInvite.setVisibility(View.GONE);
         buttonLeaveWaitlist.setVisibility(View.GONE);
+        buttonAcceptInvite.setVisibility(View.GONE);
+
+        switch (status) {
+            case "no_waitlist":
+                buttonJoinWaitlist.setVisibility(View.VISIBLE);
+                break;
+            case "waiting":
+                buttonLeaveWaitlist.setVisibility(View.VISIBLE);
+                break;
+            case "invited":
+                buttonAcceptInvite.setVisibility(View.VISIBLE);
+                buttonDeclineInvite.setVisibility(View.VISIBLE);
+            default:
+                break;
+        }
     }
 }
 

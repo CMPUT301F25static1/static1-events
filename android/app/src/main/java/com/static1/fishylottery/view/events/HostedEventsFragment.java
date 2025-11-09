@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -31,6 +33,7 @@ public class HostedEventsFragment extends Fragment {
     private RecyclerView recyclerView;
     private EventAdapter adapter;
     private AuthManager authManager;
+    private TextView textNoEventsMessage;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +45,7 @@ public class HostedEventsFragment extends Fragment {
 
         // The Event list
         eventsRepo = new EventRepository();
+        textNoEventsMessage = view.findViewById(R.id.text_no_events_message);
         recyclerView = view.findViewById(R.id.recycler_hosted_events);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -73,8 +77,17 @@ public class HostedEventsFragment extends Fragment {
             eventsRepo.fetchEventsByOrganizerId(uid)
                     .addOnSuccessListener(events -> {
                         adapter.submitList(events);
+
+                        if (events.isEmpty()) {
+                            textNoEventsMessage.setVisibility(View.VISIBLE);
+                        } else {
+                            textNoEventsMessage.setVisibility(View.GONE);
+                        }
+
                     }).addOnFailureListener(e -> {
                         Log.e("HostedEvents", "Failed to fetch events", e);
+                        Toast.makeText(getContext(), "Unable to get events", Toast.LENGTH_LONG).show();
+                        textNoEventsMessage.setVisibility(View.VISIBLE);
                     });
         }
     }
