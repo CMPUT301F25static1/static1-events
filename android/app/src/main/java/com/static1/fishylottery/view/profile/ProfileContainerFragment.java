@@ -24,10 +24,8 @@ public class ProfileContainerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile_container, container, false);
 
         MainApplication app = (MainApplication) requireActivity().getApplication();
-        AuthManager authManager = app.getAuthManager();
 
         controller = new ProfileController(
-                authManager,
                 new ProfileRepository(),
                 getChildFragmentManager(),
                 R.id.profile_container

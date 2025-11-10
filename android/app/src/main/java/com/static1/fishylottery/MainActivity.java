@@ -26,6 +26,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.color.utilities.Scheme;
 import com.static1.fishylottery.databinding.ActivityMainBinding;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.services.AuthManager;
 import com.static1.fishylottery.view.events.QrScanActivity;
 
 import java.util.Objects;
@@ -46,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        MainApplication app = (MainApplication) getApplication();
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -61,14 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
         eventRepo = new EventRepository();
 
-        // Setup the Firebase Anonymous Auth
-        app.getAuthManager().ensureSignedIn(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("AuthManager", "The user has been signed in");
-            }
-        });
-
         qrScanLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -78,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        setupAuth();
     }
 
     @Override
@@ -103,6 +97,19 @@ public class MainActivity extends AppCompatActivity {
                 (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
         NavController navController = navHostFragment.getNavController();
         return navController.navigateUp() || super.onSupportNavigateUp();
+    }
+
+    private void setupAuth() {
+        // Setup the Firebase Anonymous Auth
+        AuthManager.getInstance().signInAnonymously().addOnSuccessListener(result -> {
+            if (result.getUser() != null) {
+                Log.d("Auth", "Signed in user with uid: " + result.getUser().getUid());
+            } else {
+                Log.d("Auth", "User signed in, but no ID?");
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("Auth", "Could not sign in user. Try again later.", e);
+        });
     }
 
     private void openEventDetailsWithQrCode(String qrValue) {

@@ -6,13 +6,12 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
+import com.static1.fishylottery.services.AuthManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,12 +48,10 @@ public class EventDetailsViewModel extends ViewModel {
     }
 
     public void loadWaitlistEntry(Event event) {
+        String uid = AuthManager.getInstance().getUserId();
+        if (uid == null) return;
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user == null) return;
-
-        waitlistRepository.getWaitlistEntry(event, user.getUid()).addOnSuccessListener(entry -> {
+        waitlistRepository.getWaitlistEntry(event, uid).addOnSuccessListener(entry -> {
             waitlistEntry.setValue(entry);
         });
     }
@@ -101,15 +98,14 @@ public class EventDetailsViewModel extends ViewModel {
             return;
         }
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = AuthManager.getInstance().getUserId();
 
-        if (user == null) {
+        if (uid == null) {
             message.setValue("Please sign in first");
             return;
         }
 
         loading.setValue(true);
-        String uid = user.getUid();
 
         profileRepository.getProfileById(uid)
                 .addOnSuccessListener(profile -> {

@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.auth.FirebaseAuth;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
+import com.static1.fishylottery.services.AuthManager;
 
 public class ProfileViewModel extends ViewModel {
 
@@ -33,7 +33,7 @@ public class ProfileViewModel extends ViewModel {
 
     /** Loads current user's profile from repository */
     public void loadProfile() {
-        String uid = FirebaseAuth.getInstance().getUid();
+        String uid = AuthManager.getInstance().getUserId();
         if (uid == null) return;
 
         repository.getProfileById(uid)
@@ -43,7 +43,7 @@ public class ProfileViewModel extends ViewModel {
 
     /** Updates a user profile via repository */
     public Task<Void> updateProfile(String firstName, String lastName, String email, String phone) {
-        String uid = FirebaseAuth.getInstance().getUid();
+        String uid = AuthManager.getInstance().getUserId();
         if (uid == null) {
             return Tasks.forException(new IllegalStateException("User not logged in"));
         }
