@@ -32,7 +32,6 @@ public class HostedEventsFragment extends Fragment {
     private EventRepository eventsRepo;
     private RecyclerView recyclerView;
     private EventAdapter adapter;
-    private AuthManager authManager;
     private TextView textNoEventsMessage;
 
     @Override
@@ -40,8 +39,6 @@ public class HostedEventsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_hosted_events, container, false);
-        authManager = ((MainApplication) requireActivity().getApplication()).getAuthManager();
-
 
         // The Event list
         eventsRepo = new EventRepository();
@@ -71,7 +68,7 @@ public class HostedEventsFragment extends Fragment {
     }
 
     private void getEvents() {
-        String uid = authManager.getUserId();
+        String uid = AuthManager.getInstance().getUserId();
 
         if (uid != null) {
             eventsRepo.fetchEventsByOrganizerId(uid)
