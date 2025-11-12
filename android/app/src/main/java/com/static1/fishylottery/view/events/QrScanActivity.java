@@ -54,6 +54,10 @@ public class QrScanActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
         }
+
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getSupportActionBar().setDisplayShowHomeEnabled(true);
+
     }
 
     private void startCamera() {
@@ -128,6 +132,12 @@ public class QrScanActivity extends AppCompatActivity {
         } else {
             finish();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        getOnBackPressedDispatcher().onBackPressed();
+        return true;
     }
 
     @Override

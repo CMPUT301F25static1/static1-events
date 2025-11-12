@@ -81,7 +81,7 @@ public class EventDetailsFragment extends Fragment {
         }
 
         buttonJoinWaitlist.setOnClickListener(l -> {
-            viewModel.joinWaitlist();
+            viewModel.joinWaitlist(requireContext());
         });
 
         buttonLeaveWaitlist.setOnClickListener(l -> {
@@ -169,7 +169,7 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void setupListeners() {
-        buttonJoinWaitlist.setOnClickListener(v -> viewModel.joinWaitlist());
+        buttonJoinWaitlist.setOnClickListener(v -> viewModel.joinWaitlist(requireContext()));
         buttonLeaveWaitlist.setOnClickListener(v -> viewModel.leaveWaitlist());
         buttonAcceptInvite.setOnClickListener(v -> viewModel.acceptInvite());
         buttonDeclineInvite.setOnClickListener(v -> viewModel.declineInvite());

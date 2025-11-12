@@ -1,17 +1,21 @@
 package com.static1.fishylottery.viewmodel;
 
+import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.firestore.GeoPoint;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.services.AuthManager;
+import com.static1.fishylottery.services.LocationService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,7 +94,7 @@ public class EventDetailsViewModel extends ViewModel {
     /**
      * Allows the user to join the waitlist.
      */
-    public void joinWaitlist() {
+    public void joinWaitlist(Context context) {
         Event e = event.getValue();
 
         if (e == null || e.getEventId() == null) {
@@ -107,34 +111,50 @@ public class EventDetailsViewModel extends ViewModel {
 
         loading.setValue(true);
 
-        profileRepository.getProfileById(uid)
-                .addOnSuccessListener(profile -> {
-                    if (profile == null) {
-                        loading.setValue(false);
-                        message.setValue("Profile not found.");
-                        return;
-                    }
+        LocationService locationService = LocationService.create(context);
 
-                    WaitlistEntry entry = new WaitlistEntry();
-                    entry.setJoinedAt(new Date());
-                    entry.setProfile(profile);
-                    entry.setStatus("waiting");
+        locationService.getCurrentLocation(new LocationService.LocationCallback() {
+            @Override
+            public void onLocationResult(Location location) {
+                profileRepository.getProfileById(uid)
+                        .addOnSuccessListener(profile -> {
+                            if (profile == null) {
+                                loading.setValue(false);
+                                message.setValue("Profile not found.");
+                                return;
+                            }
 
-                    waitlistRepository.addToWaitlist(e, entry)
-                            .addOnSuccessListener(unused -> {
-                                loading.setValue(false);
-                                message.setValue("Joined waitlist!");
-                                waitlistEntry.setValue(entry);
-                            })
-                            .addOnFailureListener(exception -> {
-                                loading.setValue(false);
-                                message.setValue("Failed: " + exception.getMessage());
-                            });
-                })
-                .addOnFailureListener(exception -> {
-                    loading.setValue(false);
-                    message.setValue("Error loading profile: " + exception.getMessage());
-                });
+                            GeoPoint joinLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+
+                            WaitlistEntry entry = new WaitlistEntry();
+                            entry.setJoinedAt(new Date());
+                            entry.setProfile(profile);
+                            entry.setStatus("waiting");
+                            entry.setJoinLocation(joinLocation);
+
+                            waitlistRepository.addToWaitlist(e, entry)
+                                    .addOnSuccessListener(unused -> {
+                                        loading.setValue(false);
+                                        message.setValue("Joined waitlist!");
+                                        waitlistEntry.setValue(entry);
+                                    })
+                                    .addOnFailureListener(exception -> {
+                                        loading.setValue(false);
+                                        message.setValue("Failed: " + exception.getMessage());
+                                    });
+                        })
+                        .addOnFailureListener(exception -> {
+                            loading.setValue(false);
+                            message.setValue("Error loading profile: " + exception.getMessage());
+                        });
+            }
+
+            @Override
+            public void onLocationError(Exception e) {
+                loading.setValue(false);
+                message.setValue("Could not get device location: " + e.getMessage());
+            }
+        });
     }
 
     /**

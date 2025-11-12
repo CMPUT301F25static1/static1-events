@@ -104,9 +104,12 @@ public class HostedEventDetailsFragment extends Fragment {
         });
 
 
-        buttonViewMap.setOnClickListener(v ->
-                Navigation.findNavController(v)
-                        .navigate(R.id.action_hostedEventDetails_to_signupMap)
+        buttonViewMap.setOnClickListener(v -> {
+                    Bundle b = new Bundle();
+                    b.putSerializable("event", event);
+                    Navigation.findNavController(v)
+                        .navigate(R.id.action_hostedEventDetails_to_signupMap, b);
+                }
         );
 
 
