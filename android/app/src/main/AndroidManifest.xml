@@ -14,6 +14,7 @@
         android:theme="@style/Theme.FishyLottery">
         <activity
             android:name=".MainActivity"
+            android:theme="@style/Theme.FishyLottery"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +23,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".view.events.QrScanActivity" />
+        <activity
+            android:name=".view.events.QrScanActivity"
+            android:theme="@style/Theme.FishyLottery"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

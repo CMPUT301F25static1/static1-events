@@ -22,8 +22,6 @@ import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.viewmodel.SendNotificationsViewModel;
 
 public class SendNotificationsFragment extends Fragment {
-    public static final String ARG_EVENT_ID = "eventId";
-
     private SendNotificationsViewModel vm;
     private Event event;
 

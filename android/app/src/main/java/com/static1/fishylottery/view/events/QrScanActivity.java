@@ -3,9 +3,12 @@ package com.static1.fishylottery.view.events;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
@@ -19,6 +22,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -47,6 +51,9 @@ public class QrScanActivity extends AppCompatActivity {
         previewView = findViewById(R.id.camera_preview_view);
         cameraExecutor = Executors.newSingleThreadExecutor();
 
+        MaterialToolbar toolbar = findViewById(R.id.top_app_bar);
+        setSupportActionBar(toolbar);
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             startCamera();
@@ -55,9 +62,10 @@ public class QrScanActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
         }
 
-        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getSupportActionBar().setDisplayShowHomeEnabled(true);
-
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
     }
 
     private void startCamera() {
