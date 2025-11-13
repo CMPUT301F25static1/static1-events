@@ -66,7 +66,7 @@
 
         <action
             android:id="@+id/action_profile_to_admin_dashboard"
-            app:destination="@id/navigation_admin_dashboard"/>
+            app:destination="@id/navigation_admin_container"/>
 
         <action
             android:id="@+id/action_profile_to_notification_settings"
@@ -174,10 +174,10 @@
         tools:layout="@layout/fragment_view_qr_code"/>
 
     <fragment
-        android:id="@+id/navigation_admin_dashboard"
-        android:name="com.static1.fishylottery.view.admin.AdminDashboardFragment"
+        android:id="@+id/navigation_admin_container"
+        android:name="com.static1.fishylottery.view.admin.AdminContainerFragment"
         android:label="Administrators"
-        tools:layout="@layout/fragment_admin_dashboard">
+        tools:layout="@layout/fragment_admin_container">
 
         <action
             android:id="@+id/action_adminDashboard_to_allEvents"
