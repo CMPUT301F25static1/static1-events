@@ -18,7 +18,7 @@ public class AuthManager {
     private static AuthManager instance;
     private final FirebaseAuth auth;
 
-    private AuthManager(FirebaseAuth auth) {
+    public AuthManager(FirebaseAuth auth) {
         this.auth = auth;
     }
 
