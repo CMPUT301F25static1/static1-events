@@ -19,6 +19,14 @@ public class QrUtils {
      * @return A bitmap of the QR code.
      */
     public static Bitmap generateQrCode(String text, int size) {
+        if (text == null) {
+            throw new IllegalArgumentException("Input text cannot be null");
+        }
+
+        if (text.isEmpty()) {
+            throw new IllegalArgumentException("Input text cannot be empty");
+        }
+
         QRCodeWriter writer = new QRCodeWriter();
         try {
             var bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, size, size);

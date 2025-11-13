@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.IdRes;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -71,27 +72,13 @@ public class ProfileViewFragment extends Fragment {
     }
 
     private void setupListeners(View view) {
-        rowEditProfile.setOnClickListener(v -> openEditProfile(view));
-        rowNotifications.setOnClickListener(v -> openNotifications());
-        rowEventsHistory.setOnClickListener(v -> openEventsHistory());
-        rowAdminLogin.setOnClickListener(v -> openAdminLogin());
+        rowEditProfile.setOnClickListener(v ->navigateWithAction(view, R.id.action_profile_to_edit_profile));
+        rowNotifications.setOnClickListener(v -> navigateWithAction(view, R.id.action_profile_to_notification_settings));
+        rowEventsHistory.setOnClickListener(v -> navigateWithAction(view, R.id.action_profile_to_event_history));
+        rowAdminLogin.setOnClickListener(v -> navigateWithAction(view, R.id.action_profile_to_admin_dashboard));
     }
 
-    private void openEditProfile(View view) {
-        Navigation.findNavController(view).navigate(R.id.action_profile_to_edit_profile);
-    }
-
-
-
-    private void openNotifications() {
-        Toast.makeText(getContext(), "Notifications clicked", Toast.LENGTH_SHORT).show();
-    }
-
-    private void openEventsHistory() {
-        Toast.makeText(getContext(), "Events History clicked", Toast.LENGTH_SHORT).show();
-    }
-
-    private void openAdminLogin() {
-        Toast.makeText(getContext(), "Admin Login clicked", Toast.LENGTH_SHORT).show();
+    private void navigateWithAction(View view, @IdRes int action) {
+        Navigation.findNavController(view).navigate(action);
     }
 }

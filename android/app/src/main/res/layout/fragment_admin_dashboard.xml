@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingVertical="8dp">
+
+        <include layout="@layout/item_selectable_row"
+            android:id="@+id/row_all_events"
+            android:tag="All Events" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+
+        <include layout="@layout/item_selectable_row"
+            android:id="@+id/row_profiles"
+            android:tag="Profiles" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+
+        <include layout="@layout/item_selectable_row"
+            android:id="@+id/row_organizers"
+            android:tag="Organizers" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+
+        <include layout="@layout/item_selectable_row"
+            android:id="@+id/row_images"
+            android:tag="Uploaded Images" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+
+        <include layout="@layout/item_selectable_row"
+            android:id="@+id/row_notification_logs"
+            android:tag="Notification Logs" />
+    </LinearLayout>
+
+</ScrollView>
