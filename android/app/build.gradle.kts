@@ -1,7 +1,15 @@
+import java.util.Properties
+
+val secretsPropertiesFile = rootProject.file("secrets.properties")
+val secrets = Properties().apply {
+    if (secretsPropertiesFile.exists()) {
+        secretsPropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -17,7 +25,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders["MAPS_API_KEY"] = project.findProperty("MAPS_API_KEY") ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = secrets.getProperty("MAPS_API_KEY") ?: ""
     }
 
     buildTypes {
