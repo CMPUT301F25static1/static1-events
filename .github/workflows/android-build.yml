@@ -35,6 +35,11 @@ jobs:
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
+      - name: Create secrets.properties
+        working-directory: android
+        run: |
+          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" > secrets.properties
+
       # --- Step 1: Build project ---
       - name: Build project
         working-directory: android

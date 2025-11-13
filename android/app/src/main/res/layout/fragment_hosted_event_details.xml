@@ -12,15 +12,12 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-
         <include
             layout="@layout/content_event"
             android:id="@+id/event_details_info"
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp" />
-
 
         <LinearLayout
             android:layout_width="match_parent"

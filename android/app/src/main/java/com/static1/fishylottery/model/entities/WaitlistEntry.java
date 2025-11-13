@@ -1,9 +1,8 @@
 package com.static1.fishylottery.model.entities;
 
-import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Specifies an item in a waitlist which most importantly contains the user's profile and
@@ -17,6 +16,7 @@ public class WaitlistEntry {
     private Date declinedAt;
     private Date acceptedAt;
     private Profile profile;
+    private GeoPoint joinLocation;
 
     public WaitlistEntry() { } // Firestore needs no-arg
 
@@ -45,5 +45,12 @@ public class WaitlistEntry {
     }
     public void setProfile(Profile profile) {
         this.profile = profile;
+    }
+    public GeoPoint getJoinLocation()
+    {
+        return joinLocation;
+    }
+    public void setJoinLocation(GeoPoint joinLocation) {
+        this.joinLocation = joinLocation;
     }
 }

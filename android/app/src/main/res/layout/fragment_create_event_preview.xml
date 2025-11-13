@@ -10,8 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="?actionBarSize">
+        android:padding="16dp">
 
         <!-- Event Image -->
         <ImageView
@@ -170,6 +169,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="Finish" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"/>
 
     </LinearLayout>
 </ScrollView>

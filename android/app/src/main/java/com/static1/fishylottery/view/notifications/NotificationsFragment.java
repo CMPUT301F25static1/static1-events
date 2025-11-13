@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +37,7 @@ public class NotificationsFragment extends Fragment {
         super.onViewCreated(v, savedInstanceState);
 
         RecyclerView rv = v.findViewById(R.id.rvNotifications);
+        TextView textNoNotificationsMessage = v.findViewById(R.id.text_no_notifications_message);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         adapter = new NotificationAdapter();
@@ -43,7 +45,10 @@ public class NotificationsFragment extends Fragment {
 
         vm = new ViewModelProvider(this).get(NotificationsViewModel.class);
 
-        vm.getInbox().observe(getViewLifecycleOwner(), items -> adapter.submit(items));
+        vm.getInbox().observe(getViewLifecycleOwner(), items -> {
+            textNoNotificationsMessage.setVisibility(items.isEmpty() ? View.VISIBLE : View.GONE);
+            adapter.submit(items);
+        });
 
         adapter.setOnNotificationClick(n -> {
             NavController nav = Navigation.findNavController(v);

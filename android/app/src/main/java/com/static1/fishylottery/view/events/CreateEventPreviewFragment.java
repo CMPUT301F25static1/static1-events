@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,17 +50,19 @@ public class CreateEventPreviewFragment extends Fragment {
 
         Button button = view.findViewById(R.id.button_create_event);
 
+        eventPosterImage.setVisibility(View.GONE);
+
         // Show validation errors emitted by the ViewModel
         vm.getValidationError().observe(getViewLifecycleOwner(), msg -> {
-            if (msg != null && getView() != null) {
-                Snackbar.make(getView(), msg, Snackbar.LENGTH_LONG).show();
+            if (msg != null && !msg.isEmpty()) {
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show();
             }
         });
 
         button.setOnClickListener(v -> {
             boolean ok = vm.submit();   // runs the checks; saves if valid
             if (ok) {
-                Snackbar.make(v, "Event created!", Snackbar.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Event created!", Toast.LENGTH_SHORT).show();
                 // navigate here for a nav target:
                 Navigation.findNavController(view).popBackStack(R.id.navigation_events, false);
             }
@@ -82,7 +85,14 @@ public class CreateEventPreviewFragment extends Fragment {
             textMaxWaitlistSize.setText(maxWaitlistSize);
         });
 
-        vm.getImageUri().observe(getViewLifecycleOwner(), eventPosterImage::setImageURI);
+        vm.getImageUri().observe(getViewLifecycleOwner(), imageUri -> {
+            if (imageUri == null) {
+                eventPosterImage.setVisibility(View.GONE);
+            } else {
+                eventPosterImage.setVisibility(View.VISIBLE);
+                eventPosterImage.setImageURI(imageUri);
+            }
+        });
 
         return view;
     }
