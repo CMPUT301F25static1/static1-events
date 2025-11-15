@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,6 +25,7 @@ import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.services.LocationService;
+import com.static1.fishylottery.viewmodel.HostedEventDetailsViewModel;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,8 +36,7 @@ import java.util.Locale;
 
 public class SignupMapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap map;
-    private Event event;
-    private WaitlistRepository waitlistRepository;
+    private List<WaitlistEntry> pendingEntries;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,11 +44,7 @@ public class SignupMapFragment extends Fragment implements OnMapReadyCallback {
 
         View view = inflater.inflate(R.layout.fragment_signup_map, container, false);
 
-        waitlistRepository = new WaitlistRepository();
-
-        if (getArguments() != null) {
-            event = (Event) getArguments().getSerializable("event");
-        }
+        HostedEventDetailsViewModel viewModel = new ViewModelProvider(requireActivity()).get(HostedEventDetailsViewModel.class);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_signup);
 
@@ -55,7 +52,13 @@ public class SignupMapFragment extends Fragment implements OnMapReadyCallback {
             mapFragment.getMapAsync(this);
         }
 
-        fetchWaitlist(event);
+        viewModel.getWaitlist().observe(getViewLifecycleOwner(), entries -> {
+            if (map != null) {
+                addLocationsToMap(entries);
+            } else {
+                pendingEntries = entries;
+            }
+        });
 
         return view;
     }
@@ -86,16 +89,11 @@ public class SignupMapFragment extends Fragment implements OnMapReadyCallback {
                 Log.e("LocationService", "Failed to get location", e);
             }
         });
-    }
 
-    private void fetchWaitlist(Event event) {
-        if (event == null) return;
-
-        waitlistRepository.getWaitlist(event)
-                .addOnSuccessListener(this::addLocationsToMap)
-                .addOnFailureListener(e -> {
-                    Log.e("Waitlist", "Failed to get waitlist for event", e);
-                });
+        if (pendingEntries != null) {
+            addLocationsToMap(pendingEntries);
+            pendingEntries = null;
+        }
     }
 
     private void addLocationsToMap(List<WaitlistEntry> entries) {

@@ -4,36 +4,29 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.color.utilities.Scheme;
 import com.static1.fishylottery.databinding.ActivityMainBinding;
 import com.static1.fishylottery.model.repositories.EventRepository;
 import com.static1.fishylottery.services.AuthManager;
@@ -61,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
         MaterialToolbar toolbar = findViewById(R.id.top_app_bar);
 
         setSupportActionBar(toolbar);
@@ -77,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        forceWhiteNavigationIcon(toolbar);
+
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            forceWhiteNavigationIcon(toolbar);
+        });
 
         eventRepo = new EventRepository();
 
@@ -204,4 +202,18 @@ public class MainActivity extends AppCompatActivity {
                     LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
+    private void forceWhiteNavigationIcon(MaterialToolbar toolbar) {
+        toolbar.post(() -> {
+            Drawable icon = toolbar.getNavigationIcon();
+            if (icon != null) {
+                icon = DrawableCompat.wrap(icon).mutate();
+                DrawableCompat.setTint(
+                        icon,
+                        ContextCompat.getColor(this, R.color.white)
+                );
+                toolbar.setNavigationIcon(icon);
+            }
+        });
+    }
+
 }
