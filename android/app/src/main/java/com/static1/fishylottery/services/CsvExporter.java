@@ -11,8 +11,18 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * This is the CSV exporter class which allows the exporting of data to CSV files in the form of
+ * an output stream.
+ */
 public class CsvExporter {
 
+    /**
+     * Export the final accepted entrants on a waitlist to an OutputStream in the CSV file format.
+     * @param entries The list of entrants on the waitlist.
+     * @param out The created OutputStream.
+     * @throws IOException An exception if there is a issue with the file.
+     */
     public void exportWaitlist(List<WaitlistEntry> entries, OutputStream out) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out))) {
 
