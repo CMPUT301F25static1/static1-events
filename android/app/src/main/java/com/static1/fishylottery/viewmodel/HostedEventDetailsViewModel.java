@@ -1,6 +1,7 @@
 package com.static1.fishylottery.viewmodel;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,8 +15,8 @@ import com.static1.fishylottery.model.repositories.EventRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.services.CsvExporter;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,7 +54,7 @@ public class HostedEventDetailsViewModel extends ViewModel {
         eventRepository = new EventRepository();
     }
 
-    public void exportCsv(Context context) {
+    public void exportCsv(Context context, Uri uri) {
         List<WaitlistEntry> acceptedEntrants = waitlist.getValue()
                 .stream()
                 .filter(e -> e.getStatus().equals("accepted"))
@@ -64,12 +65,9 @@ public class HostedEventDetailsViewModel extends ViewModel {
             return;
         }
 
-        File csvFile = new File(context.getExternalFilesDir(null), "accepted_entrants.csv");
-
-        CsvExporter exporter = new CsvExporter();
-
-        try {
-            exporter.exportWaitlist(acceptedEntrants, csvFile);
+        try (OutputStream out = context.getContentResolver().openOutputStream(uri)) {
+            CsvExporter exporter = new CsvExporter();
+            exporter.exportWaitlist(acceptedEntrants, out);
             message.setValue("Export complete!");
         } catch (IOException e) {
             Log.e("CsvExporter", e.getMessage() != null ? e.getMessage() : "Unknown CSV error");

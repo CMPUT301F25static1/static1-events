@@ -1,5 +1,8 @@
 package com.static1.fishylottery.view.events.hosted;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -26,6 +31,16 @@ import com.static1.fishylottery.viewmodel.HostedEventDetailsViewModel;
 public class HostedEventDetailsFragment extends Fragment {
     private Event event;
     private HostedEventDetailsViewModel viewModel;
+    private final ActivityResultLauncher<Intent> createFileLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri uri = result.getData().getData();
+                    if (uri != null) {
+                        viewModel.
+                                exportCsv(requireContext(), uri);
+                    }
+                }
+            });
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -76,11 +91,8 @@ public class HostedEventDetailsFragment extends Fragment {
 
 
         // Nav hooks (pass event where needed)
-        buttonViewWaitlist.setOnClickListener(v -> {
-            Navigation.findNavController(v)
-                    .navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist);
-        });
-
+        buttonViewWaitlist.setOnClickListener(v -> Navigation.findNavController(v)
+                .navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist));
 
         buttonSendNotifications.setOnClickListener(v -> {
             Bundle b = new Bundle();
@@ -98,14 +110,12 @@ public class HostedEventDetailsFragment extends Fragment {
         });
 
 
-        buttonViewMap.setOnClickListener(v -> {
-                    Navigation.findNavController(v)
-                        .navigate(R.id.action_hostedEventDetails_to_signupMap);
-                }
+        buttonViewMap.setOnClickListener(v -> Navigation.findNavController(v)
+                        .navigate(R.id.action_hostedEventDetails_to_signupMap)
         );
 
 
-        buttonExportEnrolled.setOnClickListener(v -> viewModel.exportCsv(getContext()));
+        buttonExportEnrolled.setOnClickListener(v -> startCsvExport());
 
         buttonRunLottery.setOnClickListener(v -> viewModel.runLottery());
 
@@ -121,5 +131,12 @@ public class HostedEventDetailsFragment extends Fragment {
         viewModel.fetchWaitlist(event);
 
         return view;
+    }
+
+    private void startCsvExport() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_TITLE, "accepted_entrants.csv");
+        createFileLauncher.launch(intent);
     }
 }

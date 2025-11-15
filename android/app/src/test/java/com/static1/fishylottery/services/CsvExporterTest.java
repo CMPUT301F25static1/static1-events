@@ -5,9 +5,8 @@ import com.static1.fishylottery.model.entities.WaitlistEntry;
 
 import org.junit.Test;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,18 +38,16 @@ public class CsvExporterTest {
 
         CsvExporter csvExporter =  new CsvExporter();
 
-        File tempFile = File.createTempFile("test", ".csv");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        csvExporter.exportWaitlist(entries, tempFile);
+        csvExporter.exportWaitlist(entries, outputStream);
 
-        String content = new String(Files.readAllBytes(tempFile.toPath()));
+        String content = outputStream.toString();
 
         String joinDateString = formatter.format(joinDate);
         String acceptedDateString = formatter.format(acceptedDate);
 
         assertTrue(content.contains("First Name,Last Name,Email,Phone,Joined At,Accepted At"));
         assertTrue(content.contains("John,Doe,john.doe@example.com,(111) 111-1111," + joinDateString + "," + acceptedDateString));
-
-        tempFile.deleteOnExit();
     }
 }
