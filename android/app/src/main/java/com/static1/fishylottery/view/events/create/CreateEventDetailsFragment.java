@@ -408,14 +408,14 @@ public class CreateEventDetailsFragment extends Fragment {
             if (selectedLat != null) {
                 Log.d("GeoLocation", "Latitude: " + selectedLat);
                 textInputLatitude.setVisibility(View.VISIBLE);
-                textInputLatitude.setText(String.format("%.4f", selectedLat));
+                textInputLatitude.setText(String.format("%.6f", selectedLat));
 
             }
 
             if (selectedLng != null) {
                 Log.d("GeoLocation", "Longitude: " + selectedLng);
                 textInputLongitude.setVisibility(View.VISIBLE);
-                textInputLongitude.setText(String.format("%.4f", selectedLng));
+                textInputLongitude.setText(String.format("%.6f", selectedLng));
             }
 
             if (selectedRadius != null) {

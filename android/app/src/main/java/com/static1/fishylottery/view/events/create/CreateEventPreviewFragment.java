@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.firebase.firestore.GeoPoint;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.viewmodel.CreateEventViewModel;
 import com.static1.fishylottery.services.DateUtils;
@@ -43,6 +45,9 @@ public class CreateEventPreviewFragment extends Fragment {
         TextView textHostedBy = view.findViewById(R.id.text_hosted_by);
         TextView textMaxAttendees = view.findViewById(R.id.text_max_attendees);
         TextView textMaxWaitlistSize = view.findViewById(R.id.text_max_waitlist);
+        TextView textGeolocationRequirementLocation = view.findViewById(R.id.text_geolocation_requirement_location);
+        TextView textGeolocationRequirementRadius = view.findViewById(R.id.text_geolocation_requirement_radius);
+        LinearLayout layoutGeolocationRequirement = view.findViewById(R.id.layout_geolocation);
 
         ImageView eventPosterImage = view.findViewById(R.id.image_event_poster);
 
@@ -76,6 +81,14 @@ public class CreateEventPreviewFragment extends Fragment {
             textHostedBy.setText(event.getHostedBy());
             textRegistrationCloses.setText(DateUtils.formatDateTime(event.getRegistrationCloses()));
 
+            if (event.getLocationRequirement() != null && event.getLocationRequirement().getEnabled()) {
+                layoutGeolocationRequirement.setVisibility(View.VISIBLE);
+                textGeolocationRequirementLocation.setText("Location: " + formatLocationRequirement(event.getLocationRequirement().getLocation()));
+                textGeolocationRequirementRadius.setText(String.format("Radius: %.1f km", event.getLocationRequirement().getRadius() / 1000));
+            } else {
+                layoutGeolocationRequirement.setVisibility(View.GONE);
+            }
+
             String maxAttendees = "Max Attendees: " + (event.getCapacity() != null ? event.getCapacity().toString() : "None");
             String maxWaitlistSize = "Max Waitlist: " + (event.getMaxWaitlistSize() != null ? event.getMaxWaitlistSize().toString() : "None");
 
@@ -93,5 +106,21 @@ public class CreateEventPreviewFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private String formatLocationRequirement(GeoPoint geopoint) {
+
+        if (geopoint == null) return "";
+
+        double lat = geopoint.getLatitude();
+        double lng = geopoint.getLongitude();
+
+        String ns = lat >= 0 ? "N" : "S";
+        String ew = lng >= 0 ? "E" : "W";
+
+        double latAbs = Math.abs(lat);
+        double lngAbs = Math.abs(lng);
+
+        return String.format("%.6f° %s, %.6f° %s", latAbs, ns, lngAbs, ew);
     }
 }

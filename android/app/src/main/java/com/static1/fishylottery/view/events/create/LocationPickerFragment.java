@@ -36,10 +36,12 @@ public class LocationPickerFragment extends Fragment implements OnMapReadyCallba
 
     private Double centerLat = 37.7749;
     private Double centerLng = -122.4194;
-    private Double radiusMeters = 300.0;
+    private Double radiusMeters = 1000.0;
 
     private SeekBar radiusSeekBar;
     private TextView radiusLabel;
+    private static final int MIN_RADIUS = 1000;
+    private static final int MAX_RADIUS = 1_000_000;
 
     @Nullable
     @Override
@@ -50,15 +52,18 @@ public class LocationPickerFragment extends Fragment implements OnMapReadyCallba
 
         radiusLabel = view.findViewById(R.id.radius_label);
         radiusSeekBar = view.findViewById(R.id.radius_seek_bar);
-        radiusSeekBar.setProgress(radiusMeters.intValue());
+
+        radiusSeekBar.setMax(MAX_RADIUS - MIN_RADIUS);
+        radiusSeekBar.setProgress(radiusMeters.intValue() - MIN_RADIUS);
 
         radiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                radiusMeters = Integer.valueOf(progress).doubleValue();
-                double km = (double) progress / 1000;
-                radiusLabel.setText(String.format("Radius: %.1f km", km));
-                updateCircle((double) progress);
+                int radius = progress + MIN_RADIUS;
+
+                radiusMeters = Integer.valueOf(radius).doubleValue();
+                updateRadiusLabel(radiusMeters);
+                updateCircle(radiusMeters);
             }
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
@@ -90,6 +95,8 @@ public class LocationPickerFragment extends Fragment implements OnMapReadyCallba
             view.setPadding(0, 0,0, navView.getHeight());
         });
 
+        updateRadiusLabel(radiusMeters);
+
         return view;
     }
 
@@ -104,7 +111,7 @@ public class LocationPickerFragment extends Fragment implements OnMapReadyCallba
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
                 Log.d("Location", pos.toString());
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 14f));
-                googleMap.addMarker(new MarkerOptions()
+                centerMarker = googleMap.addMarker(new MarkerOptions()
                         .position(pos)
                         .draggable(true)
                         .title("Event Location"));
@@ -115,6 +122,9 @@ public class LocationPickerFragment extends Fragment implements OnMapReadyCallba
                         .strokeWidth(2)
                         .strokeColor(0xFF0066FF)
                         .fillColor(0x220066FF));
+
+                centerLat = location.getLatitude();
+                centerLng = location.getLongitude();
             }
 
             @Override
@@ -141,9 +151,23 @@ public class LocationPickerFragment extends Fragment implements OnMapReadyCallba
     }
 
     private void updateCircle(Double radius) {
-        if (radiusCircle != null) {
+        if (googleMap == null) return;
+
+        if (radiusCircle == null) {
+            radiusCircle = googleMap.addCircle(new CircleOptions()
+                    .center(new LatLng(centerLat, centerLng))
+                    .radius(radius)
+                    .strokeWidth(2)
+                    .strokeColor(0xFF0066FF)
+                    .fillColor(0x220066FF)
+            );
+        } else {
             radiusCircle.setRadius(radius);
             radiusCircle.setCenter(new LatLng(centerLat, centerLng));
         }
+    }
+
+    private void updateRadiusLabel(Double radius) {
+        radiusLabel.setText(String.format("Radius: %.1f km", radius / 1000));
     }
 }
