@@ -12,6 +12,7 @@ import com.google.firebase.firestore.GeoPoint;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
+import com.static1.fishylottery.model.logic.JoinWaitlistRules;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.services.AuthManager;
@@ -116,6 +117,18 @@ public class EventDetailsViewModel extends ViewModel {
         locationService.getCurrentLocation(new LocationService.LocationCallback() {
             @Override
             public void onLocationResult(Location location) {
+                // Must validate if the user can join the event if there is geolocation requirement
+                boolean canJoin = JoinWaitlistRules.canJoinWithGeolocationRequirement(e, location);
+
+                if (!canJoin) {
+                    // User is outside of the join radius
+                    message.setValue("You are outside of the geolocation join radius");
+                    loading.setValue(false);
+                    return;
+                }
+
+                // User is able to join, so get the profile and add them to the waitlist
+
                 profileRepository.getProfileById(uid)
                         .addOnSuccessListener(profile -> {
                             if (profile == null) {
