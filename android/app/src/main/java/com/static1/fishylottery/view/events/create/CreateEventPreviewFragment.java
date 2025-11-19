@@ -1,4 +1,4 @@
-package com.static1.fishylottery.view.events;
+package com.static1.fishylottery.view.events.create;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,13 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.viewmodel.CreateEventViewModel;
 import com.static1.fishylottery.services.DateUtils;
