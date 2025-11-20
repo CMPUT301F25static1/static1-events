@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/light_blue_1">
-
+    android:background="@drawable/light_blue_6">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,6 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp" />
 
+
+        <!-- ROW 1 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,8 +27,8 @@
             android:orientation="horizontal"
             android:weightSum="2">
 
-
-            <LinearLayout
+            <!-- CARD: WAITLIST -->
+            <androidx.cardview.widget.CardView
                 android:id="@+id/btnViewWaitlist"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -35,30 +36,44 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/white">
 
-
-                <ImageView
-                    android:layout_width="51dp"
-                    android:layout_height="43dp"
-                    android:src="@drawable/waitlist" />
-
-
-                <Button
-                    android:id="@+id/button_view_waitlist"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="View Waitlist"
-                    android:backgroundTint="@color/white"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
+                    <ImageView
+                        android:layout_width="51dp"
+                        android:layout_height="43dp"
+                        android:src="@drawable/waitlist" />
 
-            <LinearLayout
+                    <Button
+                        android:id="@+id/button_view_waitlist"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="@color/white"
+                        android:text="View Waitlist"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/black"
+                        android:textSize="16dp"
+                        android:text = "   See people in line"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- CARD: MAP -->
+            <androidx.cardview.widget.CardView
                 android:id="@+id/btnViewMap"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -66,30 +81,44 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/white">
 
-
-                <ImageView
-                    android:layout_width="51dp"
-                    android:layout_height="43dp"
-                    android:src="@drawable/map" />
-
-
-                <Button
-                    android:id="@+id/button_view_map"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="View Map"
-                    android:backgroundTint="@color/white"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="51dp"
+                        android:layout_height="43dp"
+                        android:src="@drawable/map" />
+
+                    <Button
+                        android:id="@+id/button_view_map"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="View Map"
+                        android:textStyle="bold"
+                        android:backgroundTint="@color/white"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/black"
+                        android:textSize="16dp"
+                        android:text = "   Open the location"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
 
-
+        <!-- ROW 2 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,8 +126,8 @@
             android:orientation="horizontal"
             android:weightSum="2">
 
-
-            <LinearLayout
+            <!-- CARD: SEND NOTIFICATIONS -->
+            <androidx.cardview.widget.CardView
                 android:id="@+id/SendNotifications"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -106,30 +135,45 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/white">
 
-
-                <ImageView
-                    android:layout_width="51dp"
-                    android:layout_height="43dp"
-                    android:src="@drawable/arrow" />
-
-
-                <Button
-                    android:id="@+id/button_send_notifications"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Send Notifications"
-                    android:backgroundTint="@color/white"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
+                    <ImageView
+                        android:layout_width="51dp"
+                        android:layout_height="43dp"
+                        android:src="@drawable/arrow" />
 
-            <LinearLayout
+                    <Button
+                        android:id="@+id/button_send_notifications"
+                        android:layout_width="160dp"
+                        android:layout_height="68dp"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="@color/white"
+                        android:text="Send Notification"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/black"
+                        android:textSize="16dp"
+                        android:text = "        Notify People"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- CARD: RUN LOTTERY -->
+            <androidx.cardview.widget.CardView
                 android:id="@+id/btnRunLottery"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -137,30 +181,45 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/white">
 
-
-                <ImageView
-                    android:layout_width="51dp"
-                    android:layout_height="43dp"
-                    android:src="@drawable/run_lottery" />
-
-
-                <Button
-                    android:id="@+id/button_run_lottery"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Run Lottery"
-                    android:backgroundTint="@color/white"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="51dp"
+                        android:layout_height="43dp"
+                        android:src="@drawable/run_lottery" />
+
+                    <Button
+                        android:id="@+id/button_run_lottery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Run Lottery"
+                        android:backgroundTint="@color/white"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/black"
+                        android:textSize="16dp"
+                        android:text = "Pick random winners"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
 
-
+        <!-- ROW 3 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -168,8 +227,8 @@
             android:orientation="horizontal"
             android:weightSum="2">
 
-
-            <LinearLayout
+            <!-- CARD: EXPORT -->
+            <androidx.cardview.widget.CardView
                 android:id="@+id/btnSendNotifications"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -177,30 +236,44 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/white">
 
-
-                <ImageView
-                    android:layout_width="51dp"
-                    android:layout_height="43dp"
-                    android:src="@drawable/export" />
-
-
-                <Button
-                    android:id="@+id/button_export_enrolled"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Export Enrolled"
-                    android:backgroundTint="@color/white"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
+                    <ImageView
+                        android:layout_width="51dp"
+                        android:layout_height="43dp"
+                        android:src="@drawable/export" />
 
-            <LinearLayout
+                    <Button
+                        android:id="@+id/button_export_enrolled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Export Enrolled"
+                        android:textStyle="bold"
+                        android:backgroundTint="@color/white"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/black"
+                        android:textSize="16dp"
+                        android:text = "Export attendees' list"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- CARD: QR SCANNER -->
+            <androidx.cardview.widget.CardView
                 android:id="@+id/btnqrcode"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -208,28 +281,42 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/white">
 
-
-                <ImageView
-                    android:layout_width="51dp"
-                    android:layout_height="43dp"
-                    android:src="@drawable/qrcode" />
-
-
-                <Button
-                    android:id="@+id/button_view_qr_code"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="QR code scanner"
-                    android:backgroundTint="@color/white"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="51dp"
+                        android:layout_height="43dp"
+                        android:src="@drawable/qrcode" />
+
+                    <Button
+                        android:id="@+id/button_view_qr_code"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="QR code scanner"
+                        android:textStyle="bold"
+                        android:backgroundTint="@color/white"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/black"
+                        android:textSize="16dp"
+                        android:text = "        Scan tickets"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
+
     </LinearLayout>
 </ScrollView>
-
