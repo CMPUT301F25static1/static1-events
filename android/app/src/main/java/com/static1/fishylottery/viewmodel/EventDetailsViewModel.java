@@ -117,6 +117,8 @@ public class EventDetailsViewModel extends ViewModel {
         locationService.getCurrentLocation(new LocationService.LocationCallback() {
             @Override
             public void onLocationResult(Location location) {
+                Log.d("JoinWaitlist", "The user's location is: " + location.toString());
+
                 // Must validate if the user can join the event if there is geolocation requirement
                 boolean canJoin = JoinWaitlistRules.canJoinWithGeolocationRequirement(e, location);
 
