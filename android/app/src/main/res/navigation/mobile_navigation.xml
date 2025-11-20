@@ -213,7 +213,7 @@
 
     <fragment
         android:id="@+id/navigation_event_history"
-        android:name="com.static1.fishylottery.view.profile.EventHistoryFragment"
+        android:name="com.static1.fishylottery.view.profile.history.EventHistoryFragment"
         android:label="Event History"
         tools:layout="@layout/fragment_event_history"
         />
