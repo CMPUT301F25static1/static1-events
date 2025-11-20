@@ -16,13 +16,13 @@
         android:id="@+id/text_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No profiles found"
+        android:text="No organizers found"
         android:textAlignment="center"
         android:padding="24dp"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_profiles"
+        android:id="@+id/recycler_organizers"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
