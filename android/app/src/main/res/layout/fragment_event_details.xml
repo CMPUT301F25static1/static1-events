@@ -74,15 +74,6 @@ android:layout_height="match_parent">
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
     </LinearLayout>
 
-    <!-- Map preview -->
-    <ImageView
-        android:id="@+id/image_map_preview"
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:layout_marginTop="8dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/location" />
-
     <!-- Event Description -->
     <TextView
         android:layout_width="wrap_content"

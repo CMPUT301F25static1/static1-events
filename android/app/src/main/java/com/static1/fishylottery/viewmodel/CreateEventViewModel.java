@@ -126,7 +126,9 @@ public class CreateEventViewModel extends ViewModel {
         Date now = new Date();
         e.setCreatedAt(now);
         e.setUpdatedAt(now);
+        e.setRegistrationOpens(now);
         e.setStatus("Open");
+
 
         if (imageUri == null) {
             // No image, just upload event directly
