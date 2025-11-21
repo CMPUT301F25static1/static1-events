@@ -17,6 +17,7 @@ public class WaitlistEntry {
     private Date acceptedAt;
     private Profile profile;
     private GeoPoint joinLocation;
+    private String eventId;
 
     public WaitlistEntry() { } // Firestore needs no-arg
 
@@ -52,5 +53,11 @@ public class WaitlistEntry {
     }
     public void setJoinLocation(GeoPoint joinLocation) {
         this.joinLocation = joinLocation;
+    }
+    public String getEventId() {
+        return eventId;
+    }
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 }
