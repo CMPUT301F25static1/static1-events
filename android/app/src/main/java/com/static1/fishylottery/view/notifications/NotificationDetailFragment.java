@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.services.AuthManager;
 import com.static1.fishylottery.viewmodel.NotificationsViewModel;
+import com.static1.fishylottery.services.NotificationSettings;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -70,8 +71,18 @@ public class NotificationDetailFragment extends Fragment {
         if (isInvitation && isPending) {
             inviteActions.setVisibility(View.VISIBLE);
 
-            accept.setOnClickListener(x -> vm.respondToInvitation(uid, notifId, true));
-            decline.setOnClickListener(x -> vm.respondToInvitation(uid, notifId, false));
+            accept.setOnClickListener(x -> {
+                if (NotificationSettings.areNotificationsEnabled(requireContext())) {
+                    vm.respondToInvitation(uid, notifId, true);
+                }
+            });
+
+            decline.setOnClickListener(x -> {
+                if (NotificationSettings.areNotificationsEnabled(requireContext())) {
+                    vm.respondToInvitation(uid, notifId, false);
+                }
+            });
+
         } else {
             inviteActions.setVisibility(View.GONE);
         }
