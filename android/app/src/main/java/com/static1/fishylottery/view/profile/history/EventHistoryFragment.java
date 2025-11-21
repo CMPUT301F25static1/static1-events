@@ -26,9 +26,9 @@ import com.static1.fishylottery.services.AuthManager;
 import com.static1.fishylottery.services.DateUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 public class EventHistoryFragment extends Fragment {
 
@@ -102,12 +102,15 @@ public class EventHistoryFragment extends Fragment {
                                     title,
                                     when,
                                     where,
-                                    status
+                                    status,
+                                    event.getEventEndDate()
                             );
 
                             eventHistoryItems.add(item);
                         }
                     }
+
+                    sortHistory(eventHistoryItems);
 
                     adapter.notifyDataSetChanged();
 
@@ -117,6 +120,10 @@ public class EventHistoryFragment extends Fragment {
                     Log.e("MyEvents", "Unable to get my events", e);
                     Toast.makeText(requireContext(), "Unable to get my events", Toast.LENGTH_LONG).show();
                 });
+    }
+
+    private void sortHistory(List<EventHistoryItem> events) {
+        events.sort(Comparator.comparing(EventHistoryItem::getEventDate, Collections.reverseOrder()));
     }
 
 }
