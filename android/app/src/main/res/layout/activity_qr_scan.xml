@@ -13,7 +13,7 @@
             android:id="@+id/top_app_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:titleTextColor="@color/white"/>
+            android:theme="@style/ThemeOverlay.FishyLottery.Toolbar"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.camera.view.PreviewView

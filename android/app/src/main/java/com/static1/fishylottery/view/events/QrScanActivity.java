@@ -32,6 +32,7 @@ import com.static1.fishylottery.R;
 
 import org.checkerframework.common.returnsreceiver.qual.This;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -42,6 +43,10 @@ public class QrScanActivity extends AppCompatActivity {
     private PreviewView previewView;
     private ExecutorService cameraExecutor;
     private boolean scanned = false;
+
+    public interface BarcodeData {
+        String getRawValue();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +118,19 @@ public class QrScanActivity extends AppCompatActivity {
     }
 
     private void processBarcodes(List<Barcode> barcodes) {
+        List<BarcodeData> converted = new ArrayList<>();
+
+        for (Barcode b : barcodes) {
+            converted.add(b::getRawValue);
+        }
+
+        handleBarcodes(converted);
+    }
+
+    void handleBarcodes(List<BarcodeData> barcodes) {
         if (scanned) return;
-        for (Barcode barcode : barcodes) {
+
+        for (BarcodeData barcode : barcodes) {
             String value = barcode.getRawValue();
             if (value != null && !value.isEmpty()) {
                 scanned = true;

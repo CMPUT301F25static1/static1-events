@@ -1,6 +1,8 @@
 package com.static1.fishylottery.view.events.hosted;
 
-
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,41 +13,50 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.snackbar.Snackbar;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
-import com.static1.fishylottery.model.repositories.EventRepository;
 import com.static1.fishylottery.services.DateUtils;
-
+import com.static1.fishylottery.viewmodel.HostedEventDetailsViewModel;
 
 public class HostedEventDetailsFragment extends Fragment {
     private Event event;
-    private final EventRepository eventRepository = new EventRepository();
-
+    private HostedEventDetailsViewModel viewModel;
+    private final ActivityResultLauncher<Intent> createFileLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri uri = result.getData().getData();
+                    if (uri != null) {
+                        viewModel.
+                                exportCsv(requireContext(), uri);
+                    }
+                }
+            });
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
+        viewModel = new ViewModelProvider(requireActivity()).get(HostedEventDetailsViewModel.class);
 
         if (getArguments() != null) {
             Object arg = getArguments().getSerializable("event");
             if (arg instanceof Event) {
                 event = (Event) arg;
+                viewModel.setEvent(event);
             }
         }
 
-
         View view = inflater.inflate(R.layout.fragment_hosted_event_details, container, false);
-
 
         Button buttonViewWaitlist   = view.findViewById(R.id.button_view_waitlist);
         Button buttonRunLottery     = view.findViewById(R.id.button_run_lottery);
@@ -80,13 +91,8 @@ public class HostedEventDetailsFragment extends Fragment {
 
 
         // Nav hooks (pass event where needed)
-        buttonViewWaitlist.setOnClickListener(v -> {
-            Bundle b = new Bundle();
-            b.putSerializable("event", event);
-            Navigation.findNavController(v)
-                    .navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist, b);
-        });
-
+        buttonViewWaitlist.setOnClickListener(v -> Navigation.findNavController(v)
+                .navigate(R.id.action_hostedEventDetails_to_hostedEventDetailsWaitlist));
 
         buttonSendNotifications.setOnClickListener(v -> {
             Bundle b = new Bundle();
@@ -104,54 +110,33 @@ public class HostedEventDetailsFragment extends Fragment {
         });
 
 
-        buttonViewMap.setOnClickListener(v -> {
-                    Bundle b = new Bundle();
-                    b.putSerializable("event", event);
-                    Navigation.findNavController(v)
-                        .navigate(R.id.action_hostedEventDetails_to_signupMap, b);
-                }
+        buttonViewMap.setOnClickListener(v -> Navigation.findNavController(v)
+                        .navigate(R.id.action_hostedEventDetails_to_signupMap)
         );
 
 
-        buttonExportEnrolled.setOnClickListener(v ->
-                Snackbar.make(v, "Export not implemented yet.", Snackbar.LENGTH_LONG).show()
-        );
+        buttonExportEnrolled.setOnClickListener(v -> startCsvExport());
 
-        setupRunLotteryButton(buttonRunLottery);
+        buttonRunLottery.setOnClickListener(v -> viewModel.runLottery());
+
+        viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+        });
+
+        viewModel.isLoading().observe(getViewLifecycleOwner(), loading -> {
+            buttonRunLottery.setEnabled(!loading);
+            buttonExportEnrolled.setEnabled(!loading);
+        });
+
+        viewModel.fetchWaitlist(event);
 
         return view;
     }
 
-    private void setupRunLotteryButton(Button button) {
-        if (event == null || event.getEventId() == null) {
-            button.setEnabled(false);
-            button.setOnClickListener(v ->
-                    Toast.makeText(requireContext(), "No event loaded.", Toast.LENGTH_LONG).show()
-            );
-        } else {
-            Integer n = event.getCapacity();
-            if (n == null || n <= 0) {
-                button.setEnabled(false);
-                button.setOnClickListener(v ->
-                        Toast.makeText(requireContext(), "Set a valid number of entrants to select.", Toast.LENGTH_LONG).show()
-                );
-            } else {
-                button.setOnClickListener(v -> {
-                    button.setEnabled(false);
-                    eventRepository.drawEntrants(event.getEventId())
-                            .addOnSuccessListener(unused -> {
-                                Toast.makeText(requireContext(), "Draw complete. Selected entrants recorded.", Toast.LENGTH_LONG).show();
-                                button.setEnabled(true);
-                            })
-                            .addOnFailureListener(err -> {
-                                String msg = (err != null && err.getMessage() != null)
-                                        ? err.getMessage()
-                                        : "Draw failed.";
-                                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show();
-                                button.setEnabled(true);
-                            });
-                });
-            }
-        }
+    private void startCsvExport() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_TITLE, "accepted_entrants.csv");
+        createFileLauncher.launch(intent);
     }
 }
