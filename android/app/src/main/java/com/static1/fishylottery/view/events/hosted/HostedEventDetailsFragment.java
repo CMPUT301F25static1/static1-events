@@ -1,3 +1,6 @@
+
+
+
 package com.static1.fishylottery.view.events.hosted;
 
 
@@ -53,6 +56,7 @@ public class HostedEventDetailsFragment extends Fragment {
         Button buttonExportEnrolled = view.findViewById(R.id.button_export_enrolled);
         Button buttonSendNotifications = view.findViewById(R.id.button_send_notifications);
         Button buttonViewQrCode     = view.findViewById(R.id.button_view_qr_code);
+        Button buttonViewCancelledEntrants = view.findViewById(R.id.button_view_cancelled_entrants);
 
         // Event details card
         View eventDetailsCard   = view.findViewById(R.id.event_details_info);
@@ -113,6 +117,13 @@ public class HostedEventDetailsFragment extends Fragment {
         buttonExportEnrolled.setOnClickListener(v ->
                 Snackbar.make(v, "Export not implemented yet.", Snackbar.LENGTH_LONG).show()
         );
+
+        buttonViewCancelledEntrants.setOnClickListener(v -> {
+            Bundle b = new Bundle();
+            b.putSerializable("event", event);
+            Navigation.findNavController(v)
+                    .navigate(R.id.action_hostedEventDetails_to_cancelledEntrants, b);
+        });
 
         setupRunLotteryButton(buttonRunLottery);
 

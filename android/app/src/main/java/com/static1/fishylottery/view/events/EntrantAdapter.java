@@ -1,5 +1,6 @@
 package com.static1.fishylottery.view.events;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Profile;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.EntrantViewHolder> {
@@ -16,15 +19,17 @@ public class EntrantAdapter extends RecyclerView.Adapter<EntrantAdapter.EntrantV
     private List<Profile> entrants;
     private ListType listType;
 
+    public void getItemId(List<String> profiles) {
+    }
+
     public enum ListType {
         WAITING,
         INVITED,
         ENROLLED
     }
 
-    public EntrantAdapter(List<Profile> entrants, ListType listType) {
-        this.entrants = entrants;
-        this.listType = listType;
+    public EntrantAdapter(Context entrants, ArrayList<Profile> listType) {
+
     }
 
     public void updateData(List<Profile> newEntrants) {
