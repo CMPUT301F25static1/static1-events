@@ -128,6 +128,13 @@ android:layout_height="match_parent">
         android:text="Max Attendees: 0"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
+    <TextView
+        android:id="@+id/text_waitlist_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Entrants on Waitlist: 0"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
     <!-- Bottom button -->
     <TextView
         android:id="@+id/text_max_waitlist"
