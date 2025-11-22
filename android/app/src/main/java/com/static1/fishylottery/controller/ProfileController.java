@@ -16,17 +16,13 @@ import com.static1.fishylottery.view.profile.ProfileViewFragment;
  * Manages the user's profile and what screen to show when the profile page is shown.
  */
 public class ProfileController {
-
-    private final AuthManager authManager;
     private final ProfileRepository profileRepository;
     private final FragmentManager fragmentManager;
     private final int containerId;
 
-    public ProfileController(AuthManager authManager,
-                             ProfileRepository profileRepository,
+    public ProfileController(ProfileRepository profileRepository,
                              FragmentManager fragmentManager,
                              int containerId) {
-        this.authManager = authManager;
         this.profileRepository = profileRepository;
         this.fragmentManager = fragmentManager;
         this.containerId = containerId;
@@ -47,7 +43,7 @@ public class ProfileController {
      * is displayed so the user can enter there.
      */
     public void loadInitialProfile() {
-        String uid = authManager.getUserId();
+        String uid = AuthManager.getInstance().getUserId();
 
         if (uid == null) {
             Log.e("AuthManager", "No user id");
@@ -77,7 +73,7 @@ public class ProfileController {
      * @param callback A callback which handles the result of getting the profile.
      */
     public void loadProfile(ProfileCallback callback) {
-        String uid = authManager.getUserId();
+        String uid = AuthManager.getInstance().getUserId();
 
         if (uid == null) {
             callback.onError(new Exception("No user ID"));
@@ -104,7 +100,7 @@ public class ProfileController {
      * @param callback A callback indicating if success or failure.
      */
     public void uploadProfile(Profile profile, ProfileUploadCallback callback) {
-        String uid = authManager.getUserId();
+        String uid = AuthManager.getInstance().getUserId();
 
         if (uid == null) {
             callback.onError(new Exception("The profile UID is null"));
@@ -134,7 +130,7 @@ public class ProfileController {
      * @return True if the profile exists for a UID.
      */
     public boolean hasProfile() {
-        String uid = authManager.getUserId();
+        String uid = AuthManager.getInstance().getUserId();
 
         if (uid == null) return false;
 

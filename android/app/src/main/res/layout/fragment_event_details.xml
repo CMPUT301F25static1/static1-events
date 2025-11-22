@@ -10,8 +10,7 @@ android:layout_height="match_parent">
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="?actionBarSize">
+    android:padding="16dp">
 
     <!-- Event Image -->
     <ImageView
@@ -19,6 +18,8 @@ android:layout_height="match_parent">
         android:layout_width="378dp"
         android:layout_height="392dp"
         android:scaleType="centerCrop"
+        android:visibility="visible"
+        android:contentDescription="Event Poster"
         android:src="@drawable/ic_dashboard_black_24dp" />
 
     <!-- Event Title -->
@@ -73,21 +74,12 @@ android:layout_height="match_parent">
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
     </LinearLayout>
 
-    <!-- Map preview -->
-    <ImageView
-        android:id="@+id/image_map_preview"
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:layout_marginTop="8dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/location" />
-
     <!-- Event Description -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Hosted By"
+        android:text="@string/hosted_by"
         android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
     <TextView
@@ -118,7 +110,7 @@ android:layout_height="match_parent">
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Registration"
+        android:text="@string/registration"
         android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
     <TextView
@@ -141,21 +133,53 @@ android:layout_height="match_parent">
         android:id="@+id/text_max_waitlist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Max Waitlist:"
+        android:text="Max Waitlist: None"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
-    <Button
-        android:id="@+id/button_join_waitlist"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_margin="16dp"
-        android:text="JOIN WAITLIST"
-        android:layout_marginBottom="30dp"/>
+        android:layout_marginBottom="30dp"
+        >
+
+        <Button
+            android:id="@+id/button_join_waitlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/join_waitlist"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/button_leave_waitlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:text="@string/leave_waitlist"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_accept_invite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/holo_green_dark"
+            android:text="@string/accept"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_decline_invite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:text="@string/decline"
+            android:visibility="gone" />
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="40dp"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
 </LinearLayout>

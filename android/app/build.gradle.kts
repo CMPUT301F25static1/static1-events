@@ -1,3 +1,12 @@
+import java.util.Properties
+
+val secretsPropertiesFile = rootProject.file("secrets.properties")
+val secrets = Properties().apply {
+    if (secretsPropertiesFile.exists()) {
+        secretsPropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
@@ -15,6 +24,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["MAPS_API_KEY"] = secrets.getProperty("MAPS_API_KEY") ?: ""
     }
 
     buildTypes {
@@ -65,6 +76,9 @@ dependencies {
     // ML Kit Barcode Scanning
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
     implementation(libs.coordinatorlayout)
+    // Maps and Location
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
     // Testing dependencies
 
 

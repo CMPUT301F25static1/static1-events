@@ -1,4 +1,4 @@
-package com.static1.fishylottery.view.events;
+package com.static1.fishylottery.view.events.create;
 
 
 import android.app.DatePickerDialog;
@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 
@@ -23,8 +24,10 @@ import androidx.navigation.Navigation;
 
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.firestore.GeoPoint;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
+import com.static1.fishylottery.model.entities.GeolocationRequirement;
 import com.static1.fishylottery.viewmodel.CreateEventViewModel;
 
 
@@ -45,6 +48,9 @@ public class CreateEventDetailsFragment extends Fragment {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
 
+    private Double selectedLat = null;
+    private Double selectedLng = null;
+    private Double selectedRadius = null;
 
     private EditText
             textInputTitle,
@@ -53,7 +59,9 @@ public class CreateEventDetailsFragment extends Fragment {
             textInputHost,
             textInputWaitlistMaximum,
             textInputCapacity,
-            textInputSelectCount,
+            textInputLatitude,
+            textInputLongitude,
+            textInputRadius,
             startDate,
             startTime,
             endDate,
@@ -61,12 +69,13 @@ public class CreateEventDetailsFragment extends Fragment {
             deadlineDate,
             deadlineTime;
 
-
+    private Switch switchGeolocation;
     private AutoCompleteTextView eventTypeDropdown, eventInterestsDropdown;
     private CreateEventViewModel vm;
 
 
     private boolean[] selectedInterests;
+    private boolean lastSwitchState = false;
     private final List<String> selectedItems = new ArrayList<>();
     private final List<String> interests = Arrays.asList(
             "Music",
@@ -114,7 +123,6 @@ public class CreateEventDetailsFragment extends Fragment {
         // Buttons
         Button nextButton = view.findViewById(R.id.button_next_poster);
 
-
         // Basic text fields
         textInputTitle = view.findViewById(R.id.input_event_title);
         textInputDescription = view.findViewById(R.id.input_event_description);
@@ -123,6 +131,14 @@ public class CreateEventDetailsFragment extends Fragment {
         textInputCapacity = view.findViewById(R.id.input_capacity);
         textInputWaitlistMaximum = view.findViewById(R.id.input_waitlist_max);
 
+        switchGeolocation = view.findViewById(R.id.switch_geolocation);
+        textInputLatitude = view.findViewById(R.id.input_latitude);
+        textInputLongitude = view.findViewById(R.id.input_longitude);
+        textInputRadius = view.findViewById(R.id.input_radius);
+
+        textInputLatitude.setEnabled(false);
+        textInputLongitude.setEnabled(false);
+        textInputRadius.setEnabled(false);
 
         eventTypeDropdown = view.findViewById(R.id.dropdown_event_type);
         eventInterestsDropdown = view.findViewById(R.id.dropdown_interests);
@@ -212,6 +228,7 @@ public class CreateEventDetailsFragment extends Fragment {
                     .navigate(R.id.action_eventDetails_to_eventPoster);
         });
 
+        setupLocationSwitch();
 
         return view;
     }
@@ -248,6 +265,19 @@ public class CreateEventDetailsFragment extends Fragment {
             event.setRegistrationCloses(formatter.parse(eventRegistrationClosesString));
         } catch (ParseException e) {
             Log.e("Date", e.toString());
+        }
+
+        // Handle geolocation requirement case
+        if (lastSwitchState) {
+            if (selectedLat != null && selectedLng != null && selectedRadius != null) {
+                GeolocationRequirement locationRequirement = new GeolocationRequirement();
+
+                locationRequirement.setEnabled(true);
+                locationRequirement.setLocation(new GeoPoint(selectedLat, selectedLng));
+                locationRequirement.setRadius(selectedRadius);
+
+                event.setLocationRequirement(locationRequirement);
+            }
         }
 
 
@@ -338,6 +368,65 @@ public class CreateEventDetailsFragment extends Fragment {
             return Integer.valueOf(s);
         } catch (NumberFormatException e) {
             return null;
+        }
+    }
+
+    private void setupLocationSwitch() {
+        switchGeolocation.setOnCheckedChangeListener((button, isChecked) -> {
+            if (isChecked && !lastSwitchState) {
+                Navigation.findNavController(button).navigate(R.id.action_eventDetails_locationPicker);
+            } else {
+                selectedLat = null;
+                selectedLng = null;
+                selectedRadius = null;
+            }
+
+            lastSwitchState = isChecked;
+            setLatLonRadius(isChecked);
+        });
+
+        getParentFragmentManager().setFragmentResultListener("locationPickerResult",
+                getViewLifecycleOwner(),
+                (requestKey, bundle) -> {
+                    double lat = bundle.getDouble("lat");
+                    double lng = bundle.getDouble("lng");
+                    double radius = bundle.getDouble("radius");
+
+                    selectedLng = lng;
+                    selectedLat = lat;
+                    selectedRadius = radius;
+
+                    switchGeolocation.setChecked(true);
+                    setLatLonRadius(true);
+                });
+
+    }
+
+    private void setLatLonRadius(boolean showing) {
+        if (showing) {
+
+            if (selectedLat != null) {
+                Log.d("GeoLocation", "Latitude: " + selectedLat);
+                textInputLatitude.setVisibility(View.VISIBLE);
+                textInputLatitude.setText(String.format("%.6f", selectedLat));
+
+            }
+
+            if (selectedLng != null) {
+                Log.d("GeoLocation", "Longitude: " + selectedLng);
+                textInputLongitude.setVisibility(View.VISIBLE);
+                textInputLongitude.setText(String.format("%.6f", selectedLng));
+            }
+
+            if (selectedRadius != null) {
+                Log.d("GeoLocation", "Radius: " + selectedRadius);
+                textInputRadius.setVisibility(View.VISIBLE);
+                textInputRadius.setText(String.format("%.1f", selectedRadius / 1000.0));
+            }
+        } else {
+            textInputRadius.setVisibility(View.GONE);
+            textInputLongitude.setVisibility(View.GONE);
+            textInputLatitude.setVisibility(View.GONE);
         }
     }
 }

@@ -10,8 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="?actionBarSize">
+        android:padding="16dp">
 
         <!-- Event Image -->
         <ImageView
@@ -93,14 +92,32 @@
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </LinearLayout>
 
-        <!-- Map preview -->
-        <ImageView
-            android:id="@+id/image_map_preview"
+        <!-- Location Requirement -->
+        <LinearLayout
+            android:id="@+id/layout_geolocation"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layout_marginTop="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/location" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location Requirement"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+            <TextView
+                android:id="@+id/text_geolocation_requirement_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Location: "/>
+
+            <TextView
+                android:id="@+id/text_geolocation_requirement_radius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Radius: "/>
+        </LinearLayout>
 
         <!-- Event Description -->
         <TextView
@@ -170,6 +187,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="Finish" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"/>
 
     </LinearLayout>
 </ScrollView>

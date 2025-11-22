@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -18,6 +17,7 @@ import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.NotificationRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
+import com.static1.fishylottery.services.AuthManager;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public class SendNotificationsViewModel extends ViewModel {
                 throw task.getException();
             }
 
-            String senderId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            String senderId = AuthManager.getInstance().getUserId();
 
             List<WaitlistEntry> waitlist = task.getResult();
 
