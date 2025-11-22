@@ -1,5 +1,7 @@
 package com.static1.fishylottery.model.repositories;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
@@ -196,5 +198,45 @@ public class WaitlistRepository {
 
         // Batch commit
         return batch.commit();
+    }
+
+    public Task<Void> deleteFromWaitlistByUser(@NonNull String uid) {
+        return db.collection(ENTRANT_WAITLISTS)
+            .document(uid)
+            .collection(EVENTS)
+            .get()
+            .continueWithTask(task -> {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                QuerySnapshot snapshot = task.getResult();
+
+                List<WaitlistEntry> waitlists = snapshot.toObjects(WaitlistEntry.class);
+
+                Log.d("Waitlist", waitlists.get(0).getEventId());
+
+                WriteBatch batch = db.batch();
+
+                // For each of the waitlist entries for each user, also remove the waitlist entries for that event
+                for (WaitlistEntry entry : waitlists) {
+                    String eventId = entry.getEventId();
+                    if (eventId == null) continue;
+
+                    DocumentReference docRefToDelete = db.collection(EVENTS)
+                        .document(eventId)
+                        .collection(WAITLIST)
+                        .document(uid);
+
+                    batch.delete(docRefToDelete);
+                }
+
+                // Finally, remove the user's waitlist entries
+                DocumentReference entrantWaitlistDocRef = db.collection(ENTRANT_WAITLISTS).document(uid);
+                batch.delete(entrantWaitlistDocRef);
+
+                // Commit the batch
+                return batch.commit();
+        });
     }
 }

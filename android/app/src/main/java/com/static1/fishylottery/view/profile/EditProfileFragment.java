@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -58,7 +59,7 @@ public class EditProfileFragment extends Fragment {
         });
 
         deleteProfile.setOnClickListener(v -> {
-            deleteProfile();
+            showDeletionConfirmationDialog();
         });
 
         return view;
@@ -84,10 +85,26 @@ public class EditProfileFragment extends Fragment {
                         Toast.makeText(requireContext(), "Failed: " + e2.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
+    private void showDeletionConfirmationDialog() {
+        new AlertDialog.Builder(requireContext())
+            .setTitle("Delete Profile")
+            .setMessage("Are you sure you want to delete your profile?\n\n" +
+                    "This will:\n" +
+                    "• Remove your profile data from the system\n" +
+                    "• Remove you from any waitlists or enrolled events\n" +
+                    "• Sign you out of the application\n"
+            )
+            .setPositiveButton("Delete", (dialog, which) -> {
+                deleteProfile();
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
     private void deleteProfile() {
         viewModel.deleteProfile()
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(requireContext(), "Profile deleted.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Profile Deleted.", Toast.LENGTH_SHORT).show();
                     requireActivity().finish();
                 })
                 .addOnFailureListener(e ->

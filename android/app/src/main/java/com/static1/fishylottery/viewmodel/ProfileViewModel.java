@@ -1,5 +1,7 @@
 package com.static1.fishylottery.viewmodel;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -8,12 +10,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
+import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.services.AuthManager;
 
 public class ProfileViewModel extends ViewModel {
 
     private final ProfileRepository repository;
     private final MutableLiveData<Profile> profileLiveData = new MutableLiveData<>();
+    private static final String TAG = "Profile";
 
     public ProfileViewModel() {
         this.repository = new ProfileRepository();
@@ -62,10 +66,36 @@ public class ProfileViewModel extends ViewModel {
 
     /** Deletes profile document via repository */
     public Task<Void> deleteProfile() {
-        if (profileLiveData.getValue() == null) {
+        Profile profile = profileLiveData.getValue();
+
+        if (profile == null) {
             throw new IllegalArgumentException("Profile cannot be null");
         }
-        return repository.deleteProfile(profileLiveData.getValue())
-                .addOnSuccessListener(aVoid -> profileLiveData.setValue(null));
+
+        String uid = profile.getUid();
+
+        // 1. Remove the profile from Firebase
+        return repository.deleteProfile(profile)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // Profile deleted, set the data to null
+                    profileLiveData.setValue(null);
+
+                    // 2. Remove the user's waitlists
+                    WaitlistRepository waitlistRepository = new WaitlistRepository();
+
+                    return waitlistRepository.deleteFromWaitlistByUser(uid);
+                })
+                .addOnSuccessListener(aVoid -> {
+                    profileLiveData.setValue(null);
+                    Log.d(TAG, "Successfully delete profile for uid: " + uid);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Unable to delete profile", e);
+                });
+
     }
 }
