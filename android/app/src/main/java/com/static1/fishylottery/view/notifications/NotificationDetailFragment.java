@@ -13,10 +13,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.static1.fishylottery.R;
+import com.static1.fishylottery.services.AuthManager;
 import com.static1.fishylottery.viewmodel.NotificationsViewModel;
+import com.static1.fishylottery.services.NotificationSettings;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -57,8 +57,7 @@ public class NotificationDetailFragment extends Fragment {
         String status = args.getString("status");
         long createdAt = args.getLong("createdAt");
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String uid = (user != null) ? user.getUid() : "TEST_UID";
+        String uid = AuthManager.getInstance().getUserId();
 
         tvTitle.setText(title);
         tvMessage.setText(message);
@@ -72,8 +71,18 @@ public class NotificationDetailFragment extends Fragment {
         if (isInvitation && isPending) {
             inviteActions.setVisibility(View.VISIBLE);
 
-            accept.setOnClickListener(x -> vm.respondToInvitation(uid, notifId, true));
-            decline.setOnClickListener(x -> vm.respondToInvitation(uid, notifId, false));
+            accept.setOnClickListener(x -> {
+                if (NotificationSettings.areNotificationsEnabled(requireContext())) {
+                    vm.respondToInvitation(uid, notifId, true);
+                }
+            });
+
+            decline.setOnClickListener(x -> {
+                if (NotificationSettings.areNotificationsEnabled(requireContext())) {
+                    vm.respondToInvitation(uid, notifId, false);
+                }
+            });
+
         } else {
             inviteActions.setVisibility(View.GONE);
         }

@@ -1,4 +1,4 @@
-package com.static1.fishylottery.view.events;
+package com.static1.fishylottery.view.events.create;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -27,6 +27,7 @@
         <action
             android:id="@+id/action_events_to_eventDetails"
             app:destination="@id/navigation_event_details" />
+            />
     </fragment>
 
     <!-- ✅ NOTIFICATIONS LIST -->
@@ -59,23 +60,39 @@
         <action
             android:id="@+id/action_profile_to_edit_profile"
             app:destination="@id/navigation_edit_profile" />
+
+        <action
+            android:id="@+id/action_profile_to_admin_dashboard"
+            app:destination="@id/navigation_admin_container"/>
+
+        <action
+            android:id="@+id/action_profile_to_notification_settings"
+            app:destination="@id/navigation_notification_settings"/>
+
+        <action
+            android:id="@+id/action_profile_to_event_history"
+            app:destination="@id/navigation_event_history"/>
     </fragment>
 
     <!-- CREATE EVENT -->
     <fragment
         android:id="@+id/navigation_create_event"
-        android:name="com.static1.fishylottery.view.events.CreateEventDetailsFragment"
+        android:name="com.static1.fishylottery.view.events.create.CreateEventDetailsFragment"
         android:label="1 of 3: Event Details"
         tools:layout="@layout/fragment_create_event_details">
 
         <action
             android:id="@+id/action_eventDetails_to_eventPoster"
             app:destination="@id/navigation_create_event_poster" />
+
+        <action
+            android:id="@+id/action_eventDetails_locationPicker"
+            app:destination="@id/navigation_location_picker"/>
     </fragment>
 
     <fragment
         android:id="@+id/navigation_create_event_poster"
-        android:name="com.static1.fishylottery.view.events.CreateEventPosterFragment"
+        android:name="com.static1.fishylottery.view.events.create.CreateEventPosterFragment"
         android:label="2 of 3: Event Poster"
         tools:layout="@layout/fragment_create_event_poster">
 
@@ -86,7 +103,7 @@
 
     <fragment
         android:id="@+id/navigation_create_event_preview"
-        android:name="com.static1.fishylottery.view.events.CreateEventPreviewFragment"
+        android:name="com.static1.fishylottery.view.events.create.CreateEventPreviewFragment"
         android:label="3 of 3: Event Preview" />
 
     <!-- EDIT PROFILE -->
@@ -161,6 +178,89 @@
         android:name="com.static1.fishylottery.view.events.hosted.CancelledEntrantsFragment"
         android:label="Cancelled Entrants"
         tools:layout="@layout/fragment_cancelled_entrants" />
+
+    <fragment
+        android:id="@+id/navigation_admin_container"
+        android:name="com.static1.fishylottery.view.admin.AdminContainerFragment"
+        android:label="Administrators"
+        tools:layout="@layout/fragment_admin_container">
+
+        <action
+            android:id="@+id/action_adminDashboard_to_allEvents"
+            app:destination="@id/navigation_admin_all_events"/>
+
+        <action
+            android:id="@+id/action_adminDashboard_to_profiles"
+            app:destination="@id/navigation_admin_profiles"/>
+
+        <action
+            android:id="@+id/action_adminDashboard_to_organizers"
+            app:destination="@id/navigation_admin_organizers"/>
+
+        <action
+            android:id="@+id/action_adminDashboard_to_images"
+            app:destination="@id/navigation_admin_images"/>
+
+        <action
+            android:id="@+id/action_adminDashboard_to_notificationLogs"
+            app:destination="@id/navigation_admin_notification_logs"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_notification_settings"
+        android:name="com.static1.fishylottery.view.profile.NotificationSettingsFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_notification_settings"
+        />
+
+    <fragment
+        android:id="@+id/navigation_event_history"
+        android:name="com.static1.fishylottery.view.profile.history.EventHistoryFragment"
+        android:label="Event History"
+        tools:layout="@layout/fragment_event_history"
+        />
+
+    <fragment
+        android:id="@+id/navigation_admin_all_events"
+        android:name="com.static1.fishylottery.view.admin.AdminAllEventsFragment"
+        android:label="All Events"
+        tools:layout="@layout/fragment_admin_all_events"
+        />
+
+    <fragment
+        android:id="@+id/navigation_admin_profiles"
+        android:name="com.static1.fishylottery.view.admin.AdminProfilesFragment"
+        android:label="Profiles"
+        tools:layout="@layout/fragment_admin_profiles"
+        />
+
+    <fragment
+        android:id="@+id/navigation_admin_organizers"
+        android:name="com.static1.fishylottery.view.admin.AdminOrganizersFragment"
+        android:label="Organizers"
+        tools:layout="@layout/fragment_admin_profiles"
+        />
+
+    <fragment
+        android:id="@+id/navigation_admin_images"
+        android:name="com.static1.fishylottery.view.admin.AdminImagesFragment"
+        android:label="Uploaded Images"
+        tools:layout="@layout/fragment_admin_images"
+        />
+
+    <fragment
+        android:id="@+id/navigation_admin_notification_logs"
+        android:name="com.static1.fishylottery.view.admin.AdminNotificationLogsFragment"
+        android:label="Notification Logs"
+        tools:layout="@layout/fragment_notifications"
+        />
+
+    <fragment
+        android:id="@+id/navigation_location_picker"
+        android:name="com.static1.fishylottery.view.events.create.LocationPickerFragment"
+        android:label="Location Picker"
+        tools:layout="@layout/fragment_location_picker"
+        />
 
 </navigation>
 

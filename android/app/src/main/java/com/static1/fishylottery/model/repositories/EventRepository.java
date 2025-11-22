@@ -24,8 +24,17 @@ import java.util.Map;
  */
 public class EventRepository {
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference eventsRef = db.collection("events");
+    private final FirebaseFirestore db;
+    private final CollectionReference eventsRef;
+
+    public EventRepository() {
+        this(FirebaseFirestore.getInstance());
+    }
+
+    public EventRepository(FirebaseFirestore db) {
+        this.db = db;
+        this.eventsRef = db.collection("events");
+    }
 
     // ---------- CRUD ----------
 

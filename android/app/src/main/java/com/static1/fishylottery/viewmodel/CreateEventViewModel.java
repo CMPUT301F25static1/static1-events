@@ -7,17 +7,12 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.static1.fishylottery.MainApplication;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.services.AuthManager;
 import com.static1.fishylottery.services.StorageManager;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * ViewModel for creating the events and sharing data between the organizer's event creation views
@@ -28,7 +23,6 @@ public class CreateEventViewModel extends ViewModel {
     private final MutableLiveData<String> validationError = new MutableLiveData<>();
 
     private final EventRepository eventsRepository = new EventRepository();
-    private final FirebaseStorage storage = FirebaseStorage.getInstance();
 
     /**
      * Live data showing the event object.
@@ -119,20 +113,22 @@ public class CreateEventViewModel extends ViewModel {
         // clear any old error
         validationError.setValue(null);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = AuthManager.getInstance().getUserId();
 
-        if (user == null) {
-            Log.e("CreateEvent", "Firebase user not created");
+        if (uid == null) {
+            Log.e("CreateEvent", "User not signed in");
             return false;
         }
 
         // Set the organizer ID
-        e.setOrganizerId(user.getUid());
+        e.setOrganizerId(uid);
 
         Date now = new Date();
         e.setCreatedAt(now);
         e.setUpdatedAt(now);
+        e.setRegistrationOpens(now);
         e.setStatus("Open");
+
 
         if (imageUri == null) {
             // No image, just upload event directly

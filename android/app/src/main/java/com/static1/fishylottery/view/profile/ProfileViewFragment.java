@@ -5,8 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.IdRes;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -16,7 +16,7 @@ import com.static1.fishylottery.viewmodel.ProfileViewModel;
 
 public class ProfileViewFragment extends Fragment {
     private TextView textName, textEmail, textInitials, textPhone;
-    private View rowEditProfile, rowNotifications, rowEventsHistory, rowAdminLogin;
+    private View rowEditProfile, rowNotifications, rowEventHistory, rowAdminLogin;
     private ProfileViewModel viewModel;
 
     @Override
@@ -34,7 +34,7 @@ public class ProfileViewFragment extends Fragment {
 
         rowEditProfile = view.findViewById(R.id.row_edit_profile);
         rowNotifications = view.findViewById(R.id.row_notifications);
-        rowEventsHistory = view.findViewById(R.id.row_events_history);
+        rowEventHistory = view.findViewById(R.id.row_event_history);
         rowAdminLogin = view.findViewById(R.id.row_admin_login);
 
         setupRowLabels(view);
@@ -60,7 +60,7 @@ public class ProfileViewFragment extends Fragment {
     private void setupRowLabels(View root) {
         setRowTitle(root, R.id.row_edit_profile, "Edit Profile");
         setRowTitle(root, R.id.row_notifications, "Notifications");
-        setRowTitle(root, R.id.row_events_history, "Events History");
+        setRowTitle(root, R.id.row_event_history, "Event History");
         setRowTitle(root, R.id.row_admin_login, "Admin Login");
     }
 
@@ -71,27 +71,13 @@ public class ProfileViewFragment extends Fragment {
     }
 
     private void setupListeners(View view) {
-        rowEditProfile.setOnClickListener(v -> openEditProfile(view));
-        rowNotifications.setOnClickListener(v -> openNotifications());
-        rowEventsHistory.setOnClickListener(v -> openEventsHistory());
-        rowAdminLogin.setOnClickListener(v -> openAdminLogin());
+        rowEditProfile.setOnClickListener(v ->navigateWithAction(view, R.id.action_profile_to_edit_profile));
+        rowNotifications.setOnClickListener(v -> navigateWithAction(view, R.id.action_profile_to_notification_settings));
+        rowEventHistory.setOnClickListener(v -> navigateWithAction(view, R.id.action_profile_to_event_history));
+        rowAdminLogin.setOnClickListener(v -> navigateWithAction(view, R.id.action_profile_to_admin_dashboard));
     }
 
-    private void openEditProfile(View view) {
-        Navigation.findNavController(view).navigate(R.id.action_profile_to_edit_profile);
-    }
-
-
-
-    private void openNotifications() {
-        Toast.makeText(getContext(), "Notifications clicked", Toast.LENGTH_SHORT).show();
-    }
-
-    private void openEventsHistory() {
-        Toast.makeText(getContext(), "Events History clicked", Toast.LENGTH_SHORT).show();
-    }
-
-    private void openAdminLogin() {
-        Toast.makeText(getContext(), "Admin Login clicked", Toast.LENGTH_SHORT).show();
+    private void navigateWithAction(View view, @IdRes int action) {
+        Navigation.findNavController(view).navigate(action);
     }
 }

@@ -24,28 +24,51 @@ import java.util.Collections;
 @RunWith(AndroidJUnit4.class)
 public class NotificationsFragmentTest {
 
-    /** Test 4 — click a row in NotificationsFragment → navigates to NotificationDetailFragment */
+    /** ✅ SIMPLE TEST 1 — Adapter receives 1 item */
     @Test
-    public void clickingNotification_opensDetailFragment() {
-        final TestNavHostController navController =
-                new TestNavHostController(ApplicationProvider.getApplicationContext());
-
-        // 1) Launch in CREATED (avoid onStart side-effects)
+    public void adapter_receivesOneItem() {
         FragmentScenario<NotificationsFragment> scenario =
                 FragmentScenario.launchInContainer(
                         NotificationsFragment.class,
-                        /* args */ null,
+                        null,
+                        android.R.style.Theme_Material_Light_NoActionBar,
+                        Lifecycle.State.RESUMED
+                );
+
+        scenario.onFragment(fragment -> {
+            RecyclerView rv = fragment.requireView().findViewById(R.id.rvNotifications);
+            NotificationAdapter ad = (NotificationAdapter) rv.getAdapter();
+
+            AppNotification n = new AppNotification();
+            n.setId("ID1");
+            n.setTitle("Hello");
+            n.setMessage("World");
+
+            ad.submit(Collections.singletonList(n));
+
+            assertEquals(1, ad.getItemCount());
+        });
+    }
+
+    /** ✅ SIMPLE TEST 2 — Clicking row navigates to detail screen */
+    @Test
+    public void clickingNotification_opensDetailFragment() {
+        TestNavHostController nav = new TestNavHostController(
+                ApplicationProvider.getApplicationContext());
+
+        FragmentScenario<NotificationsFragment> scenario =
+                FragmentScenario.launchInContainer(
+                        NotificationsFragment.class,
+                        null,
                         android.R.style.Theme_Material_Light_NoActionBar,
                         Lifecycle.State.CREATED
                 );
 
-        // 2) Move to STARTED so the view exists
         scenario.moveToState(Lifecycle.State.STARTED);
 
-        // 3) Attach nav + inject one item
         scenario.onFragment(fragment -> {
-            Navigation.setViewNavController(fragment.requireView(), navController);
-            navController.setGraph(R.navigation.mobile_navigation);
+            Navigation.setViewNavController(fragment.requireView(), nav);
+            nav.setGraph(R.navigation.mobile_navigation);
 
             RecyclerView rv = fragment.requireView().findViewById(R.id.rvNotifications);
             NotificationAdapter ad = (NotificationAdapter) rv.getAdapter();
@@ -54,18 +77,15 @@ public class NotificationsFragmentTest {
             n.setId("TEST_ID");
             n.setTitle("Test Title");
             n.setMessage("Body");
-            n.setType("info");
-            n.setStatus("pending");
 
-            if (ad != null) ad.submit(Collections.singletonList(n));
+            ad.submit(Collections.singletonList(n));
         });
 
-        // 4) Now allow user interaction
         scenario.moveToState(Lifecycle.State.RESUMED);
 
-        // 5) Click first row (ensure RV is laid out)
         scenario.onFragment(fragment -> {
             RecyclerView rv = fragment.requireView().findViewById(R.id.rvNotifications);
+
             rv.measure(
                     View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.AT_MOST)
@@ -76,22 +96,20 @@ public class NotificationsFragmentTest {
             if (vh != null) vh.itemView.performClick();
         });
 
-        // 6) Assert destination
         assertEquals(R.id.notificationDetailFragment,
-                navController.getCurrentDestination().getId());
+                nav.getCurrentDestination().getId());
     }
 
-    /** Test 5 — NotificationDetailFragment shows Accept/Decline for pending invitations */
+    /** ✅ SIMPLE TEST 3 — Invitation buttons visible */
     @Test
     public void invitationButtons_areVisible() {
-        // Arguments same as the list passes
         android.os.Bundle args = new android.os.Bundle();
-        args.putString("notificationId", "TEST_ID");
+        args.putString("notificationId", "T1");
         args.putString("title", "Invite");
-        args.putString("message", "Join us");
-        args.putLong("createdAt", 0L);
+        args.putString("message", "Join");
         args.putString("type", "invitation");
         args.putString("status", "pending");
+        args.putLong("createdAt", 0L);
 
         FragmentScenario<NotificationDetailFragment> scenario =
                 FragmentScenario.launchInContainer(
@@ -103,13 +121,13 @@ public class NotificationsFragmentTest {
 
         scenario.onFragment(fragment -> {
             View root = fragment.requireView();
-            View inviteActions = root.findViewById(R.id.inviteActions);
-            View btnAccept = root.findViewById(R.id.btnAccept);
-            View btnDecline = root.findViewById(R.id.btnDecline);
+            View invite = root.findViewById(R.id.inviteActions);
+            View accept = root.findViewById(R.id.btnAccept);
+            View decline = root.findViewById(R.id.btnDecline);
 
-            assertEquals(View.VISIBLE, inviteActions.getVisibility());
-            assertTrue(btnAccept.isShown());
-            assertTrue(btnDecline.isShown());
+            assertEquals(View.VISIBLE, invite.getVisibility());
+            assertTrue(accept.isShown());
+            assertTrue(decline.isShown());
         });
     }
 }
