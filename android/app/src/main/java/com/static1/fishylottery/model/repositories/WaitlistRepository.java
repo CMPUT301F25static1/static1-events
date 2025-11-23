@@ -131,9 +131,7 @@ public class WaitlistRepository {
                         return null;
                     }
 
-                    WaitlistEntry entry = doc.toObject(WaitlistEntry.class);
-
-                    return entry;
+                    return doc.toObject(WaitlistEntry.class);
                 });
     }
 
@@ -214,21 +212,27 @@ public class WaitlistRepository {
 
                 List<WaitlistEntry> waitlists = snapshot.toObjects(WaitlistEntry.class);
 
-                Log.d("Waitlist", waitlists.get(0).getEventId());
-
                 WriteBatch batch = db.batch();
 
                 // For each of the waitlist entries for each user, also remove the waitlist entries for that event
                 for (WaitlistEntry entry : waitlists) {
+                    Log.d("Waitlist", "Deleting waitlist entry for event ID: " + entry.getEventId());
+
                     String eventId = entry.getEventId();
                     if (eventId == null) continue;
 
-                    DocumentReference docRefToDelete = db.collection(EVENTS)
+                    DocumentReference eventWaitlistDocRef = db.collection(EVENTS)
                         .document(eventId)
                         .collection(WAITLIST)
                         .document(uid);
 
-                    batch.delete(docRefToDelete);
+                    DocumentReference entrantWaitlistDocRef = db.collection(ENTRANT_WAITLISTS)
+                        .document(uid)
+                        .collection(EVENTS)
+                        .document(eventId);
+
+                    batch.delete(eventWaitlistDocRef);
+                    batch.delete(entrantWaitlistDocRef);
                 }
 
                 // Finally, remove the user's waitlist entries

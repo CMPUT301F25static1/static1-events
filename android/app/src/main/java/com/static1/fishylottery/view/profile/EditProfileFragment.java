@@ -105,7 +105,7 @@ public class EditProfileFragment extends Fragment {
         viewModel.deleteProfile()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(requireContext(), "Profile Deleted.", Toast.LENGTH_SHORT).show();
-                    requireActivity().finish();
+                    Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main).navigate(R.id.navigation_profile);
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(requireContext(), "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
