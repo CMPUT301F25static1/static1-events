@@ -1,5 +1,7 @@
 package com.static1.fishylottery.viewmodel;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -11,6 +13,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.static1.fishylottery.model.entities.AppNotification;
 import com.static1.fishylottery.model.repositories.NotificationRepository;
+import com.static1.fishylottery.services.NotificationSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,7 @@ public class NotificationsViewModel extends ViewModel {
     private final NotificationRepository repo = new NotificationRepository();
     private final MutableLiveData<List<AppNotification>> inbox = new MutableLiveData<>();
     private ListenerRegistration reg;
+    private Context context;
 
     public LiveData<List<AppNotification>> getInbox() {
         return inbox;
@@ -32,12 +36,26 @@ public class NotificationsViewModel extends ViewModel {
     /**
      * Called by NotificationsFragment.onStart()
      */
-    public void start(@NonNull String uid) {
+    public void start(@NonNull String uid, Context context) {
+        this.context = context;
         stop();
+
+        // Check if notifications are enabled before starting listener
+        if (!NotificationSettings.areNotificationsEnabled(context)) {
+            // If notifications are disabled, post empty list and return
+            inbox.postValue(new ArrayList<>());
+            return;
+        }
 
         // IMPORTANT: use FirebaseFirestoreException (not Exception)
         reg = repo.listenToInbox(uid, (QuerySnapshot snap, FirebaseFirestoreException err) -> {
             if (snap == null) return;
+
+            // Double-check preference hasn't changed
+            if (!NotificationSettings.areNotificationsEnabled(context)) {
+                inbox.postValue(new ArrayList<>());
+                return;
+            }
 
             List<AppNotification> out = new ArrayList<>();
 
@@ -73,6 +91,9 @@ public class NotificationsViewModel extends ViewModel {
      * @param accept True is accepted, false is declined.
      */
     public void respondToInvitation(String uid, String notifId, boolean accept) {
-        repo.respondToInvitation(uid, notifId, accept);
+        // Check if notifications are enabled before responding
+        if (context != null && NotificationSettings.areNotificationsEnabled(context)) {
+            repo.respondToInvitation(uid, notifId, accept);
+        }
     }
 }
