@@ -10,15 +10,11 @@
         android:padding="16dp">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
             android:id="@+id/tvDetailTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:textStyle="bold"
+            android:text="Notification Title"
             android:textSize="18sp" />
 
         <TextView
@@ -26,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#777"
+            android:text="Notification Date"
             android:layout_marginTop="4dp" />
 
         <TextView
@@ -33,30 +30,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:text="This is a notification body message"
             android:textSize="16sp" />
 
-        <LinearLayout
-            android:id="@+id/inviteActions"
+        <Button
+            android:id="@+id/button_view_event"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end"
-            android:layout_marginTop="16dp"
-            android:visibility="gone">
-
-            <Button
-                android:id="@+id/btnDecline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Decline" />
-
-            <Button
-                android:id="@+id/btnAccept"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Accept"
-                android:layout_marginStart="12dp" />
-        </LinearLayout>
-
+            android:layout_marginTop="12dp"
+            android:text="View Event Details" />
     </LinearLayout>
 </ScrollView>

@@ -130,6 +130,7 @@ public class HostedEventDetailsFragment extends Fragment {
         buttonRunLottery.setOnClickListener(v -> viewModel.runLottery());
 
         viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
+            if (message.isEmpty()) return;
             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
         });
 
@@ -139,6 +140,7 @@ public class HostedEventDetailsFragment extends Fragment {
         });
 
         viewModel.fetchWaitlist(event);
+        viewModel.resetMessage();
 
         return view;
     }

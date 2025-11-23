@@ -1,7 +1,6 @@
 package com.static1.fishylottery.view.events.hosted;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +33,26 @@ public class WaitlistFragment extends Fragment {
         RecyclerView recyclerWaitingList = view.findViewById(R.id.recycler_waitlist);
         recyclerWaitingList.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        adapter = new WaitlistEntryAdapter(localWaitlist, l -> {
-            Log.d("Waitlist", "Clicked: " + l.getProfile().getFullName());
+        adapter = new WaitlistEntryAdapter(localWaitlist, new WaitlistEntryAdapter.OnItemClickListener() {
+            @Override
+            public void onDeleteEntrant(WaitlistEntry entry) {
+                viewModel.deleteEntrant(entry);
+            }
+
+            @Override
+            public void onAcceptEntrant(WaitlistEntry entry) {
+                viewModel.updateEntrantStatus(entry, "accepted");
+            }
+
+            @Override
+            public void onInviteEntrant(WaitlistEntry entry) {
+                viewModel.updateEntrantStatus(entry, "invited");
+            }
+
+            @Override
+            public void onCancelEntrant(WaitlistEntry entry) {
+                viewModel.updateEntrantStatus(entry, "cancelled");
+            }
         });
 
         recyclerWaitingList.setAdapter(adapter);

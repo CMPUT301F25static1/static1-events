@@ -162,4 +162,71 @@ public class HostedEventDetailsViewModel extends ViewModel {
                     loading.setValue(false);
                 });
     }
+
+    /**
+     * Manually update the waitlist status for an entrant on the waiting list.
+     * @param entry The entry to update.
+     * @param status The new status to change to.
+     */
+    public void updateEntrantStatus(@NonNull WaitlistEntry entry, @NonNull String status) {
+        Event e = event.getValue();
+
+        if (e == null) {
+            message.setValue("Error no event");
+            return;
+        }
+
+        // Update the entry status for the waitlist
+        entry.setStatus(status);
+
+        // Start the update
+        loading.setValue(true);
+        waitlistRepository.addToWaitlist(e, entry)
+                .addOnSuccessListener(a -> {
+                    loading.setValue(false);
+                    message.setValue("Update entrant on waitlist");
+                })
+                .addOnFailureListener(exception -> {
+                    loading.setValue(false);
+                    message.setValue("Failed to update entrant");
+                    Log.e("Waitlist", "Failed to update entrant", exception);
+                });
+    }
+
+    /**
+     * Deletes an entrant from the waitlist given the waitlist entry item.
+     *
+     * @param entry The waitlist entry,
+     */
+    public void deleteEntrant(@NonNull WaitlistEntry entry) {
+        Event e = event.getValue();
+
+        if (e == null) {
+            message.setValue("Error no event");
+            return;
+        }
+
+        String uid = entry.getProfile().getUid();
+
+        if (uid == null) {
+            message.setValue("Cannot delete entrant from waitlist");
+            return;
+        }
+
+        loading.setValue(true);
+        waitlistRepository.deleteFromWaitlist(e, uid)
+                .addOnSuccessListener(a -> {
+                    loading.setValue(false);
+                    message.setValue("Delete user from waitlist");
+                })
+                .addOnFailureListener(exception -> {
+                    loading.setValue(false);
+                    message.setValue("Unable to delete entrant from waitlist");
+                    Log.e("Waitlist", "Unable to delete entrant from waitlist", exception);
+                });
+    }
+
+    public void resetMessage() {
+        message.setValue("");
+    }
 }
