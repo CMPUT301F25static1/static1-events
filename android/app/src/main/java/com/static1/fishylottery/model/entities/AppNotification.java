@@ -1,6 +1,8 @@
 package com.static1.fishylottery.model.entities;
 
 import com.google.firebase.firestore.ServerTimestamp;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -8,7 +10,7 @@ import java.util.Date;
  * an event with a customer title, message, a type, status, and way of handling the response
  * (if applicable).
  */
-public class AppNotification {
+public class AppNotification implements Serializable {
 
     private String id;        // Firestore doc id (filled client-side)
     private String eventId;
