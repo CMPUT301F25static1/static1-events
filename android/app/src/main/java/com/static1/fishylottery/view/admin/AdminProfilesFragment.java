@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.viewmodel.AdminProfilesViewModel;
 
@@ -31,9 +33,14 @@ public class AdminProfilesFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(AdminProfilesViewModel.class);
 
-        recyclerView = view.findViewById(R.id.recycler_profiles);
+        recyclerView = view.findViewById(R.id.recycler_view_all_profiles);
         progressBar = view.findViewById(R.id.progress_bar);
         textEmpty = view.findViewById(R.id.text_empty);
+
+        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
+        navView.post(() -> {
+           recyclerView.setPadding(0, 0, 0, navView.getHeight());
+        });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new AdminProfileAdapter(profile -> {

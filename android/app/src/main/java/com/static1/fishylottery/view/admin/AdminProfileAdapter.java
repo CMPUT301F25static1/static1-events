@@ -3,7 +3,7 @@ package com.static1.fishylottery.view.admin;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -57,15 +57,15 @@ public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapte
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textName, textEmail, textPhone, textInitials;
-        Button buttonDelete;
+        ImageButton buttonDelete;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            textName = itemView.findViewById(R.id.text_name);
-            textEmail = itemView.findViewById(R.id.text_email);
-            textPhone = itemView.findViewById(R.id.text_phone);
-            textInitials = itemView.findViewById(R.id.text_initials);
-            buttonDelete = itemView.findViewById(R.id.button_delete);
+            textName = itemView.findViewById(R.id.text_profile_name);
+            textEmail = itemView.findViewById(R.id.text_profile_email);
+            textPhone = itemView.findViewById(R.id.text_profile_phone);
+            textInitials = itemView.findViewById(R.id.text_profile_initials);
+            buttonDelete = itemView.findViewById(R.id.button_profile_delete);
         }
 
         void bind(Profile profile, OnDeleteClickListener listener) {

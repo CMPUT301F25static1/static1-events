@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.viewmodel.AdminOrganizersViewModel;
 
@@ -49,6 +50,11 @@ public class AdminOrganizersFragment extends Fragment {
                     .show();
         });
         recyclerView.setAdapter(adapter);
+
+        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
+        navView.post(() -> {
+            recyclerView.setPadding(0, 0, 0, navView.getHeight());
+        });
 
         viewModel.getOrganizers().observe(getViewLifecycleOwner(), organizers -> {
             adapter.submitList(organizers);
