@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -16,14 +16,14 @@
         android:id="@+id/text_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No profiles found"
+        android:text="No notification logs found"
         android:textAlignment="center"
         android:padding="24dp"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_all_profiles"
+        android:id="@+id/recycler_notification_logs"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:nestedScrollingEnabled="false" />
+        android:layout_height="match_parent" />
+
 </LinearLayout>
