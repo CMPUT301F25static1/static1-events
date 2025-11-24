@@ -4,8 +4,7 @@
     android:id="@+id/scrollview_hosted_event_details"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/light_blue_1">
-
+    android:background="@drawable/img_9">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,8 +21,32 @@
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:background="@drawable/edittext_background"
+            android:orientation="vertical"
+            android:padding="1dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:text="Organize the fun, let FishyLottery hook the rest:)"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:textStyle="italic" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -37,6 +60,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
+                android:background="@drawable/edittext_background"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -67,6 +91,7 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
+                android:background="@drawable/edittext_background"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -105,6 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
+                android:background="@drawable/edittext_background"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
@@ -137,6 +163,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:clickable="true"
+                android:background="@drawable/edittext_background"
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -175,6 +202,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                android:background="@drawable/edittext_background"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
@@ -209,6 +237,7 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
+                android:background="@drawable/edittext_background"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -232,22 +261,21 @@
             </LinearLayout>
         </LinearLayout>
 
-
-        <!-- New row: Cancelled Entrants -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="190dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginBottom="16dp"
-            android:orientation="horizontal"
-            android:weightSum="2">
+            android:orientation="horizontal">
 
 
             <LinearLayout
                 android:id="@+id/btnViewCancelled"
-                android:layout_width="0dp"
+                android:layout_width="272dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
+                android:background="@drawable/edittext_background"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
@@ -258,7 +286,7 @@
                 <ImageView
                     android:layout_width="51dp"
                     android:layout_height="43dp"
-                    android:src="@drawable/cancelled" />
+                    android:src="@drawable/cancel" />
 
 
                 <Button
@@ -266,8 +294,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Cancelled Entrants"
                     android:backgroundTint="@color/white"
+                    android:text="Cancelled Entrants"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -276,4 +304,3 @@
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
-
