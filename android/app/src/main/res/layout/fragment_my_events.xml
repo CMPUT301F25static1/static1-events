@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/light_blue_9"
     android:padding="16dp">
 
     <TextView
@@ -15,9 +16,11 @@
         android:paddingBottom="8dp"/>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/text_no_events_message"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Coming Soon"
+        android:textAlignment="center"
+        android:text="No Events"
         android:paddingBottom="8dp"/>
 
     <!-- List of events -->

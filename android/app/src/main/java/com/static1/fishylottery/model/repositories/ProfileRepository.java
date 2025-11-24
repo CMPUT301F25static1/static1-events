@@ -1,9 +1,10 @@
 package com.static1.fishylottery.model.repositories;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.static1.fishylottery.model.entities.Profile;
@@ -94,6 +95,45 @@ public class ProfileRepository {
                     } else {
                         return null;
                     }
-        });
+                });
+    }
+
+    /**
+     * Fetch many profiles by their UIDs. Uses chunked whereIn queries (max 10 IDs per query).
+     */
+    public Task<List<Profile>> fetchProfilesByIds(List<String> uids) {
+        if (uids == null || uids.isEmpty()) {
+            return Tasks.forResult(new ArrayList<>());
+        }
+
+        List<Task<QuerySnapshot>> chunkTasks = new ArrayList<>();
+
+        // Firestore whereIn supports up to 10 values per query.
+        for (int i = 0; i < uids.size(); i += 10) {
+            List<String> chunk = uids.subList(i, Math.min(i + 10, uids.size()));
+            chunkTasks.add(
+                    profilesRef.whereIn(FieldPath.documentId(), chunk).get()
+            );
+        }
+
+        // Use the non-typed overload and cast each element to QuerySnapshot.
+        return Tasks.whenAllSuccess(chunkTasks)
+                .continueWith(t -> {
+                    List<Profile> out = new ArrayList<>();
+                    List<Object> results = t.getResult(); // may be null
+
+                    if (results != null) {
+                        for (Object obj : results) {
+                            QuerySnapshot qs = (QuerySnapshot) obj;
+                            for (DocumentSnapshot doc : qs.getDocuments()) {
+                                Profile p = doc.toObject(Profile.class);
+                                if (p != null) {
+                                    out.add(p);
+                                }
+                            }
+                        }
+                    }
+                    return out;
+                });
     }
 }

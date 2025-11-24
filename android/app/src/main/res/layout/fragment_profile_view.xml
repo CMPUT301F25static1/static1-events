@@ -89,8 +89,8 @@
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
 
             <include layout="@layout/item_selectable_row"
-                android:id="@+id/row_events_history"
-                android:tag="Events History" />
+                android:id="@+id/row_event_history"
+                android:tag="Event History" />
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
 

@@ -368,7 +368,8 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_latitude"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Longitude -->
@@ -381,7 +382,8 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_longitude"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Radius -->
@@ -395,7 +397,8 @@
                 android:id="@+id/input_radius"
                 android:inputType="numberDecimal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Next Button -->

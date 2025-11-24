@@ -12,6 +12,30 @@
     <string name="upcoming_events">Upcoming Events</string>
     <string name="hosted_by">Hosted By</string>
     <string name="registration">Registration</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="interests_array">
+        <item>Interests...</item>
+        <item>Music</item>
+        <item>Sports</item>
+        <item>Art</item>
+        <item>Technology</item>
+        <item>Travel</item>
+        <item>Food</item>
+        <item>Fitness</item>
+        <item>Education</item>
+        <item>Nature</item>
+        <item>Movies</item>
+        <item>Reading</item>
+        <item>Gaming</item>
+        <item>Science</item>
+        <item>Health</item>
+        <item>Fashion</item>
+        <item>Photography</item>
+        <item>Volunteering</item>
+        <item>Business</item>
+        <item>Culture</item>
+        <item>Socializing</item>
+    </string-array>
+
 </resources>

@@ -10,13 +10,14 @@ import java.util.Date;
  * selected for the event.
  */
 public class WaitlistEntry {
-    private String status; // waiting | invited | accepted | declined
+    private String status; // waiting | invited | accepted | declined | cancelled
     private Date joinedAt;
     private Date invitedAt;
     private Date declinedAt;
     private Date acceptedAt;
     private Profile profile;
     private GeoPoint joinLocation;
+    private String eventId;
 
     public WaitlistEntry() { } // Firestore needs no-arg
 
@@ -52,5 +53,11 @@ public class WaitlistEntry {
     }
     public void setJoinLocation(GeoPoint joinLocation) {
         this.joinLocation = joinLocation;
+    }
+    public String getEventId() {
+        return eventId;
+    }
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 }

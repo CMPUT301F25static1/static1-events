@@ -80,7 +80,6 @@ public class SignupMapFragment extends Fragment implements OnMapReadyCallback {
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
                 Log.d("Location", pos.toString());
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 14f));
-                googleMap.addMarker(new MarkerOptions().position(pos).title("You are here"));
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             }
 

@@ -24,6 +24,7 @@ public class Event implements Serializable {
     private Date createdAt;
     private Date updatedAt;
     private Date registrationOpens;
+    private GeolocationRequirement locationRequirement;
 
     public Event() {}
 
@@ -180,5 +181,13 @@ public class Event implements Serializable {
 
     public void setInterests(List<String> interests) {
         this.interests = interests;
+    }
+
+    public GeolocationRequirement getLocationRequirement() {
+        return locationRequirement;
+    }
+
+    public void setLocationRequirement(GeolocationRequirement locationRequirement) {
+        this.locationRequirement = locationRequirement;
     }
 }
