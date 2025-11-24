@@ -8,29 +8,41 @@
 
     <TextView
         android:id="@+id/text_event_title"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="367dp"
+        android:layout_height="wrap_content"
+        android:text = "Pull Event Title"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/text_event_when"
-        android:layout_marginTop="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="367dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text = "Pull Event Date"
+        android:layout_marginTop="4dp" />
 
     <TextView
         android:id="@+id/text_event_where"
-        android:layout_marginTop="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="367dp"
+        android:textSize="16sp"
+        android:text = "Pull Event Location"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/text_waitlist_status"
-        android:layout_marginTop="8dp"
-        android:textStyle="italic"
+        android:text = "Pull Waitlist Status"
+        android:layout_width="367dp"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
         android:textAllCaps="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/text_waitlist_count"
+        android:text = "________________________________________________________"
+        android:layout_width="367dp"
+        android:layout_height="wrap_content"
+        />
 
 </LinearLayout>

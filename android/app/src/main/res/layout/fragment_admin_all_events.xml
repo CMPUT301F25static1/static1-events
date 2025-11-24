@@ -5,10 +5,18 @@
     android:layout_height="match_parent"
     tools:context=".view.admin.AdminAllEventsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:textAlignment="center"
+        android:text = "No Events"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_all_events"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="true"
+        android:scrollbars="none" />
 
 </FrameLayout>

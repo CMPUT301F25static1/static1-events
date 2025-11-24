@@ -83,6 +83,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:paddingBottom="8dp"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_browse_events"
             android:layout_width="match_parent"

@@ -1,43 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F2F2F2">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <TextView
-            android:id="@+id/tvDetailTitle"
+        <!-- Card -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Notification Title"
-            android:textSize="18sp" />
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:padding="14dp"
+            android:elevation="6dp"
+            android:radius="14dp"
+            android:clipToOutline="true"
+            android:outlineProvider="background">
 
-        <TextView
-            android:id="@+id/tvDetailDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#777"
-            android:text="Notification Date"
-            android:layout_marginTop="4dp" />
+            <TextView
+                android:id="@+id/tvDetailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Notification Title"
+                android:textStyle="bold"
+                android:textSize="23sp"
+                android:textColor="#333" />
 
-        <TextView
-            android:id="@+id/tvDetailMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="This is a notification body message"
-            android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tvDetailDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Notification Date"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginTop="6dp" />
 
-        <Button
-            android:id="@+id/button_view_event"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="View Event Details" />
+            <TextView
+                android:id="@+id/tvDetailMessage"
+                android:layout_width="345dp"
+                android:layout_height="42dp"
+                android:layout_marginTop="14dp"
+                android:text="This is a notification body message"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_view_event"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:padding="12dp"
+                android:text="VIEW EVENT DETAILS"
+                android:letterSpacing="0.05"
+                android:textAllCaps="true"
+                android:backgroundTint="#009BD6"
+                android:textColor="@android:color/white"
+                android:fontFamily="sans-serif-medium"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>
