@@ -25,6 +25,7 @@ public class Event implements Serializable {
     private Date updatedAt;
     private Date registrationOpens;
     private GeolocationRequirement locationRequirement;
+    public Integer countEntries;
 
     public Event() {}
 
@@ -166,7 +167,6 @@ public class Event implements Serializable {
         return true;
     }
 
-
     public String getEventType() {
         return eventType;
     }
@@ -190,4 +190,20 @@ public class Event implements Serializable {
     public void setLocationRequirement(GeolocationRequirement locationRequirement) {
         this.locationRequirement = locationRequirement;
     }
+
+    private Integer waitlistCount = 0;
+
+    public Integer getWaitlistCount() {
+        return waitlistCount;
+    }
+
+    public void setWaitlistCount(Integer waitlistCount) {
+        this.waitlistCount = waitlistCount;
+    }
+
+    // Update the countEntries method
+    public int countEntries() {
+        return waitlistCount != null ? waitlistCount : 0;
+    }
+
 }

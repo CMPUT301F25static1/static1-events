@@ -21,6 +21,7 @@ import com.static1.fishylottery.services.LocationService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EventDetailsViewModel extends ViewModel {
 
@@ -34,19 +35,20 @@ public class EventDetailsViewModel extends ViewModel {
     private MutableLiveData<List<Profile>> invitedList = new MutableLiveData<>(new ArrayList<>());
     private MutableLiveData<List<Profile>> enrolledList = new MutableLiveData<>(new ArrayList<>());
 
+    // NEW: LiveData for waitlist count
+    private MutableLiveData<Integer> waitlistCount = new MutableLiveData<>(0);
+
     public EventDetailsViewModel() {
         waitlistRepository = new WaitlistRepository();
         profileRepository = new ProfileRepository();
     }
 
-    public LiveData<String> getMessage() { return message; };
-    public LiveData<Event> getEvent() {
-        return event;
-    }
+    public LiveData<String> getMessage() { return message; }
+    public LiveData<Event> getEvent() { return event; }
     public LiveData<Boolean> isLoading() { return loading; }
-    public LiveData<WaitlistEntry> getWaitlistEntry() {
-        return waitlistEntry;
-    }
+    public LiveData<WaitlistEntry> getWaitlistEntry() { return waitlistEntry; }
+
+    public LiveData<Integer> getWaitlistCount() { return waitlistCount; }
 
     public void setEvent(Event event) {
         this.event.setValue(event);
@@ -59,6 +61,46 @@ public class EventDetailsViewModel extends ViewModel {
         waitlistRepository.getWaitlistEntry(event, uid).addOnSuccessListener(entry -> {
             waitlistEntry.setValue(entry);
         });
+    }
+
+    public void loadWaitlistCount(Event event) {
+        if (event == null) {
+            Log.d("EventDetailsVM", "loadWaitlistCount: event is null");
+            waitlistCount.postValue(0);
+            return;
+        }
+        String eid = event.getEventId();
+        Log.d("EventDetailsVM", "loadWaitlistCount for eventId=" + eid);
+        if (eid == null) {
+            waitlistCount.postValue(0);
+            return;
+        }
+
+        waitlistRepository.getWaitlist(event)
+                .addOnSuccessListener(entries -> {
+                    int count = 0;
+                    if (entries == null) {
+                        Log.d("EventDetailsVM", "getWaitlist returned null");
+                    } else {
+                        Log.d("EventDetailsVM", "getWaitlist returned size=" + entries.size());
+                        for (WaitlistEntry entry : entries) {
+                            String s = entry == null ? null : entry.getStatus();
+                            Log.d("EventDetailsVM", "entry status: " + s);
+                            if (s != null) {
+                                String ss = s.trim().toLowerCase(Locale.ROOT);
+                                // count both waiting and invited (change as you need)
+                                if ("waiting".equals(ss) || "invited".equals(ss)) {
+                                    count++;
+                                }
+                            }
+                        }
+                    }
+                    waitlistCount.postValue(count);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("EventDetailsVM", "Failed to load waitlist count", e);
+                    waitlistCount.postValue(0);
+                });
     }
 
     public void loadEventEntrants(String eventId) {
@@ -130,7 +172,6 @@ public class EventDetailsViewModel extends ViewModel {
                 }
 
                 // User is able to join, so get the profile and add them to the waitlist
-
                 profileRepository.getProfileById(uid)
                         .addOnSuccessListener(profile -> {
                             if (profile == null) {
@@ -152,6 +193,8 @@ public class EventDetailsViewModel extends ViewModel {
                                         loading.setValue(false);
                                         message.setValue("Joined waitlist!");
                                         waitlistEntry.setValue(entry);
+                                        // Reload waitlist count
+                                        loadWaitlistCount(e);
                                     })
                                     .addOnFailureListener(exception -> {
                                         loading.setValue(false);
@@ -197,11 +240,13 @@ public class EventDetailsViewModel extends ViewModel {
         }
 
         waitlistRepository.deleteFromWaitlist(e, profileId)
-                 .addOnSuccessListener(l -> {
-                     loading.setValue(false);
-                     message.setValue("Removed from the waitlist");
-                     waitlistEntry.setValue(null);
-                 })
+                .addOnSuccessListener(l -> {
+                    loading.setValue(false);
+                    message.setValue("Removed from the waitlist");
+                    waitlistEntry.setValue(null);
+                    // Reload waitlist count
+                    loadWaitlistCount(e);
+                })
                 .addOnFailureListener(exception -> {
                     loading.setValue(false);
                     message.setValue("Failed to leave the waitlist");
@@ -245,6 +290,8 @@ public class EventDetailsViewModel extends ViewModel {
 
                     // Update the live data with the current entry
                     waitlistEntry.setValue(currentEntry);
+                    // Reload waitlist count (one less in waiting)
+                    loadWaitlistCount(currentEvent);
                 })
                 .addOnFailureListener(exception -> {
                     loading.setValue(false);
@@ -288,5 +335,6 @@ public class EventDetailsViewModel extends ViewModel {
                     loading.setValue(false);
                     message.setValue("Could not decline invite");
                     Log.e("Waitlist", "Failed to decline invite", exception);
-                });    }
+                });
+    }
 }

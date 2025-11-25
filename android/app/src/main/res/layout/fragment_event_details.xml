@@ -74,6 +74,33 @@ android:layout_height="match_parent">
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
     </LinearLayout>
 
+    <!-- Location Requirement -->
+    <LinearLayout
+        android:id="@+id/layout_geolocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location Requirement"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+        <TextView
+            android:id="@+id/text_geolocation_requirement_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Location: "/>
+
+        <TextView
+            android:id="@+id/text_geolocation_requirement_radius"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Radius: "/>
+    </LinearLayout>
+
     <!-- Event Description -->
     <TextView
         android:layout_width="wrap_content"
@@ -126,6 +153,13 @@ android:layout_height="match_parent">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Max Attendees: 0"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+    <TextView
+        android:id="@+id/text_waitlist_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Entrants on Waitlist: 0"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
     <!-- Bottom button -->
