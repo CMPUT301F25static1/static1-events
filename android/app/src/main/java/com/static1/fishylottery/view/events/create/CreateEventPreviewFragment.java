@@ -20,6 +20,7 @@ import com.static1.fishylottery.R;
 import com.static1.fishylottery.viewmodel.CreateEventViewModel;
 import com.static1.fishylottery.services.DateUtils;
 
+
 /**
  * Fragment view for showing the preview step of the event creation process for organizers.
  */
@@ -45,6 +46,7 @@ public class CreateEventPreviewFragment extends Fragment {
         TextView textHostedBy = view.findViewById(R.id.text_hosted_by);
         TextView textMaxAttendees = view.findViewById(R.id.text_max_attendees);
         TextView textMaxWaitlistSize = view.findViewById(R.id.text_max_waitlist);
+        TextView textWaitlistCount = view.findViewById(R.id.text_waitlist_count);
         TextView textGeolocationRequirementLocation = view.findViewById(R.id.text_geolocation_requirement_location);
         TextView textGeolocationRequirementRadius = view.findViewById(R.id.text_geolocation_requirement_radius);
         LinearLayout layoutGeolocationRequirement = view.findViewById(R.id.layout_geolocation);
@@ -91,9 +93,13 @@ public class CreateEventPreviewFragment extends Fragment {
 
             String maxAttendees = "Max Attendees: " + (event.getCapacity() != null ? event.getCapacity().toString() : "None");
             String maxWaitlistSize = "Max Waitlist: " + (event.getMaxWaitlistSize() != null ? event.getMaxWaitlistSize().toString() : "None");
+            String numEntries = "Entrants on Waitlist: " + (event.countEntries());
+
+
 
             textMaxAttendees.setText(maxAttendees);
             textMaxWaitlistSize.setText(maxWaitlistSize);
+            textWaitlistCount.setText(numEntries);
         });
 
         vm.getImageUri().observe(getViewLifecycleOwner(), imageUri -> {

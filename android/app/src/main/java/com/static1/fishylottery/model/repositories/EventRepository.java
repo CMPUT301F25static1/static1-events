@@ -67,7 +67,7 @@ public class EventRepository {
     }
 
     public Task<Event> getEventById(String eventId) {
-        return eventsRef.document(eventId).get().continueWith(task -> {
+        return eventsRef.document(eventId).get().continueWithTask(task -> {
             if (!task.isSuccessful()) {
                 throw task.getException();
             }
@@ -76,12 +76,13 @@ public class EventRepository {
                 Event event = doc.toObject(Event.class);
                 if (event != null) {
                     event.setEventId(doc.getId());
-                    return event;
+                    // Fetch waitlist count for this event
+                    return fetchWaitlistCountForEvent(event);
                 } else {
-                    return null;
+                    return Tasks.forResult(null);
                 }
             } else {
-                return null;
+                return Tasks.forResult(null);
             }
         });
     }
@@ -100,7 +101,8 @@ public class EventRepository {
                     events.add(event);
                 }
             }
-            return Tasks.forResult(events);
+            // Fetch waitlist counts for all events
+            return fetchWaitlistCountsForEvents(events);
         });
     }
 
@@ -120,7 +122,91 @@ public class EventRepository {
                             events.add(event);
                         }
                     }
-                    return Tasks.forResult(events);
+                    // Fetch waitlist counts for organizer events
+                    return fetchWaitlistCountsForEvents(events);
+                });
+    }
+
+    // ---------- Waitlist Count Methods ----------
+
+    /**
+     * Fetches waitlist counts for multiple events in parallel.
+     *
+     * @param events list of events to populate
+     * @return Task containing the same list with counts populated
+     */
+    private Task<List<Event>> fetchWaitlistCountsForEvents(List<Event> events) {
+        if (events.isEmpty()) {
+            return Tasks.forResult(events);
+        }
+
+        // Create a list of tasks, one for each event's waitlist count
+        List<Task<Void>> countTasks = new ArrayList<>();
+
+        for (Event event : events) {
+            Task<Void> countTask = eventsRef
+                    .document(event.getEventId())
+                    .collection("waitlist")
+                    .get()
+                    .continueWith(t -> {
+                        if (t.isSuccessful()) {
+                            int count = t.getResult().size();
+                            event.setWaitlistCount(count);
+                        } else {
+                            // On error, set count to 0
+                            event.setWaitlistCount(0);
+                        }
+                        return null;
+                    });
+            countTasks.add(countTask);
+        }
+
+        // Wait for all count tasks to complete
+        return Tasks.whenAllComplete(countTasks)
+                .continueWith(task -> events);
+    }
+
+    /**
+     * Fetches waitlist count for a single event.
+     *
+     * @param event the event to populate
+     * @return Task containing the same event with count populated
+     */
+    private Task<Event> fetchWaitlistCountForEvent(Event event) {
+        return eventsRef
+                .document(event.getEventId())
+                .collection("waitlist")
+                .get()
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        int count = task.getResult().size();
+                        event.setWaitlistCount(count);
+                    } else {
+                        event.setWaitlistCount(0);
+                    }
+                    return event;
+                });
+    }
+
+    /**
+     * Gets the count of waitlist entries by status.
+     * Useful for counting only "waiting", "invited", "accepted", etc.
+     *
+     * @param eventId the event ID
+     * @param status the status to filter by
+     * @return Task containing the count
+     */
+    public Task<Integer> getWaitlistCountByStatus(String eventId, String status) {
+        return eventsRef
+                .document(eventId)
+                .collection("waitlist")
+                .whereEqualTo("status", status)
+                .get()
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        return task.getResult().size();
+                    }
+                    return 0;
                 });
     }
 
@@ -286,5 +372,3 @@ public class EventRepository {
         });
     }
 }
-
-

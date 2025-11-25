@@ -38,7 +38,8 @@ public class EventDetailsFragment extends Fragment {
             tvWhen,
             tvHostedBy,
             tvMaxAttendees,
-            tvMaxWaitlist;
+            tvMaxWaitlist,
+            tvWaitlistCount;
     private ImageView ivEventPoster;
     private Button buttonJoinWaitlist,
             buttonLeaveWaitlist,
@@ -63,6 +64,7 @@ public class EventDetailsFragment extends Fragment {
         tvHostedBy = v.findViewById(R.id.text_hosted_by);
         tvMaxAttendees = v.findViewById(R.id.text_max_attendees);
         tvMaxWaitlist = v.findViewById(R.id.text_max_waitlist);
+        tvWaitlistCount = v.findViewById(R.id.text_waitlist_count);
 
         buttonJoinWaitlist = v.findViewById(R.id.button_join_waitlist);
         buttonLeaveWaitlist = v.findViewById(R.id.button_leave_waitlist);
@@ -133,6 +135,8 @@ public class EventDetailsFragment extends Fragment {
             tvHostedBy.setText(nullTo(event.getHostedBy(), ""));
             tvMaxAttendees.setText("Max Attendees: " + nullTo(event.getCapacity(), "None"));
             tvMaxWaitlist.setText("Max Waitlist: " + nullTo(event.getMaxWaitlistSize(), "None"));
+            tvWaitlistCount.setText("Entrants on Waitlist: " + nullTo(event.countEntries(), "0"));
+
 
             String imageUrl = event.getImageUrl();
 
