@@ -1,5 +1,7 @@
 package com.static1.fishylottery.model.repositories;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
@@ -129,9 +131,7 @@ public class WaitlistRepository {
                         return null;
                     }
 
-                    WaitlistEntry entry = doc.toObject(WaitlistEntry.class);
-
-                    return entry;
+                    return doc.toObject(WaitlistEntry.class);
                 });
     }
 
@@ -196,5 +196,51 @@ public class WaitlistRepository {
 
         // Batch commit
         return batch.commit();
+    }
+
+    public Task<Void> deleteFromWaitlistByUser(@NonNull String uid) {
+        return db.collection(ENTRANT_WAITLISTS)
+            .document(uid)
+            .collection(EVENTS)
+            .get()
+            .continueWithTask(task -> {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                QuerySnapshot snapshot = task.getResult();
+
+                List<WaitlistEntry> waitlists = snapshot.toObjects(WaitlistEntry.class);
+
+                WriteBatch batch = db.batch();
+
+                // For each of the waitlist entries for each user, also remove the waitlist entries for that event
+                for (WaitlistEntry entry : waitlists) {
+                    Log.d("Waitlist", "Deleting waitlist entry for event ID: " + entry.getEventId());
+
+                    String eventId = entry.getEventId();
+                    if (eventId == null) continue;
+
+                    DocumentReference eventWaitlistDocRef = db.collection(EVENTS)
+                        .document(eventId)
+                        .collection(WAITLIST)
+                        .document(uid);
+
+                    DocumentReference entrantWaitlistDocRef = db.collection(ENTRANT_WAITLISTS)
+                        .document(uid)
+                        .collection(EVENTS)
+                        .document(eventId);
+
+                    batch.delete(eventWaitlistDocRef);
+                    batch.delete(entrantWaitlistDocRef);
+                }
+
+                // Finally, remove the user's waitlist entries
+                DocumentReference entrantWaitlistDocRef = db.collection(ENTRANT_WAITLISTS).document(uid);
+                batch.delete(entrantWaitlistDocRef);
+
+                // Commit the batch
+                return batch.commit();
+        });
     }
 }

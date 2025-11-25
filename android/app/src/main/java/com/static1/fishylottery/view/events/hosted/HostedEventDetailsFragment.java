@@ -1,3 +1,6 @@
+
+
+
 package com.static1.fishylottery.view.events.hosted;
 
 import android.app.Activity;
@@ -9,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +27,7 @@ import androidx.navigation.Navigation;
 
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.services.DateUtils;
@@ -64,6 +69,8 @@ public class HostedEventDetailsFragment extends Fragment {
         Button buttonExportEnrolled = view.findViewById(R.id.button_export_enrolled);
         Button buttonSendNotifications = view.findViewById(R.id.button_send_notifications);
         Button buttonViewQrCode     = view.findViewById(R.id.button_view_qr_code);
+        Button buttonViewCancelledEntrants = view.findViewById(R.id.button_view_cancelled_entrants);
+        ScrollView scrollView = view.findViewById(R.id.scrollview_hosted_event_details);
 
         // Event details card
         View eventDetailsCard   = view.findViewById(R.id.event_details_info);
@@ -72,6 +79,12 @@ public class HostedEventDetailsFragment extends Fragment {
         TextView textEventTime  = eventDetailsCard.findViewById(R.id.eventTime);
         TextView textEventLocation = eventDetailsCard.findViewById(R.id.eventLocation);
         ImageView imageView     = eventDetailsCard.findViewById(R.id.eventImage);
+
+        // Add padding to the event details screen
+        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
+        navView.post(() -> {
+            scrollView.setPadding(0, 0, 0, navView.getHeight());
+        });
 
 
         String imageUrl = (event != null) ? event.getImageUrl() : null;
@@ -117,9 +130,16 @@ public class HostedEventDetailsFragment extends Fragment {
 
         buttonExportEnrolled.setOnClickListener(v -> startCsvExport());
 
+        buttonViewCancelledEntrants.setOnClickListener(v -> {
+            Bundle b = new Bundle();
+            b.putSerializable("event", event);
+            Navigation.findNavController(v)
+                    .navigate(R.id.action_hostedEventDetails_to_cancelledEntrants, b);
+        });
         buttonRunLottery.setOnClickListener(v -> viewModel.runLottery());
 
         viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
+            if (message.isEmpty()) return;
             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
         });
 
@@ -129,6 +149,7 @@ public class HostedEventDetailsFragment extends Fragment {
         });
 
         viewModel.fetchWaitlist(event);
+        viewModel.resetMessage();
 
         return view;
     }

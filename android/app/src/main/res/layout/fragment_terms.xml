@@ -6,45 +6,79 @@
     android:fillViewport="true"
     android:background="#FFFFFF">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:fillViewport="true"
+        android:background="#FFFFFF">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Terms and Conditions"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="16dp"
-            android:textColor="#000000" />
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="By using this Event Lottery App, users agree to the following terms:\n\n• Purpose: The app allows entrants to join event waiting lists, participate in random selection ('lottery') draws, and receive notifications regarding event registration.\n\n• Privacy: Users must provide accurate personal information and consent to be contacted through in-app notifications or email.\n\n• Fair Use: Lottery outcomes are determined randomly and cannot be influenced or appealed. Organizers must treat all entrants fairly and comply with app policies.\n\n• Content &amp; Conduct: Organizers are responsible for the accuracy and appropriateness of event details and uploaded media. Inappropriate or misleading content may be removed by administrators.\n\n• Data Privacy: Personal data (name, contact info, device ID) is stored securely and used only for event registration, notification, and audit purposes.\n\n• Account Removal: Administrators may remove users, events, or content that violate these terms without prior notice.\n\n• Liability: The app and its administrators are not liable for event cancellations."
-            android:textSize="14sp"
-            android:layout_marginBottom="24dp"
-            android:textColor="#000000" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Terms and Conditions"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:textColor="#000000"
+                android:layout_marginBottom="16dp" />
 
-        <CheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="I agree to the Terms and Conditions"
-            android:textSize="16sp"
-            android:layout_marginBottom="16dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="457dp"
+                android:lineSpacingExtra="4dp"
+                android:text="These Terms and Conditions (“Terms”) govern the use of the FishyLottery application (“the App”). By downloading, accessing, or using FishyLottery, users agree to comply with these Terms. Anyone who does not agree with these conditions must discontinue use of the App immediately.
 
-        <Button
-            android:id="@+id/Continue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Continue"
-            android:textSize="18sp"
-            android:padding="16dp" />
+FishyLottery is intended solely for users who meet the legal age requirements for lottery-style participation within their region. Users are responsible for ensuring they follow all applicable laws in their jurisdiction.\n\n
 
-    </LinearLayout>
+FishyLottery is created for entertainment purposes only as part of a group project. The App does not involve real-money gambling, and any rewards, tokens, points, or in-app items do not hold real-world monetary value.
+
+To access certain features, users may be required to create an account. By registering, users agree to provide accurate information and maintain the confidentiality of their login credentials.\n\n
+
+Before participating in any draws or games, users should read the rules presented in the App. The FishyLottery team reserves the right to modify, pause, or cancel any game, draw, or event at any time.
+
+If the App includes virtual currency, users acknowledge it has no real-world value. Transactions are handled by third-party platforms, and the FishyLottery team is not responsible for external errors.
+
+Users must not attempt to manipulate the App, interfere with gameplay mechanics, or access systems beyond what is made available. Abusive or illegal behavior may result in account termination.
+
+All graphics, artwork, designs, logos, text, and software used within FishyLottery are the intellectual property of the FishyLottery Project Team.
+
+FishyLottery may collect non-sensitive user information according to the Privacy Policy. The App is provided “as is,” without warranties. Continued use constitutes acceptance of updated Terms.\n\n
+
+Privacy Policy\n\n
+
+FishyLottery collects only the minimum information necessary to operate and improve the App. The App does not sell, trade, or rent user data to third parties. Users may request data removal by contacting the development team.
+
+This Privacy Policy may be updated at any time. Continued use after updates constitutes acceptance.
+
+For questions, contact the FishyLottery Development Team via the email provided in the App."
+                android:textColor="#333333"
+                android:textSize="14sp" />
+
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="I agree to the Terms and Conditions"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/Continue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Continue"
+                android:textSize="18sp"
+                android:padding="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
 
 </ScrollView>

@@ -4,19 +4,16 @@
     android:layout_height="match_parent"
     android:background="@drawable/light_blue_9"
     android:fillViewport="true">
-
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-
             <TextView
                 android:id="@+id/tvInterestsLabel"
                 android:layout_width="wrap_content"
@@ -26,37 +23,14 @@
                 android:textSize="16sp"
                 android:textColor="@color/grey"
                 android:layout_marginBottom="8dp" />
-
-            <LinearLayout
-                android:id="@+id/interestsDropdown"
+            <Spinner
+                android:id="@+id/spinnerInterests"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:padding="16dp"
                 android:layout_marginBottom="24dp"
                 android:background="@drawable/dropdown_background"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/tvInterestsHint"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Interests..."
-                    android:textSize="16sp"
-                    android:textColor="#BDBDBD" />
-
-                <ImageView
-                    android:id="@+id/ivInterestsArrow"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/arrow_down"
-                    android:contentDescription="Dropdown arrow" />
-
-            </LinearLayout>
-
+                android:spinnerMode="dropdown" />
             <TextView
                 android:id="@+id/tvAvailabilityLabel"
                 android:layout_width="wrap_content"
@@ -68,36 +42,37 @@
                 android:layout_marginBottom="8dp" />
 
             <LinearLayout
-                android:id="@+id/availabilityDropdown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
-                android:background="@drawable/dropdown_background"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical">
+                android:weightSum="2">
 
-                <TextView
-                    android:id="@+id/tvAvailabilityHint"
+                <EditText
+                    android:id="@+id/etStartDate"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Availability..."
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/dropdown_background"
+                    android:hint="Start date..."
+                    android:padding="16dp"
                     android:textSize="16sp"
-                    android:textColor="#BDBDBD" />
+                    android:textColorHint="#BDBDBD"
+                    android:drawablePadding="8dp" />
 
-                <ImageView
-                    android:id="@+id/ivAvailabilityArrow"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/arrow_down"
-                    android:clickable="true"
-                    android:focusable="false"
-                    android:contentDescription="Dropdown arrow" />
-
+                <EditText
+                    android:id="@+id/etEndDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/dropdown_background"
+                    android:hint="End date..."
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:textColorHint="#BDBDBD"
+                    android:drawablePadding="8dp" />
             </LinearLayout>
-
         </LinearLayout>
 
         <TextView
@@ -116,6 +91,5 @@
             android:clipToPadding="false"
             android:scrollbars="none"
             android:nestedScrollingEnabled="true"/>
-
     </LinearLayout>
 </ScrollView>

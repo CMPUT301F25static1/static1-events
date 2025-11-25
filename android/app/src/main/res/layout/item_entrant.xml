@@ -40,4 +40,13 @@
             android:textColor="@android:color/darker_gray"
             android:layout_marginTop="1dp" />
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/button_menu"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="6dp"
+        android:src="@android:drawable/ic_menu_more"
+        android:contentDescription="Menu" />
 </LinearLayout>

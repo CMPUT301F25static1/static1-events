@@ -3,6 +3,8 @@ package com.static1.fishylottery.view.events.hosted;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,7 +23,10 @@ public class WaitlistEntryAdapter extends RecyclerView.Adapter<WaitlistEntryAdap
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(WaitlistEntry entry);
+        void onDeleteEntrant(WaitlistEntry entry);
+        void onCancelEntrant(WaitlistEntry entry);
+        void onAcceptEntrant(WaitlistEntry entry);
+        void onInviteEntrant(WaitlistEntry entry);
     }
 
     public WaitlistEntryAdapter(List<WaitlistEntry> waitlistEntries, OnItemClickListener listener) {
@@ -57,6 +62,7 @@ public class WaitlistEntryAdapter extends RecyclerView.Adapter<WaitlistEntryAdap
         private TextView nameTextView;
         private TextView statusTextView;
         private TextView joinedTextView;
+        private ImageButton menuButton;
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
         ViewHolder(View itemView) {
@@ -64,6 +70,7 @@ public class WaitlistEntryAdapter extends RecyclerView.Adapter<WaitlistEntryAdap
             nameTextView = itemView.findViewById(R.id.text_entrant_name);
             statusTextView = itemView.findViewById(R.id.text_status);
             joinedTextView = itemView.findViewById(R.id.text_joined);
+            menuButton = itemView.findViewById(R.id.button_menu);
         }
 
         void bind(final WaitlistEntry entry, final OnItemClickListener listener) {
@@ -81,8 +88,62 @@ public class WaitlistEntryAdapter extends RecyclerView.Adapter<WaitlistEntryAdap
                 joinedTextView.setText("Joined: —");
             }
 
-            itemView.setOnClickListener(v -> {
-                if (listener != null) listener.onItemClick(entry);
+            menuButton.setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(v.getContext(), v);
+                popup.getMenuInflater().inflate(R.menu.entrant_row_menu, popup.getMenu());
+
+                String status = entry.getStatus();
+
+                switch (status) {
+                    case "waiting":
+                        // Can invite or delete
+                        popup.getMenu().findItem(R.id.action_delete_entrant).setVisible(true);
+                        popup.getMenu().findItem(R.id.action_invite_entrant).setVisible(true);
+                        popup.getMenu().findItem(R.id.action_cancel_entrant).setVisible(false);
+                        popup.getMenu().findItem(R.id.action_accept_entrant).setVisible(false);
+
+                        break;
+                    case "invited":
+                        // Can delete, cancel, or accept entrant
+                        popup.getMenu().findItem(R.id.action_delete_entrant).setVisible(true);
+                        popup.getMenu().findItem(R.id.action_invite_entrant).setVisible(false);
+                        popup.getMenu().findItem(R.id.action_cancel_entrant).setVisible(true);
+                        popup.getMenu().findItem(R.id.action_accept_entrant).setVisible(true);
+                        break;
+                    case "accepted":
+                        // Can cancel or delete entrant
+                        popup.getMenu().findItem(R.id.action_delete_entrant).setVisible(true);
+                        popup.getMenu().findItem(R.id.action_invite_entrant).setVisible(false);
+                        popup.getMenu().findItem(R.id.action_cancel_entrant).setVisible(true);
+                        popup.getMenu().findItem(R.id.action_accept_entrant).setVisible(false);
+                        break;
+                    default:
+                        // Can only delete
+                        popup.getMenu().findItem(R.id.action_delete_entrant).setVisible(true);
+                        popup.getMenu().findItem(R.id.action_invite_entrant).setVisible(false);
+                        popup.getMenu().findItem(R.id.action_cancel_entrant).setVisible(false);
+                        popup.getMenu().findItem(R.id.action_accept_entrant).setVisible(false);
+                }
+
+                popup.setOnMenuItemClickListener(item -> {
+                    if (item.getItemId() == R.id.action_cancel_entrant) {
+                        listener.onCancelEntrant(entry);
+                        return true;
+                    } else if (item.getItemId() == R.id.action_accept_entrant) {
+                        listener.onAcceptEntrant(entry);
+                        return true;
+                    } else if (item.getItemId() == R.id.action_delete_entrant) {
+                        listener.onDeleteEntrant(entry);
+                        return true;
+                    } else if (item.getItemId() == R.id.action_invite_entrant) {
+                        listener.onInviteEntrant(entry);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+
+                popup.show();
             });
         }
     }

@@ -69,13 +69,7 @@ public class NotificationsFragment extends Fragment {
             NavController nav = Navigation.findNavController(v);
 
             Bundle b = new Bundle();
-            b.putString("notificationId", n.getId());
-            b.putString("title", n.getTitle());
-            b.putString("message", n.getMessage());
-            b.putLong("createdAt", n.getCreatedAt() != null ? n.getCreatedAt().getTime() : 0L);
-            b.putString("type", n.getType());
-            b.putString("status", n.getStatus());
-
+            b.putSerializable("notification", n);
             nav.navigate(R.id.notificationDetailFragment, b);
         });
     }
