@@ -5,20 +5,29 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Lifecycle;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
@@ -64,11 +73,6 @@ public class BrowseEventsFragment extends Fragment {
         });
         recyclerView.setAdapter(adapter);
 
-        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
-        navView.post(() -> {
-            recyclerView.setPadding(0, 0, 0, navView.getHeight());
-        });
-
         // Setup interests spinner
         setupInterestsSpinner();
 
@@ -79,7 +83,46 @@ public class BrowseEventsFragment extends Fragment {
         etStartDate.setOnClickListener(v -> showDatePicker(etStartDate));
         etEndDate.setOnClickListener(v -> showDatePicker(etEndDate));
 
+        Button buttonApplyFilters = view.findViewById(R.id.buttonApplyFilters);
+        View bottomSheet = view.findViewById(R.id.bottom_sheet_filters);
+        BottomSheetBehavior<View> sheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        sheetBehavior.setHideable(true);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        buttonApplyFilters.setOnClickListener(v -> {
+            // When applying the filters, close the bottom navigation view
+            filterEvents();
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        });
+
+
         getEvents(); // load
+
+        FragmentActivity activity = requireActivity();
+
+        BottomNavigationView navView = activity.findViewById(R.id.nav_view);
+        navView.post(() -> {
+            recyclerView.setPadding(0, 0, 0, navView.getHeight());
+            bottomSheet.setPadding(0, 0, 0, navView.getHeight());
+        });
+
+        // Add the menu provider
+        activity.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.menu_event_filters, menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.action_filter) {
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    return true;
+                }
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+
         return view;
     }
 
@@ -95,15 +138,10 @@ public class BrowseEventsFragment extends Fragment {
 
         spinnerInterests.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Apply filter whenever selection changes (including the placeholder)
-                filterEvents();
-            }
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {}
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                filterEvents();
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
@@ -136,8 +174,6 @@ public class BrowseEventsFragment extends Fragment {
                     Calendar chosen = Calendar.getInstance();
                     chosen.set(year, month, dayOfMonth);
                     target.setText(dateFormat.format(chosen.getTime()));
-                    // Apply filter when date is selected
-                    filterEvents();
                 },
                 y, m, d
         );

@@ -13,6 +13,14 @@
     <string name="hosted_by">Hosted By</string>
     <string name="registration">Registration</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="view_waitlist">View Waitlist</string>
+    <string name="view_map">View Map</string>
+    <string name="send_notifications">Send Notifications</string>
+    <string name="run_lottery">Run Lottery</string>
+    <string name="export_enrolled">Export Enrolled</string>
+    <string name="generate_qr_code">Generate QR Code</string>
+    <string name="cancelled_entrants">Cancelled Entrants</string>
+    <string name="edit_event">Edit Event</string>
 
     <string-array name="interests_array">
         <item>Interests...</item>

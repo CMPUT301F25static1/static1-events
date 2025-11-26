@@ -3,6 +3,7 @@ package com.static1.fishylottery.viewmodel;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -19,6 +20,7 @@ import java.util.Date;
  */
 public class CreateEventViewModel extends ViewModel {
     private final MutableLiveData<Event> event = new MutableLiveData<>(new Event());
+    private final MutableLiveData<Boolean> isEdit = new MutableLiveData<>(false);
     private final MutableLiveData<Uri> imageUri = new MutableLiveData<>();
     private final MutableLiveData<String> validationError = new MutableLiveData<>();
 
@@ -31,6 +33,16 @@ public class CreateEventViewModel extends ViewModel {
      */
     public LiveData<Event> getEvent() {
         return event;
+    }
+
+    /**
+     * Returns a boolean if the view model is in edit mode or create mode for the event.
+     *
+     * @return A boolean if in edit mode.
+     */
+    public LiveData<Boolean> isEdit() { return isEdit; }
+    public void setIsEdit(boolean isEdit) {
+        this.isEdit.setValue(isEdit);
     }
 
     /**
@@ -72,9 +84,18 @@ public class CreateEventViewModel extends ViewModel {
     public boolean submit() {
         Event e = event.getValue();
 
+        boolean _isEdit = isEdit.getValue() != null ? isEdit.getValue() : false;
+
         if (e == null) {
             validationError.setValue("No event to save.");
             return false;
+        }
+
+        if (_isEdit) {
+            if (e.getEventId() == null) {
+                validationError.setValue("Unable to edit event with no ID");
+                return false;
+            }
         }
 
         // required text fields
@@ -110,17 +131,23 @@ public class CreateEventViewModel extends ViewModel {
             return false;
         }
 
-        // clear any old error
-        validationError.setValue(null);
+        if (_isEdit) {
+            return editEvent(e);
+        } else {
+            return createEvent(e);
+        }
+    }
 
+    private boolean createEvent(@NonNull Event e) {
+        // Get the uid for the organizer
         String uid = AuthManager.getInstance().getUserId();
 
         if (uid == null) {
+            validationError.setValue("Please sign in to create an event");
             Log.e("CreateEvent", "User not signed in");
             return false;
         }
 
-        // Set the organizer ID
         e.setOrganizerId(uid);
 
         Date now = new Date();
@@ -130,19 +157,32 @@ public class CreateEventViewModel extends ViewModel {
         e.setStatus("Open");
 
 
+
+        // No image, upload the event as is
         if (imageUri == null) {
-            // No image, just upload event directly
             eventsRepository.addEvent(e);
-            return true;
+        } else {
+            uploadImage(imageUri.getValue(), imageUrl -> {
+                if (imageUrl != null) {
+                    e.setImageUrl(imageUrl);
+                }
+
+                eventsRepository.addEvent(e);
+            });
         }
 
-        uploadImage(imageUri.getValue(), imageUrl -> {
-            if (imageUrl != null) {
-                e.setImageUrl(imageUrl);
-            }
+        validationError.setValue(null);
+        return true;
+    }
 
-            eventsRepository.addEvent(e);
-        });
+    private boolean editEvent(@NonNull Event e)  {
+        Date now = new Date();
+
+        e.setUpdatedAt(now);
+
+        // TODO: Handle updating the image poster
+
+        eventsRepository.updateEvent(e);
 
         return true;
     }
