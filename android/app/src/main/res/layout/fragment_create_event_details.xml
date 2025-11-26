@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:text="Start Date                                 Start time"
+            android:text="Start Date                         Start time"
             android:textStyle="bold"
             android:textSize="15sp"
             android:layout_marginTop="15sp"
@@ -148,7 +148,7 @@
         </LinearLayout>
 
         <TextView
-            android:text="End Date                                   End time"
+            android:text="End Date                           End time"
             android:textStyle="bold"
             android:textSize="15sp"
             android:layout_marginTop="15sp"
@@ -257,20 +257,45 @@
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- ===================== -->
+        <!-- Waitlist limit (optional) -->
+        <!-- ===================== -->
         <TextView
-            android:text="Waitlist maximum (none if blank)"
+            android:text="Waitlist limit (optional)"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_marginTop="20sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Enable waitlist size limit"/>
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkbox_limit_waitlist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layout_waitlist_max"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Waitlist maximum (none if blank)">
+            android:hint="Waitlist maximum"
+            android:enabled="false"
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_waitlist_max"
@@ -289,7 +314,7 @@
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:text=" Date                                          Time"
+            android:text=" Date                                  Time"
             android:textStyle="bold"
             android:layout_marginTop="15sp"
             android:textSize="15sp"

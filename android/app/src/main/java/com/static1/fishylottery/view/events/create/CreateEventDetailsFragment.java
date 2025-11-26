@@ -1,6 +1,5 @@
 package com.static1.fishylottery.view.events.create;
 
-
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
@@ -17,19 +16,18 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
-
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.GeolocationRequirement;
 import com.static1.fishylottery.viewmodel.CreateEventViewModel;
-
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,9 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
 public class CreateEventDetailsFragment extends Fragment {
-
 
     // Date/time display formats used by the pickers
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
@@ -73,44 +69,26 @@ public class CreateEventDetailsFragment extends Fragment {
     private AutoCompleteTextView eventTypeDropdown, eventInterestsDropdown;
     private CreateEventViewModel vm;
 
+    // UI for optional waitlist limit
+    private MaterialCheckBox checkLimitWaitlist;
+    private TextInputLayout tilWaitlistMax;
 
     private boolean[] selectedInterests;
     private boolean lastSwitchState = false;
     private final List<String> selectedItems = new ArrayList<>();
     private final List<String> interests = Arrays.asList(
-            "Music",
-            "Sports",
-            "Art",
-            "Technology",
-            "Travel",
-            "Food",
-            "Fitness",
-            "Education",
-            "Nature",
-            "Movies",
-            "Reading",
-            "Gaming",
-            "Science",
-            "Health",
-            "Fashion",
-            "Photography",
-            "Volunteering",
-            "Business",
-            "Culture",
-            "Socializing"
+            "Music","Sports","Art","Technology","Travel","Food","Fitness","Education","Nature",
+            "Movies","Reading","Gaming","Science","Health","Fashion","Photography","Volunteering",
+            "Business","Culture","Socializing"
     );
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
         View view = inflater.inflate(R.layout.fragment_create_event_details, container, false);
 
-
         vm = new ViewModelProvider(requireActivity()).get(CreateEventViewModel.class);
-
 
         // Observe validation errors from the ViewModel and surface as a Toast
         vm.getValidationError().observe(getViewLifecycleOwner(), msg -> {
@@ -118,7 +96,6 @@ public class CreateEventDetailsFragment extends Fragment {
                 Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
             }
         });
-
 
         // Buttons
         Button nextButton = view.findViewById(R.id.button_next_poster);
@@ -129,7 +106,11 @@ public class CreateEventDetailsFragment extends Fragment {
         textInputLocation = view.findViewById(R.id.input_location);
         textInputHost = view.findViewById(R.id.input_hosted_by);
         textInputCapacity = view.findViewById(R.id.input_capacity);
+
+        // Waitlist (existing input) +  controls
         textInputWaitlistMaximum = view.findViewById(R.id.input_waitlist_max);
+        checkLimitWaitlist      = view.findViewById(R.id.checkbox_limit_waitlist);
+        tilWaitlistMax          = view.findViewById(R.id.layout_waitlist_max);
 
         switchGeolocation = view.findViewById(R.id.switch_geolocation);
         textInputLatitude = view.findViewById(R.id.input_latitude);
@@ -143,30 +124,18 @@ public class CreateEventDetailsFragment extends Fragment {
         eventTypeDropdown = view.findViewById(R.id.dropdown_event_type);
         eventInterestsDropdown = view.findViewById(R.id.dropdown_interests);
 
-
         String[] eventTypes = {
-                "Music",
-                "Sports",
-                "Education",
-                "Workshop",
-                "Networking",
-                "Conference",
-                "Festival",
-                "Fundraiser",
-                "Social Gathering",
-                "Other"
+                "Music","Sports","Education","Workshop","Networking","Conference","Festival",
+                "Fundraiser","Social Gathering","Other"
         };
-
 
         ArrayAdapter<String> eventTypeAdapter = new ArrayAdapter<>(
                 requireContext(),
-                android.R.layout.simple_dropdown_item_1line,
+                android.R.layout.simple_dropdown_item_1line, // use android built-in
                 eventTypes
         );
 
-
         selectedInterests = new boolean[interests.size()];
-
 
         eventInterestsDropdown.setOnClickListener(v -> {
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
@@ -187,11 +156,9 @@ public class CreateEventDetailsFragment extends Fragment {
             builder.show();
         });
 
-
         eventTypeDropdown.setAdapter(eventTypeAdapter);
         eventTypeDropdown.setOnClickListener(v -> eventTypeDropdown.showDropDown());
         eventTypeDropdown.setText(eventTypes[0], false);
-
 
         // Date/time fields
         startDate = view.findViewById(R.id.input_start_date);
@@ -201,7 +168,6 @@ public class CreateEventDetailsFragment extends Fragment {
         deadlineDate = view.findViewById(R.id.input_deadline_date);
         deadlineTime = view.findViewById(R.id.input_deadline_time);
 
-
         // Make date/time EditTexts non-editable by keyboard but clickable to open pickers
         setupPickerField(startDate);
         setupPickerField(startTime);
@@ -210,17 +176,23 @@ public class CreateEventDetailsFragment extends Fragment {
         setupPickerField(deadlineDate);
         setupPickerField(deadlineTime);
 
-
         // click listeners
         startDate.setOnClickListener(v -> showDatePicker(startDate));
         endDate.setOnClickListener(v -> showDatePicker(endDate));
         deadlineDate.setOnClickListener(v -> showDatePicker(deadlineDate));
 
-
         startTime.setOnClickListener(v -> showTimePicker(startTime));
         endTime.setOnClickListener(v -> showTimePicker(endTime));
         deadlineTime.setOnClickListener(v -> showTimePicker(deadlineTime));
 
+        // NEW: toggle waitlist limit UI
+        checkLimitWaitlist.setOnCheckedChangeListener((btn, checked) -> {
+            tilWaitlistMax.setEnabled(checked);
+            tilWaitlistMax.setVisibility(checked ? View.VISIBLE : View.GONE);
+            if (!checked) {
+                textInputWaitlistMaximum.setText(null);
+            }
+        });
 
         nextButton.setOnClickListener(v -> {
             updateDetails();
@@ -233,12 +205,10 @@ public class CreateEventDetailsFragment extends Fragment {
         return view;
     }
 
-
     /** Copies all UI values into the Event stored in the ViewModel. */
     private void updateDetails() {
         Event event = vm.getEvent().getValue();
         if (event == null) return;
-
 
         // Set the new values for the event object
         event.setTitle(textInputTitle.getText().toString());
@@ -248,7 +218,16 @@ public class CreateEventDetailsFragment extends Fragment {
         event.setEventType(eventTypeDropdown.getText().toString());
         event.setInterests(new ArrayList<>(selectedItems));
         event.setCapacity(safeParse(textInputCapacity.getText().toString()));
-        event.setMaxWaitlistSize(safeParse(textInputWaitlistMaximum.getText().toString()));
+
+        // NEW: wire into model
+        boolean limitEnabled = checkLimitWaitlist.isChecked();
+        event.setWaitlistLimited(limitEnabled);
+        event.setMaxWaitlistSize( // keep your existing field updated
+                limitEnabled ? safeParse(textInputWaitlistMaximum.getText().toString()) : null
+        );
+        event.setWaitlistLimit(   // new explicit field if you added it in Event.java
+                limitEnabled ? safeParse(textInputWaitlistMaximum.getText().toString()) : null
+        );
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm a", Locale.getDefault());
         try {
@@ -258,7 +237,6 @@ public class CreateEventDetailsFragment extends Fragment {
                     endDate.getText().toString() + " " + endTime.getText().toString();
             String eventRegistrationClosesString =
                     deadlineDate.getText().toString() + " " + deadlineTime.getText().toString();
-
 
             event.setEventStartDate(formatter.parse(eventStartDateString));
             event.setEventEndDate(formatter.parse(eventEndDateString));
@@ -271,20 +249,16 @@ public class CreateEventDetailsFragment extends Fragment {
         if (lastSwitchState) {
             if (selectedLat != null && selectedLng != null && selectedRadius != null) {
                 GeolocationRequirement locationRequirement = new GeolocationRequirement();
-
                 locationRequirement.setEnabled(true);
                 locationRequirement.setLocation(new GeoPoint(selectedLat, selectedLng));
                 locationRequirement.setRadius(selectedRadius);
-
                 event.setLocationRequirement(locationRequirement);
             }
         }
 
-
         // Update the event using the view model
         vm.updateEvent(event);
     }
-
 
     /** Prevent soft keyboard. allow click to open pickers. */
     private void setupPickerField(EditText et) {
@@ -293,22 +267,18 @@ public class CreateEventDetailsFragment extends Fragment {
         et.setInputType(InputType.TYPE_NULL);
     }
 
-
     /** Opens a DatePickerDialog, initializing from current value if present. */
     private void showDatePicker(final EditText target) {
         final Calendar c = Calendar.getInstance();
-
 
         try {
             Date existing = dateFormat.parse(target.getText().toString());
             if (existing != null) c.setTime(existing);
         } catch (Exception ignored) {}
 
-
         int y = c.get(Calendar.YEAR);
         int m = c.get(Calendar.MONTH);
         int d = c.get(Calendar.DAY_OF_MONTH);
-
 
         DatePickerDialog dp = new DatePickerDialog(
                 requireContext(),
@@ -320,15 +290,12 @@ public class CreateEventDetailsFragment extends Fragment {
                 y, m, d
         );
 
-
         dp.show();
     }
-
 
     // TimePicker
     private void showTimePicker(final EditText target) {
         final Calendar c = Calendar.getInstance();
-
 
         try {
             Date existing = timeFormat.parse(target.getText().toString());
@@ -337,10 +304,8 @@ public class CreateEventDetailsFragment extends Fragment {
             }
         } catch (Exception ignored) {}
 
-
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
-
 
         boolean is24Hour = android.text.format.DateFormat.is24HourFormat(requireContext());
         TimePickerDialog tp = new TimePickerDialog(
@@ -355,10 +320,8 @@ public class CreateEventDetailsFragment extends Fragment {
                 is24Hour
         );
 
-
         tp.show();
     }
-
 
     private Integer safeParse(String s) {
         try {
@@ -430,5 +393,3 @@ public class CreateEventDetailsFragment extends Fragment {
         }
     }
 }
-
-
