@@ -35,6 +35,12 @@ public class EventRepository {
         this.db = db;
         this.eventsRef = db.collection("events");
     }
+    /**
+     * Adds a new event to the events collection in Firestore.
+     *
+     * @param event The event to add to the Firebase.
+     * @return Returns the event with the new ID.
+     */
 
     // ---------- CRUD ----------
 
@@ -49,6 +55,12 @@ public class EventRepository {
                     return event;
                 });
     }
+    /**
+     * Updates an event in Firebase by overriding the document.
+     *
+     * @param event The new event object to update with.
+     * @return A task indicating success or failure.
+     */
 
     public Task<Void> updateEvent(Event event) {
         String eventId = event.getEventId();
@@ -57,7 +69,12 @@ public class EventRepository {
         }
         return eventsRef.document(eventId).set(event);
     }
-
+    /**
+     * Deletes an event from the Firestore.
+     *
+     * @param event The event object, only the ID is needed.
+     * @return A task indicating success or failure.
+     */
     public Task<Void> deleteEvent(Event event) {
         String eventId = event.getEventId();
         if (eventId == null) {
@@ -65,6 +82,12 @@ public class EventRepository {
         }
         return eventsRef.document(eventId).delete();
     }
+    /**
+     * Get a single event by the ID.
+     *
+     * @param eventId The ID for the event.
+     * @return A task containing an event. Event is null if does not exist.
+     */
 
     public Task<Event> getEventById(String eventId) {
         return eventsRef.document(eventId).get().continueWithTask(task -> {
@@ -86,7 +109,11 @@ public class EventRepository {
             }
         });
     }
-
+    /**
+     * Fetch all of the events from the database as is (so search criteria)
+     *
+     * @return Returns a task containing a list of events
+     */
     public Task<List<Event>> fetchAllEvents() {
         return eventsRef.get().continueWithTask(task -> {
             if (!task.isSuccessful()) {
@@ -105,7 +132,12 @@ public class EventRepository {
             return fetchWaitlistCountsForEvents(events);
         });
     }
-
+    /**
+     * Fetch all of the events that are hosted by a particular user given their uid.
+     *
+     * @param uid The Firebase UID of the authenticated organizer user.
+     * @return A task containing the list of events.
+     */
     public Task<List<Event>> fetchEventsByOrganizerId(String uid) {
         return eventsRef
                 .whereEqualTo("organizerId", uid)
@@ -209,7 +241,18 @@ public class EventRepository {
                     return 0;
                 });
     }
-
+    /**
+     * System chooses a specified number of entrants for the event.
+     * Logic:
+     * - Read event.capacity from the event document.
+     * - If selectCount <= 0 -> error (cannot draw).
+     * - Read events/{eventId}/waitlist/*
+     * - Shuffle and select min(capacity, waitlistSize).
+     * - For each selected:
+     *      - Write events/{eventId}/selectedEntrants/{profileId}
+     *      - Mark their waitlist doc with selected = true
+     * - Save selectedEntrants: [profileId, ...] on the event document.
+     */
     // ---------- Lottery draw ----------
 
     public Task<Void> drawEntrants(String eventId) {
