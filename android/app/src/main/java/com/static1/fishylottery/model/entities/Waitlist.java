@@ -33,7 +33,7 @@ public class Waitlist {
     }
 
     /**
-     * Deletes the provided city from the list if present.
+     * Deletes the provided entry from the list if present.
      *
      * @param entry the entry to delete
      * @throws IllegalArgumentException if the city does not exist in the list
@@ -41,7 +41,7 @@ public class Waitlist {
     public void delete(WaitlistEntry entry) {
         boolean removed = entries.remove(entry);
         if (!removed) {
-            throw new IllegalArgumentException("City not found: " + entry);
+            throw new IllegalArgumentException("Entry not found: " + entry);
         }
     }
 
@@ -50,7 +50,7 @@ public class Waitlist {
      *
      * @return count of entries
      */
-    public int countCities() {
+    public int countEntries() {
         return entries.size();
     }
 }

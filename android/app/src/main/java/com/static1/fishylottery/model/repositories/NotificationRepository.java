@@ -3,14 +3,16 @@ package com.static1.fishylottery.model.repositories;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.static1.fishylottery.model.entities.AppNotification;
 
 /**
@@ -86,5 +88,36 @@ public class NotificationRepository {
         return col(uid)
                 .document(notifId)
                 .update("status", status);
+    }
+
+    public Task<Void> deleteAllNotifications() {
+        // TODO: Deletes all of the notifications
+        return Tasks.forResult(null);
+    }
+
+    /**
+     * Deletes all of the notifications for a user by the UID.
+     *
+     * @param uid The UID of the profile.
+     * @return A task indicating success or failure.
+     */
+    public Task<Void> deleteNotificationsByUser(@NonNull String uid) {
+        return db.collection("profiles")
+                .document(uid)
+                .collection("notifications")
+                .get()
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    WriteBatch batch = db.batch();
+
+                    for (DocumentSnapshot snap : task.getResult().getDocuments()) {
+                        batch.delete(snap.getReference());
+                    }
+
+                    return batch.commit();
+                });
     }
 }

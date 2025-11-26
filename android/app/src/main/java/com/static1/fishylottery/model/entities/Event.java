@@ -1,7 +1,5 @@
 package com.static1.fishylottery.model.entities;
-
 import androidx.annotation.Nullable;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +29,6 @@ public class Event implements Serializable {
     private Boolean waitlistLimited;      // null => unlimited / not set
     @Nullable
     private Integer waitlistLimit;        // null => unlimited
-
 
     public Event() {}
 
@@ -90,7 +87,6 @@ public class Event implements Serializable {
     public void setMaxWaitlistSize(Integer maxWaitlistSize) {
         this.maxWaitlistSize = maxWaitlistSize;
     }
-
 
     public String getOrganizerId() {
         return organizerId;
@@ -198,6 +194,21 @@ public class Event implements Serializable {
     public void setLocationRequirement(GeolocationRequirement locationRequirement) {
         this.locationRequirement = locationRequirement;
     }
+    private Integer waitlistCount = 0;
+
+    public Integer getWaitlistCount() {
+        return waitlistCount;
+    }
+
+    public void setWaitlistCount(Integer waitlistCount) {
+        this.waitlistCount = waitlistCount;
+    }
+
+    // Update the countEntries method
+    public int countEntries() {
+        return waitlistCount != null ? waitlistCount : 0;
+    }
+
     @Nullable
     public Boolean getWaitlistLimited() { return waitlistLimited; }
 

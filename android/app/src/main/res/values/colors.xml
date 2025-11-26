@@ -14,4 +14,7 @@
     <color name="fishylottery_blue4">#90E0EF</color>
     <color name="fishylottery_blue5">#03045E</color>
     <color name="grey">#757575</color>
+    <color name="red">#D70040</color>
+    <color name="navy_blue">#000080</color>
+
 </resources>
