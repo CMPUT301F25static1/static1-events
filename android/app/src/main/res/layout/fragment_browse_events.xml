@@ -1,80 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/light_blue_9"
     android:fillViewport="true">
+
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:padding="16dp">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-            <TextView
-                android:id="@+id/tvInterestsLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Filter by interests"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@color/grey"
-                android:layout_marginBottom="8dp" />
-            <Spinner
-                android:id="@+id/spinnerInterests"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:layout_marginBottom="24dp"
-                android:background="@drawable/dropdown_background"
-                android:spinnerMode="dropdown" />
-            <TextView
-                android:id="@+id/tvAvailabilityLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Filter by availability"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@color/grey"
-                android:layout_marginBottom="8dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <EditText
-                    android:id="@+id/etStartDate"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/dropdown_background"
-                    android:hint="Start date..."
-                    android:padding="16dp"
-                    android:textSize="16sp"
-                    android:textColorHint="#BDBDBD"
-                    android:drawablePadding="8dp" />
-
-                <EditText
-                    android:id="@+id/etEndDate"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/dropdown_background"
-                    android:hint="End date..."
-                    android:padding="16dp"
-                    android:textSize="16sp"
-                    android:textColorHint="#BDBDBD"
-                    android:drawablePadding="8dp" />
-            </LinearLayout>
-        </LinearLayout>
-
         <TextView
             android:id="@+id/text_browse_events"
             android:layout_width="wrap_content"
@@ -87,9 +23,30 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_browse_events"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:clipToPadding="false"
             android:scrollbars="none"
             android:nestedScrollingEnabled="true"/>
+
     </LinearLayout>
-</ScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Your interests + availability filters go here -->
+        <include layout="@layout/bottom_sheet_event_filters"/>
+
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

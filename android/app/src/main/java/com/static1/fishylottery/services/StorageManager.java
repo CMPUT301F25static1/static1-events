@@ -19,7 +19,7 @@ public class StorageManager {
      *
      * @param imageUri The local image URI to upload
      * @param path The path within the Firebase Storage bucket to upload to
-     * @return A string with the image URL
+     * @return A Task that resolves to a String with the image URL
      */
     public static Task<String> uploadImage(Uri imageUri, String path) {
         if (imageUri == null) {
@@ -52,16 +52,32 @@ public class StorageManager {
     /**
      * Deletes an image from the Firebase Storage bucket given the image URL string.
      *
-     * @param imageUrl The image URL to be removed.
+     * @param imageUrl The image URL (download URL or path) to be removed.
      * @return A Task indicating success or failure
      */
     public static Task<Void> deleteImage(String imageUrl) {
         if (imageUrl == null || imageUrl.isEmpty()) {
-            return Tasks.forException(new IllegalArgumentException("imageUrl cannot be empty or null"));
+            return Tasks.forException(
+                    new IllegalArgumentException("imageUrl cannot be empty or null")
+            );
         }
 
-        StorageReference imageRef = storage.getReference(imageUrl);
+        try {
+            StorageReference imageRef;
 
-        return imageRef.delete();
+            // If this is a full download URL (what uploadImage currently stores in Firestore)
+            if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+                imageRef = storage.getReferenceFromUrl(imageUrl);
+            } else {
+                // If you ever store just a relative path like "images/events/xxxx.jpg"
+                imageRef = storage.getReference().child(imageUrl);
+            }
+
+            return imageRef.delete();
+
+        } catch (IllegalArgumentException e) {
+            // Return a failed Task instead of crashing the app
+            return Tasks.forException(e);
+        }
     }
 }
