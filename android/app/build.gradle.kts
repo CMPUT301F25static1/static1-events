@@ -100,6 +100,10 @@ dependencies {
     // Lets FragmentScenario work in local unit tests
     debugImplementation("androidx.fragment:fragment-testing:1.7.1")
     debugImplementation("androidx.fragment:fragment-testing:1.8.4")
+    testImplementation("androidx.fragment:fragment-testing:1.8.2") {
+        exclude(group = "androidx.test", module = "core")
+    }
+
 
     testImplementation(libs.junit)
     testImplementation("org.mockito:mockito-core:5.4.0")
