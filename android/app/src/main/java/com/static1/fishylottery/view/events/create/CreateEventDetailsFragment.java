@@ -315,8 +315,7 @@ public class CreateEventDetailsFragment extends Fragment {
 
         nextButton.setOnClickListener(v -> {
             updateDetails();
-            Navigation.findNavController(view)
-                    .navigate(R.id.action_eventDetails_to_eventPoster);
+            NavHostFragment.findNavController(this).navigate(R.id.action_eventDetails_to_eventPoster);
         });
 
         setupLocationSwitch();
