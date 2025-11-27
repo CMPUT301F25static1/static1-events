@@ -14,7 +14,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.viewmodel.CreateEventViewModel;
@@ -32,7 +34,9 @@ public class CreateEventPosterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event_poster, container, false);
-        CreateEventViewModel viewModel = new ViewModelProvider(requireActivity()).get(CreateEventViewModel.class);
+
+        // Initialize the view model
+        CreateEventViewModel viewModel = initViewModel();
 
         imagePreview = view.findViewById(R.id.image_poster_preview);
         Button chooseImageButton = view.findViewById(R.id.button_choose_image);
@@ -68,5 +72,14 @@ public class CreateEventPosterFragment extends Fragment {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         imagePickerLauncher.launch(intent);
+    }
+
+    private CreateEventViewModel initViewModel() {
+        // Create the view model, but scope it to the create event navigation graph so that it
+        // only lives the lifetime of the 3 views used to create or edit the event.
+        ViewModelStoreOwner vmOwner = NavHostFragment.findNavController(this)
+                .getViewModelStoreOwner(R.id.create_event_graph);
+
+        return new ViewModelProvider(vmOwner).get(CreateEventViewModel.class);
     }
 }

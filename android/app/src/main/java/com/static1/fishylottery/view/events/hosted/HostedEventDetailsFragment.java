@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
+import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.services.DateUtils;
 import com.static1.fishylottery.viewmodel.HostedEventDetailsViewModel;
 
@@ -63,6 +64,10 @@ public class HostedEventDetailsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_hosted_event_details, container, false);
 
+        TextView textWaitlistCount = view.findViewById(R.id.text_waitlist_count);
+        TextView textEnrolledCount = view.findViewById(R.id.text_enrolled_count);
+        TextView textInvitedCount = view.findViewById(R.id.text_invited_count);
+
         Button buttonViewWaitlist   = view.findViewById(R.id.button_view_waitlist);
         Button buttonRunLottery     = view.findViewById(R.id.button_run_lottery);
         Button buttonViewMap        = view.findViewById(R.id.button_view_map);
@@ -70,6 +75,7 @@ public class HostedEventDetailsFragment extends Fragment {
         Button buttonSendNotifications = view.findViewById(R.id.button_send_notifications);
         Button buttonViewQrCode     = view.findViewById(R.id.button_view_qr_code);
         Button buttonViewCancelledEntrants = view.findViewById(R.id.button_view_cancelled_entrants);
+        Button buttonEditEvent = view.findViewById(R.id.button_edit_event);
         ScrollView scrollView = view.findViewById(R.id.scrollview_hosted_event_details);
 
         // Event details card
@@ -138,6 +144,12 @@ public class HostedEventDetailsFragment extends Fragment {
         });
         buttonRunLottery.setOnClickListener(v -> viewModel.runLottery());
 
+        buttonEditEvent.setOnClickListener(v -> {
+            Bundle b = new Bundle();
+            b.putSerializable("event", event);
+            Navigation.findNavController(v).navigate(R.id.action_hostedEventDetails_to_editEvent, b);
+        });
+
         viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
             if (message.isEmpty()) return;
             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
@@ -146,6 +158,39 @@ public class HostedEventDetailsFragment extends Fragment {
         viewModel.isLoading().observe(getViewLifecycleOwner(), loading -> {
             buttonRunLottery.setEnabled(!loading);
             buttonExportEnrolled.setEnabled(!loading);
+        });
+
+        viewModel.getWaitlist().observe(getViewLifecycleOwner(), waitlist -> {
+
+            int waitingCount = 0;
+            int enrolledCount = 0;
+            int invitedCount = 0;
+
+            for (WaitlistEntry entry : waitlist) {
+                String status = entry.getStatus();
+
+                if ("accepted".equals(status)) {
+                    enrolledCount++;
+                } else if ("invited".equals(status)) {
+                    invitedCount++;
+                } else if ("waiting".equals(status)) {
+                    waitingCount++;
+                }
+            }
+
+            Integer maxWaitlist = event.getMaxWaitlistSize();;
+            Integer maxCapacity = event.getCapacity();
+            Integer maxPossibleInvited = maxCapacity - enrolledCount;
+
+            textWaitlistCount.setText(
+                    "Waitlist: " + formatCurrentOutOfMax(waitingCount, maxWaitlist)
+            );
+            textEnrolledCount.setText(
+                    "Enrolled: " + formatCurrentOutOfMax(enrolledCount, maxCapacity)
+            );
+            textInvitedCount.setText(
+                    "Invited: " + formatCurrentOutOfMax(invitedCount, maxPossibleInvited)
+            );
         });
 
         viewModel.fetchWaitlist(event);
@@ -159,5 +204,16 @@ public class HostedEventDetailsFragment extends Fragment {
         intent.setType("text/csv");
         intent.putExtra(Intent.EXTRA_TITLE, "accepted_entrants.csv");
         createFileLauncher.launch(intent);
+    }
+
+    private String formatCurrentOutOfMax(int current, Integer max) {
+        String currentStr = Integer.valueOf(current).toString();
+        if (max == null) {
+            return currentStr;
+        }
+
+        String maxStr = max.toString();
+
+        return currentStr + "/" + maxStr;
     }
 }

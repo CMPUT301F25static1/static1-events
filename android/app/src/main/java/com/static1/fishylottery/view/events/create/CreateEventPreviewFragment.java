@@ -13,7 +13,9 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.firebase.firestore.GeoPoint;
 import com.static1.fishylottery.R;
@@ -33,7 +35,8 @@ public class CreateEventPreviewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        vm = new ViewModelProvider(requireActivity()).get(CreateEventViewModel.class);
+        // Initialize the view model
+        vm = initViewModel();
 
         View view = inflater.inflate(R.layout.fragment_create_event_preview, container, false);
 
@@ -64,12 +67,25 @@ public class CreateEventPreviewFragment extends Fragment {
             }
         });
 
+        vm.isEdit().observe(getViewLifecycleOwner(), isEdit -> {
+            button.setText(isEdit ? "Update" : "Create");
+        });
+
         button.setOnClickListener(v -> {
             boolean ok = vm.submit();   // runs the checks; saves if valid
+            boolean isEdit = vm.isEdit().getValue();
+
             if (ok) {
-                Toast.makeText(requireContext(), "Event created!", Toast.LENGTH_SHORT).show();
-                // navigate here for a nav target:
+                if (isEdit) {
+                    Toast.makeText(requireContext(), "Event updated!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(requireContext(), "Event created!", Toast.LENGTH_SHORT).show();
+                }
+
                 Navigation.findNavController(view).popBackStack(R.id.navigation_events, false);
+
+
             }
             // If not ok, the observer above shows the error.
         });
@@ -128,5 +144,14 @@ public class CreateEventPreviewFragment extends Fragment {
         double lngAbs = Math.abs(lng);
 
         return String.format("%.6f° %s, %.6f° %s", latAbs, ns, lngAbs, ew);
+    }
+
+    private CreateEventViewModel initViewModel() {
+        // Create the view model, but scope it to the create event navigation graph so that it
+        // only lives the lifetime of the 3 views used to create or edit the event.
+        ViewModelStoreOwner vmOwner = NavHostFragment.findNavController(this)
+                .getViewModelStoreOwner(R.id.create_event_graph);
+
+        return new ViewModelProvider(vmOwner).get(CreateEventViewModel.class);
     }
 }

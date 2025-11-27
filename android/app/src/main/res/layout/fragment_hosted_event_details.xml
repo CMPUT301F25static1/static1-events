@@ -41,12 +41,47 @@
                 android:textStyle="italic" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:background="@drawable/edittext_background"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:padding="1dp">
+
+            <TextView
+                android:id="@+id/text_waitlist_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:text="Waitlist: 4/1000"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/text_invited_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:text="Invited: 95/100"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/text_enrolled_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:text="Enrolled: 5/100"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -76,7 +111,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="View Waitlist"
+                    android:text="@string/view_waitlist"
                     android:backgroundTint="@color/white"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
@@ -108,7 +143,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="View Map"
+                    android:text="@string/view_map"
                     android:backgroundTint="@color/white"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
@@ -149,7 +184,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Send Notifications"
+                    android:text="@string/send_notifications"
                     android:backgroundTint="@color/white"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
@@ -181,7 +216,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Run Lottery"
+                    android:text="@string/run_lottery"
                     android:backgroundTint="@color/white"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
@@ -198,7 +233,6 @@
 
 
             <LinearLayout
-                android:id="@+id/btnSendNotifications"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -222,7 +256,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Export Enrolled"
+                    android:text="@string/export_enrolled"
                     android:backgroundTint="@color/white"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
@@ -254,7 +288,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="QR code scanner"
+                    android:text="@string/generate_qr_code"
                     android:backgroundTint="@color/white"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
@@ -262,16 +296,15 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="190dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginBottom="16dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="2">
 
 
             <LinearLayout
-                android:id="@+id/btnViewCancelled"
-                android:layout_width="272dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
@@ -295,12 +328,40 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:backgroundTint="@color/white"
-                    android:text="Cancelled Entrants"
+                    android:text="@string/cancelled_entrants"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
 
+
+                <ImageView
+                    android:layout_width="51dp"
+                    android:layout_height="43dp"
+                    android:src="@android:drawable/ic_menu_edit" />
+
+
+                <Button
+                    android:id="@+id/button_edit_event"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="@color/white"
+                    android:text="@string/edit_event"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
