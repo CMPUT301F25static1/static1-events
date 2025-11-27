@@ -218,6 +218,7 @@ public class EventRepository implements IEventRepository {
 
     // ---------- Lottery draw ----------
 
+    @Override
     public Task<Void> drawEntrants(String eventId) {
         if (eventId == null) {
             return Tasks.forException(new IllegalArgumentException("eventId is null"));

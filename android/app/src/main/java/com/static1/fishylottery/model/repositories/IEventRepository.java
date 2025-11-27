@@ -8,10 +8,11 @@ import java.util.List;
  * This class abstracts the Firestore handling of events.
  */
 public interface IEventRepository {
-    public Task<Event> addEvent(Event event);
-    public Task<Void> updateEvent(Event event);
-    public Task<Void> deleteEvent(Event event);
-    public Task<Event> getEventById(String eventId);
-    public Task<List<Event>> fetchAllEvents();
-    public Task<List<Event>> fetchEventsByOrganizerId(String uid);
+    Task<Event> addEvent(Event event);
+    Task<Void> updateEvent(Event event);
+    Task<Void> deleteEvent(Event event);
+    Task<Event> getEventById(String eventId);
+    Task<List<Event>> fetchAllEvents();
+    Task<List<Event>> fetchEventsByOrganizerId(String uid);
+    public Task<Void> drawEntrants(String eventId);
 }

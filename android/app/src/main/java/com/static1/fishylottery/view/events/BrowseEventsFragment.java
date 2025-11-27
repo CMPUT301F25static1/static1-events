@@ -31,6 +31,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.model.repositories.IEventRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class BrowseEventsFragment extends Fragment {
-    private EventRepository eventsRepo;
+    private IEventRepository eventsRepo;
     private RecyclerView recyclerView;
     private EventAdapter adapter;
     private Spinner spinnerInterests;
@@ -50,12 +51,18 @@ public class BrowseEventsFragment extends Fragment {
 
     private List<Event> allEvents = new ArrayList<>(); // Store all events
 
+    public BrowseEventsFragment() {
+        this.eventsRepo = new EventRepository();
+    }
+
+    public BrowseEventsFragment(IEventRepository eventRepository) {
+        this.eventsRepo = eventRepository;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_browse_events, container, false);
-
-        eventsRepo = new EventRepository();
 
         // Initialize views
         recyclerView = view.findViewById(R.id.recycler_browse_events);
@@ -98,30 +105,34 @@ public class BrowseEventsFragment extends Fragment {
 
         getEvents(); // load
 
-        FragmentActivity activity = requireActivity();
+        FragmentActivity activity = getActivity();
 
-        BottomNavigationView navView = activity.findViewById(R.id.nav_view);
-        navView.post(() -> {
-            recyclerView.setPadding(0, 0, 0, navView.getHeight());
-            bottomSheet.setPadding(0, 0, 0, navView.getHeight());
-        });
-
-        // Add the menu provider
-        activity.addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.menu_event_filters, menu);
+        if (activity != null) {
+            BottomNavigationView navView = activity.findViewById(R.id.nav_view);
+            if (navView != null) {
+                navView.post(() -> {
+                    recyclerView.setPadding(0, 0, 0, navView.getHeight());
+                    bottomSheet.setPadding(0, 0, 0, navView.getHeight());
+                });
             }
 
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.action_filter) {
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                    return true;
+            // Add the menu provider for the filter button menu
+            activity.addMenuProvider(new MenuProvider() {
+                @Override
+                public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                    menuInflater.inflate(R.menu.menu_event_filters, menu);
                 }
-                return false;
-            }
-        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+
+                @Override
+                public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                    if (menuItem.getItemId() == R.id.action_filter) {
+                        sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        return true;
+                    }
+                    return false;
+                }
+            }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+        }
 
         return view;
     }

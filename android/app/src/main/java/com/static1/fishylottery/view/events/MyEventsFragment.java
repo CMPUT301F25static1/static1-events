@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +21,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.model.repositories.IEventRepository;
+import com.static1.fishylottery.model.repositories.IWaitlistRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.services.AuthManager;
 import com.static1.fishylottery.model.entities.Event;
@@ -34,18 +37,25 @@ import java.util.Set;
 public class MyEventsFragment extends Fragment {
     private TextView textNoEventsMessage;
     private RecyclerView myEventsRecycler;
-    private EventRepository eventsRepo;
-    private WaitlistRepository waitlistRepo;
+    private IEventRepository eventsRepo;
+    private IWaitlistRepository waitlistRepo;
     private EventAdapter adapter;
     private final static String TAG = "MyEvents";
+
+    public MyEventsFragment() {
+        this.eventsRepo = new EventRepository();
+        this.waitlistRepo = new WaitlistRepository();
+    }
+
+    public MyEventsFragment(IEventRepository eventRepository, IWaitlistRepository waitlistRepository) {
+        this.eventsRepo = eventRepository;
+        this.waitlistRepo = waitlistRepository;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_events, container, false);
-
-        eventsRepo = new EventRepository();
-        waitlistRepo = new WaitlistRepository();
 
         textNoEventsMessage = view.findViewById(R.id.text_no_events_message);
 
@@ -60,10 +70,16 @@ public class MyEventsFragment extends Fragment {
         });
         myEventsRecycler.setAdapter(adapter);
 
-        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
-        navView.post(() -> {
-            myEventsRecycler.setPadding(0, 0,0, navView.getHeight());
-        });
+        FragmentActivity activity = getActivity();
+
+        if (activity != null) {
+            BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
+            if (navView != null) {
+                navView.post(() -> {
+                    myEventsRecycler.setPadding(0, 0,0, navView.getHeight());
+                });
+            }
+        }
 
         getMyEvents(); // load
 

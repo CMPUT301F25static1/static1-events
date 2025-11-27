@@ -41,4 +41,9 @@ public class FakeEventRepository implements IEventRepository {
     public Task<List<Event>> fetchEventsByOrganizerId(String uid) {
         return Tasks.forResult(events);
     }
+
+    @Override
+    public Task<Void> drawEntrants(String eventId) {
+        return null;
+    }
 }
