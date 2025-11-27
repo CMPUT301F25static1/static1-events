@@ -1,9 +1,14 @@
 package com.static1.fishylottery.view.notifications;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import android.view.View;
+import android.widget.Button;
 
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.lifecycle.Lifecycle;
@@ -20,11 +25,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Collections;
+import java.util.Date;
 
 @RunWith(AndroidJUnit4.class)
 public class NotificationsFragmentTest {
 
-    /** ✅ SIMPLE TEST 1 — Adapter receives 1 item */
     @Test
     public void adapter_receivesOneItem() {
         FragmentScenario<NotificationsFragment> scenario =
@@ -50,7 +55,6 @@ public class NotificationsFragmentTest {
         });
     }
 
-    /** ✅ SIMPLE TEST 2 — Clicking row navigates to detail screen */
     @Test
     public void clickingNotification_opensDetailFragment() {
         TestNavHostController nav = new TestNavHostController(
@@ -100,16 +104,20 @@ public class NotificationsFragmentTest {
                 nav.getCurrentDestination().getId());
     }
 
-    /** ✅ SIMPLE TEST 3 — Invitation buttons visible */
     @Test
-    public void invitationButtons_areVisible() {
+    public void viewEventDetailsIsVisible() {
         android.os.Bundle args = new android.os.Bundle();
-        args.putString("notificationId", "T1");
-        args.putString("title", "Invite");
-        args.putString("message", "Join");
-        args.putString("type", "invitation");
-        args.putString("status", "pending");
-        args.putLong("createdAt", 0L);
+
+        AppNotification notification = new AppNotification();
+
+        notification.setId("T1");
+        notification.setTitle("Invite");
+        notification.setType("invitation");
+        notification.setStatus("pending");
+        notification.setCreatedAt(new Date());
+        notification.setMessage("Join");
+
+        args.putSerializable("notification", notification);
 
         FragmentScenario<NotificationDetailFragment> scenario =
                 FragmentScenario.launchInContainer(
@@ -121,13 +129,13 @@ public class NotificationsFragmentTest {
 
         scenario.onFragment(fragment -> {
             View root = fragment.requireView();
-            View invite = root.findViewById(R.id.inviteActions);
-            View accept = root.findViewById(R.id.btnAccept);
-            View decline = root.findViewById(R.id.btnDecline);
+            Button buttonViewEvent = root.findViewById(R.id.button_view_event);
 
-            assertEquals(View.VISIBLE, invite.getVisibility());
-            assertTrue(accept.isShown());
-            assertTrue(decline.isShown());
+
+            assertEquals(View.VISIBLE, buttonViewEvent.getVisibility());
         });
+
+        onView(withId(R.id.tvDetailTitle)).check(matches(withText("Invite")));
+        onView(withId(R.id.tvDetailMessage)).check(matches(withText("Join")));
     }
 }
