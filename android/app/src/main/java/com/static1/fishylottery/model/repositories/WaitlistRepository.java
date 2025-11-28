@@ -16,6 +16,7 @@ import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -340,6 +341,143 @@ public class WaitlistRepository implements IWaitlistRepository {
             if (!t.isSuccessful()) throw t.getException();
             long count = t.getResult() != null ? t.getResult() : 0L;
             return count < event.getWaitlistLimit();
+        });
+    }
+
+    /**
+     * Marks an invited entrant as declined and, if possible, invites a replacement
+     * entrant from the remaining waitlist for the same event.
+     *
+     * Logic:
+     *  1. Mark the current entrant as "declined" on BOTH:
+     *      - events/{eventId}/waitlist/{uid}
+     *      - entrantWaitlists/{uid}/events/{eventId}
+     *  2. If they were in "invited" status, look for a replacement:
+     *      - Scan the event's waitlist for entries with status == "waiting"
+     *      - Choose the earliest joined (by joinedAt) as the replacement
+     *      - Mark that replacement as "invited" and set invitedAt (both sides)
+     *
+     * This is done inside a Firestore transaction so the update + replacement
+     * selection are consistent.
+     */
+    @Override
+    public Task<Void> declineInvitationAndDrawReplacement(@NonNull Event event, @NonNull String uid) {
+        String eventId = event.getEventId();
+        if (eventId == null) {
+            return Tasks.forException(new Exception("Event ID cannot be null"));
+        }
+
+        // References for this entrant's waitlist docs (both sides)
+        DocumentReference eventWaitlistRef = db.collection(EVENTS)
+                .document(eventId)
+                .collection(WAITLIST)
+                .document(uid);
+
+        DocumentReference entrantWaitlistRef = db.collection(ENTRANT_WAITLISTS)
+                .document(uid)
+                .collection(EVENTS)
+                .document(eventId);
+
+        // 1) Get the current entry so we know its previous status
+        return eventWaitlistRef.get().continueWithTask(task -> {
+            if (!task.isSuccessful()) {
+                throw task.getException();
+            }
+
+            DocumentSnapshot snapshot = task.getResult();
+            if (snapshot == null || !snapshot.exists()) {
+                // Nothing to do if the entry doesn't exist
+                return Tasks.forResult(null);
+            }
+
+            WaitlistEntry entry = snapshot.toObject(WaitlistEntry.class);
+            if (entry == null) {
+                return Tasks.forResult(null);
+            }
+
+            String previousStatus = entry.getStatus();
+            Date now = new Date();
+
+            // 2) Mark this entrant as declined on BOTH sides in a batch
+            WriteBatch batch = db.batch();
+            batch.update(eventWaitlistRef,
+                    "status", "declined",
+                    "declinedAt", now);
+            batch.update(entrantWaitlistRef,
+                    "status", "declined",
+                    "declinedAt", now);
+
+            return batch.commit().continueWithTask(commitTask -> {
+                if (!commitTask.isSuccessful()) {
+                    throw commitTask.getException();
+                }
+
+                // If they weren't invited, we don't need to draw a replacement
+                if (!"invited".equals(previousStatus)) {
+                    return Tasks.forResult(null);
+                }
+
+                // 3) Find a replacement from remaining "waiting" entries
+                return db.collection(EVENTS)
+                        .document(eventId)
+                        .collection(WAITLIST)
+                        .get()
+                        .continueWithTask(waitlistTask -> {
+                            if (!waitlistTask.isSuccessful()) {
+                                throw waitlistTask.getException();
+                            }
+
+                            QuerySnapshot allEntriesSnapshot = waitlistTask.getResult();
+                            if (allEntriesSnapshot == null || allEntriesSnapshot.isEmpty()) {
+                                return Tasks.forResult(null);
+                            }
+
+                            DocumentSnapshot replacementDoc = null;
+                            Date earliestJoined = null;
+
+                            // Pick the "waiting" entry with the earliest joinedAt
+                            for (DocumentSnapshot doc : allEntriesSnapshot.getDocuments()) {
+                                WaitlistEntry e = doc.toObject(WaitlistEntry.class);
+                                if (e == null) continue;
+                                if (!"waiting".equals(e.getStatus())) continue;
+
+                                Date joined = e.getJoinedAt();
+                                if (replacementDoc == null) {
+                                    replacementDoc = doc;
+                                    earliestJoined = joined;
+                                } else if (joined != null &&
+                                        (earliestJoined == null || joined.before(earliestJoined))) {
+                                    replacementDoc = doc;
+                                    earliestJoined = joined;
+                                }
+                            }
+
+                            if (replacementDoc == null) {
+                                // No "waiting" entrants left
+                                return Tasks.forResult(null);
+                            }
+
+                            String replacementUid = replacementDoc.getId();
+                            DocumentReference replacementEventRef = replacementDoc.getReference();
+                            DocumentReference replacementEntrantRef = db.collection(ENTRANT_WAITLISTS)
+                                    .document(replacementUid)
+                                    .collection(EVENTS)
+                                    .document(eventId);
+
+                            Date inviteTime = new Date();
+
+                            // 4) Promote the replacement to invited on BOTH sides
+                            WriteBatch promoteBatch = db.batch();
+                            promoteBatch.update(replacementEventRef,
+                                    "status", "invited",
+                                    "invitedAt", inviteTime);
+                            promoteBatch.update(replacementEntrantRef,
+                                    "status", "invited",
+                                    "invitedAt", inviteTime);
+
+                            return promoteBatch.commit();
+                        });
+            });
         });
     }
 }

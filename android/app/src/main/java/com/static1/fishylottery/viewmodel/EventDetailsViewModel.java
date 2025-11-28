@@ -328,18 +328,29 @@ public class EventDetailsViewModel extends ViewModel {
             return;
         }
 
-        // Update status and timestamp
+        // Get the entrant's UID (needed for repository call)
+        Profile profile = currentEntry.getProfile();
+        if (profile == null || profile.getUid() == null) {
+            message.setValue("Could not identify entrant");
+            return;
+        }
+        String uid = profile.getUid();
+
+        // Update local model for UI
         currentEntry.setStatus("declined");
         currentEntry.setDeclinedAt(new Date());
 
         loading.setValue(true);
 
-        // *** changed here ***
-        waitlistRepository.addToWaitlistRespectingLimit(currentEvent, currentEntry)
+        // Use the new repository method that also draws a replacement entrant
+        waitlistRepository.declineInvitationAndDrawReplacement(currentEvent, uid)
                 .addOnSuccessListener(unused -> {
                     loading.setValue(false);
                     message.setValue("Successfully declined invite!");
+                    // Update LiveData so UI shows declined state
                     waitlistEntry.setValue(currentEntry);
+                    // Reload waitlist count – someone else may have just been invited
+                    loadWaitlistCount(currentEvent);
                 })
                 .addOnFailureListener(exception -> {
                     loading.setValue(false);
