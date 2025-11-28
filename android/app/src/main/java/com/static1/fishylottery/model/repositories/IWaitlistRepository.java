@@ -65,5 +65,5 @@ public interface IWaitlistRepository {
      */
     Task<Void> deleteFromWaitlistByUser(@NonNull String uid);
 
-    Task<Object> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry);
+    Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry);
 }

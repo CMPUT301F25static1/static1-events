@@ -69,7 +69,7 @@ public class EventDetailsFragmentTest {
     private void launchWithEmptyRepos(Event event) {
         FakeWaitlistRepository waitlistRepo = new FakeWaitlistRepository() {
             @Override
-            public Task<Object> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
                 return null;
             }
         };
@@ -93,7 +93,7 @@ public class EventDetailsFragmentTest {
 
         FakeWaitlistRepository waitlistRepo = new FakeWaitlistRepository() {
             @Override
-            public Task<Object> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
                 return null;
             }
         };
@@ -160,7 +160,7 @@ public class EventDetailsFragmentTest {
         FakeProfileRepository fakeProfileRepository = new FakeProfileRepository();
         FakeWaitlistRepository fakeWaitlistRepository = new FakeWaitlistRepository() {
             @Override
-            public Task<Object> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
                 return null;
             }
         };

@@ -105,7 +105,7 @@ public class MyEventsFragmentTest {
         IEventRepository fakeEventRepo = new FakeEventRepository();
         IWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository() {
             @Override
-            public Task<Object> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
                 return null;
             }
         };
@@ -131,7 +131,7 @@ public class MyEventsFragmentTest {
 
         IWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository() {
             @Override
-            public Task<Object> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
                 return null;
             }
         };
@@ -153,7 +153,7 @@ public class MyEventsFragmentTest {
     private FakeWaitlistRepository createFakeWaitlist() {
         FakeWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository() {
             @Override
-            public Task<Object> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
                 return null;
             }
         };
