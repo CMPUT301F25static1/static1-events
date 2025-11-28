@@ -47,6 +47,11 @@ public class EventDetailsFragment extends Fragment {
             buttonDeclineInvite;
     private EventDetailsViewModel viewModel;
 
+    public EventDetailsFragment() {}
+    public EventDetailsFragment(EventDetailsViewModel viewModel) {
+        this.viewModel = viewModel;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -54,7 +59,9 @@ public class EventDetailsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_event_details, container, false);
 
-        viewModel = new ViewModelProvider(this).get(EventDetailsViewModel.class);
+        if (viewModel == null) {
+            viewModel = new ViewModelProvider(this).get(EventDetailsViewModel.class);
+        }
 
         ivEventPoster = v.findViewById(R.id.image_event_poster);
         tvTitle = v.findViewById(R.id.text_title);

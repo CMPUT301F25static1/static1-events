@@ -17,44 +17,26 @@ import java.util.List;
  * for profiles. This is designed to allow easy, reusable, and shared access of documents
  * to and from the "profiles" collection in Firestore.
  */
-public class ProfileRepository {
+public class ProfileRepository implements IProfileRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference profilesRef = db.collection("profiles");
 
-    /**
-     * Adds a profile to the profiles collection. The UID is already determined from Firebase Auth.
-     *
-     * @param profile The profile to be added.
-     * @return A task indicating success or failure.
-     */
+    @Override
     public Task<Void> addProfile(Profile profile) {
         return profilesRef.document(profile.getUid()).set(profile);
     }
 
-    /**
-     * Update the profile with a new object.
-     *
-     * @param profile The new profile object that should be updated.
-     * @return A task indicating success or failure.
-     */
+    @Override
     public Task<Void> updateProfile(Profile profile) {
         return profilesRef.document(profile.getUid()).set(profile);
     }
 
-    /**
-     * Deletes the profile from the profiles collection.
-     *
-     * @param profile The profile object to delete (only requires the ID to exist)
-     * @return A task indicating success or failure.
-     */
+    @Override
     public Task<Void> deleteProfile(Profile profile) {
         return profilesRef.document(profile.getUid()).delete();
     }
 
-    /**
-     * Gets a list of all of the profiles currently in the database.
-     * @return A task with a list of profile objects.
-     */
+    @Override
     public Task<List<Profile>> getAllProfiles() {
         return profilesRef.get()
                 .continueWith(task -> {
@@ -78,12 +60,7 @@ public class ProfileRepository {
                 });
     }
 
-    /**
-     * Get a single profile object by the UID.
-     *
-     * @param uid The UID of the profile. Most often comes from Firebase Auth.
-     * @return A task with a profile object. Will be null if doesn't exist.
-     */
+    @Override
     public Task<Profile> getProfileById(String uid) {
         return profilesRef
                 .document(uid)
@@ -98,9 +75,7 @@ public class ProfileRepository {
                 });
     }
 
-    /**
-     * Fetch many profiles by their UIDs. Uses chunked whereIn queries (max 10 IDs per query).
-     */
+    @Override
     public Task<List<Profile>> fetchProfilesByIds(List<String> uids) {
         if (uids == null || uids.isEmpty()) {
             return Tasks.forResult(new ArrayList<>());

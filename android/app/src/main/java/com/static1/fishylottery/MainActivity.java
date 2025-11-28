@@ -29,6 +29,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.static1.fishylottery.databinding.ActivityMainBinding;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.model.repositories.IEventRepository;
 import com.static1.fishylottery.services.AuthManager;
 import com.static1.fishylottery.view.events.QrScanActivity;
 
@@ -42,7 +43,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private ActivityResultLauncher<Intent> qrScanLauncher;
-    private EventRepository eventRepo;
+    private IEventRepository eventRepo = new EventRepository();
     private NavController navController;
     private boolean locationEnabled = false;
 
@@ -75,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             forceWhiteNavigationIcon(toolbar);
         });
-
-        eventRepo = new EventRepository();
 
         qrScanLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),

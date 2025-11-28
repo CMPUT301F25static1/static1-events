@@ -21,21 +21,14 @@ import java.util.List;
 /**
  * Stores a user's intent to join the waitlist under: events/{eventId}/waitlist/{profileId}
  */
-public class WaitlistRepository {
+public class WaitlistRepository implements IWaitlistRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private static final String EVENTS = "events";
     private static final String WAITLIST = "waitlist";
     private static final String ENTRANT_WAITLISTS = "entrantWaitlists";
 
-    /**
-     * An entrant can join a waitlist with the event and the created waitlist entry containing the
-     * profile of who is joining the waitlist.
-     *
-     * @param event The event the waitlist belongs to.
-     * @param entry Information about the entrant profile and status.
-     * @return A task indicating success or failure.
-     */
+    @Override
     public Task<Void> addToWaitlist(@NonNull Event event, @NonNull WaitlistEntry entry) {
         String eventId = event.getEventId();
         String profileId = entry.getProfile().getUid();
@@ -76,12 +69,7 @@ public class WaitlistRepository {
         return batch.commit();
     }
 
-    /**
-     * Get the full waitlist of everyone on it for a specified event.
-     *
-     * @param event The event object.
-     * @return A list of waitlist entries.
-     */
+    @Override
     public Task<List<WaitlistEntry>> getWaitlist(@NonNull Event event) {
 
         String eventId = event.getEventId();
@@ -115,6 +103,7 @@ public class WaitlistRepository {
                 });
     }
 
+    @Override
     public Task<WaitlistEntry> getWaitlistEntry(@NonNull Event event, String uid) {
         return db.collection(EVENTS)
                 .document(event.getEventId())
@@ -135,6 +124,7 @@ public class WaitlistRepository {
                 });
     }
 
+    @Override
     public Task<List<WaitlistEntry>> getEventWaitlistEntriesByUser(@NonNull String uid) {
         return db.collection(ENTRANT_WAITLISTS)
                 .document(uid)
@@ -160,13 +150,7 @@ public class WaitlistRepository {
                 });
     }
 
-    /**
-     * Deletes a waitlist entry from the Firebase references to event waitlist and entrant waitlists.
-     *
-     * @param event The event for which the user is on the waitlist.
-     * @param uid The uid of the user for which they are on the waitlist.
-     * @return A task indicating success or failure.
-     */
+    @Override
     public Task<Void> deleteFromWaitlist(@NonNull Event event, @NonNull String uid) {
         WriteBatch batch = db.batch();
 

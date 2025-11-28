@@ -22,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -87,11 +88,17 @@ public class HostedEventDetailsFragment extends Fragment {
         ImageView imageView     = eventDetailsCard.findViewById(R.id.eventImage);
 
         // Add padding to the event details screen
-        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
-        navView.post(() -> {
-            scrollView.setPadding(0, 0, 0, navView.getHeight());
-        });
 
+        FragmentActivity activity = getActivity();
+
+        if (activity != null) {
+            BottomNavigationView navView = activity.findViewById(R.id.nav_view);
+            if (navView != null) {
+                navView.post(() -> {
+                    scrollView.setPadding(0, 0, 0, navView.getHeight());
+                });
+            }
+        }
 
         String imageUrl = (event != null) ? event.getImageUrl() : null;
         if (imageUrl != null && !imageUrl.isEmpty()) {
