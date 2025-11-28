@@ -12,21 +12,16 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
         <LinearLayout
+            android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
             <ImageView
-                android:layout_width="79dp"
-                android:layout_height="107dp"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/inbox"/>
 
@@ -36,15 +31,6 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:layout_marginStart="16dp">
-
-                <TextView
-                    android:id="@+id/eventTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pull name of event from firebase"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
 
                 <TextView
                     android:id="@+id/tvTitle"
@@ -79,7 +65,4 @@
             </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
-
 </androidx.cardview.widget.CardView>
