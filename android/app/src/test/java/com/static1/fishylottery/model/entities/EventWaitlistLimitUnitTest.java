@@ -4,6 +4,12 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.static1.fishylottery.model.repositories.WaitlistRepository;
+
 public class EventWaitlistLimitUnitTest {
 
     @Test
@@ -28,4 +34,5 @@ public class EventWaitlistLimitUnitTest {
         e.setWaitlistLimit(10);
         assertEquals(Integer.valueOf(10), e.getWaitlistLimit());
     }
+
 }

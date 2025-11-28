@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * This class abstracts the Firestore handling of events.
  */
-public class EventRepository {
+public class EventRepository implements IEventRepository {
 
     private final FirebaseFirestore db;
     private final CollectionReference eventsRef;
@@ -44,6 +44,7 @@ public class EventRepository {
 
     // ---------- CRUD ----------
 
+    @Override
     public Task<Event> addEvent(Event event) {
         return eventsRef.add(event)
                 .continueWith(task -> {
@@ -62,6 +63,7 @@ public class EventRepository {
      * @return A task indicating success or failure.
      */
 
+    @Override
     public Task<Void> updateEvent(Event event) {
         String eventId = event.getEventId();
         if (eventId == null) {
@@ -75,6 +77,8 @@ public class EventRepository {
      * @param event The event object, only the ID is needed.
      * @return A task indicating success or failure.
      */
+
+    @Override
     public Task<Void> deleteEvent(Event event) {
         String eventId = event.getEventId();
         if (eventId == null) {
@@ -89,6 +93,7 @@ public class EventRepository {
      * @return A task containing an event. Event is null if does not exist.
      */
 
+    @Override
     public Task<Event> getEventById(String eventId) {
         return eventsRef.document(eventId).get().continueWithTask(task -> {
             if (!task.isSuccessful()) {
@@ -114,6 +119,8 @@ public class EventRepository {
      *
      * @return Returns a task containing a list of events
      */
+
+    @Override
     public Task<List<Event>> fetchAllEvents() {
         return eventsRef.get().continueWithTask(task -> {
             if (!task.isSuccessful()) {
@@ -138,6 +145,8 @@ public class EventRepository {
      * @param uid The Firebase UID of the authenticated organizer user.
      * @return A task containing the list of events.
      */
+
+    @Override
     public Task<List<Event>> fetchEventsByOrganizerId(String uid) {
         return eventsRef
                 .whereEqualTo("organizerId", uid)
@@ -255,6 +264,7 @@ public class EventRepository {
      */
     // ---------- Lottery draw ----------
 
+    @Override
     public Task<Void> drawEntrants(String eventId) {
         if (eventId == null) {
             return Tasks.forException(new IllegalArgumentException("eventId is null"));

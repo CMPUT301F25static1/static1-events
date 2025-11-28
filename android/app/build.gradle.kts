@@ -130,9 +130,6 @@ dependencies {
     androidTestImplementation("androidx.navigation:navigation-testing:2.7.3")
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
 
-    // ✅ CRITICAL FIX: use mockito-android NOT mockito-inline
     androidTestImplementation("org.mockito:mockito-android:5.4.0")
-
-    // ✅ FragmentScenario must be debugImplementation
     debugImplementation("androidx.fragment:fragment-testing:1.6.2")
 }

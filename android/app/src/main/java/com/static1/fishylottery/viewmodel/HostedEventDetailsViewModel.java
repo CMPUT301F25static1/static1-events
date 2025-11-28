@@ -12,8 +12,11 @@ import androidx.lifecycle.ViewModel;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.model.repositories.IEventRepository;
+import com.static1.fishylottery.model.repositories.IWaitlistRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.services.CsvExporter;
+import com.static1.fishylottery.view.events.hosted.HostedEventDetailsFragment;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,12 +28,31 @@ import java.util.stream.Collectors;
  * ViewModel for sharing data between the organizer's hosted event details screens.
  */
 public class HostedEventDetailsViewModel extends ViewModel {
-    private final WaitlistRepository waitlistRepository;
-    private final EventRepository eventRepository;
+    private final IWaitlistRepository waitlistRepository;
+    private final IEventRepository eventRepository;
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
     private final MutableLiveData<String> message = new MutableLiveData<>();
     private final MutableLiveData<List<WaitlistEntry>> waitlist = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<Event> event = new MutableLiveData<>();
+
+    public HostedEventDetailsViewModel() {
+        this.eventRepository = new EventRepository();
+        this.waitlistRepository = new WaitlistRepository();
+    }
+
+    /**
+     * Constructs a ViewModel instance using interfaces for the event and waitlist repository so
+     * that the appropriate dependencies can be injected, such as in the case of unit and UI
+     * testing.
+     *
+     * @param eventRepository The event repository.
+     * @param waitlistRepository The waitlist repository.
+     */
+    public HostedEventDetailsViewModel(IEventRepository eventRepository, IWaitlistRepository waitlistRepository) {
+        this.eventRepository = eventRepository;
+        this.waitlistRepository = waitlistRepository;
+    }
+
 
     /**
      * Set the event for the live data.
@@ -75,11 +97,6 @@ public class HostedEventDetailsViewModel extends ViewModel {
      */
     public LiveData<Boolean> isLoading() {
         return loading;
-    }
-
-    public HostedEventDetailsViewModel() {
-        waitlistRepository = new WaitlistRepository();
-        eventRepository = new EventRepository();
     }
 
     /**

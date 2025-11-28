@@ -9,15 +9,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.static1.fishylottery.MainActivity;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.model.repositories.IEventRepository;
 import com.static1.fishylottery.services.AuthManager;
 
 import java.util.Comparator;
@@ -25,11 +28,19 @@ import java.util.List;
 
 public class HostedEventsFragment extends Fragment {
 
-    private EventRepository eventsRepo;
+    private IEventRepository eventsRepo;
     private RecyclerView recyclerView;
     private EventAdapter adapter;
     private TextView textNoEventsMessage;
     private final static String TAG = "HostedEvents";
+
+    public HostedEventsFragment() {
+        this.eventsRepo = new EventRepository();
+    }
+
+    public HostedEventsFragment(IEventRepository eventRepository) {
+        this.eventsRepo = eventRepository;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,15 +48,21 @@ public class HostedEventsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_hosted_events, container, false);
 
+        FragmentActivity activity = getActivity();
+
         // The Event list
-        eventsRepo = new EventRepository();
         textNoEventsMessage = view.findViewById(R.id.text_no_events_message);
         recyclerView = view.findViewById(R.id.recycler_hosted_events);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
-        navView.post(() -> {
-            recyclerView.setPadding(0, 0,0, navView.getHeight());
-        });
+
+        if (activity != null) {
+            BottomNavigationView navView = activity.findViewById(R.id.nav_view);
+            if (navView != null) {
+                navView.post(() -> {
+                    recyclerView.setPadding(0, 0,0, navView.getHeight());
+                });
+            }
+        }
 
         adapter = new EventAdapter(requireContext());
 

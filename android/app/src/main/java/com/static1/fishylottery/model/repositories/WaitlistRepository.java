@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Stores a user's intent to join the waitlist under: events/{eventId}/waitlist/{profileId}
  */
-public class WaitlistRepository {
+public class WaitlistRepository implements IWaitlistRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private static final String EVENTS = "events";
@@ -36,6 +36,7 @@ public class WaitlistRepository {
      * @param entry Information about the entrant profile and status.
      * @return A task indicating success or failure.
      */
+    @Override
     public Task<Void> addToWaitlist(@NonNull Event event, @NonNull WaitlistEntry entry) {
         String eventId = event.getEventId();
         String profileId = entry.getProfile().getUid();
@@ -57,16 +58,16 @@ public class WaitlistRepository {
         // We need to store the waitlist entry in the events waitlist sub-collection
         DocumentReference eventSideRef =
                 db.collection(EVENTS)
-                        .document(eventId)
-                        .collection(WAITLIST)
-                        .document(profileId);
+                    .document(eventId)
+                    .collection(WAITLIST)
+                    .document(profileId);
 
         // We also need to store the waitlist entry in the user's waitlist store of events
         DocumentReference entrantSideRef =
                 db.collection(ENTRANT_WAITLISTS)
-                        .document(profileId)
-                        .collection(EVENTS)
-                        .document(eventId);
+                    .document(profileId)
+                    .collection(EVENTS)
+                    .document(eventId);
 
         // Batch set
         batch.set(eventSideRef, entry, SetOptions.merge());
@@ -82,6 +83,7 @@ public class WaitlistRepository {
      * @param event The event object.
      * @return A list of waitlist entries.
      */
+    @Override
     public Task<List<WaitlistEntry>> getWaitlist(@NonNull Event event) {
 
         String eventId = event.getEventId();
@@ -115,6 +117,7 @@ public class WaitlistRepository {
                 });
     }
 
+    @Override
     public Task<WaitlistEntry> getWaitlistEntry(@NonNull Event event, String uid) {
         return db.collection(EVENTS)
                 .document(event.getEventId())
@@ -135,6 +138,7 @@ public class WaitlistRepository {
                 });
     }
 
+    @Override
     public Task<List<WaitlistEntry>> getEventWaitlistEntriesByUser(@NonNull String uid) {
         return db.collection(ENTRANT_WAITLISTS)
                 .document(uid)
@@ -164,9 +168,10 @@ public class WaitlistRepository {
      * Deletes a waitlist entry from the Firebase references to event waitlist and entrant waitlists.
      *
      * @param event The event for which the user is on the waitlist.
-     * @param uid   The uid of the user for which they are on the waitlist.
+     * @param uid The uid of the user for which they are on the waitlist.
      * @return A task indicating success or failure.
      */
+    @Override
     public Task<Void> deleteFromWaitlist(@NonNull Event event, @NonNull String uid) {
         WriteBatch batch = db.batch();
 
@@ -203,47 +208,48 @@ public class WaitlistRepository {
      */
     public Task<Void> deleteFromWaitlistByUser(@NonNull String uid) {
         return db.collection(ENTRANT_WAITLISTS)
-                .document(uid)
-                .collection(EVENTS)
-                .get()
-                .continueWithTask(task -> {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
+            .document(uid)
+            .collection(EVENTS)
+            .get()
+            .continueWithTask(task -> {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
 
-                    QuerySnapshot snapshot = task.getResult();
-                    List<WaitlistEntry> waitlists = snapshot.toObjects(WaitlistEntry.class);
+                QuerySnapshot snapshot = task.getResult();
 
-                    WriteBatch batch = db.batch();
+                List<WaitlistEntry> waitlists = snapshot.toObjects(WaitlistEntry.class);
 
-                    // For each of the waitlist entries for each user, also remove the waitlist entries for that event
-                    for (WaitlistEntry entry : waitlists) {
-                        Log.d("Waitlist", "Deleting waitlist entry for event ID: " + entry.getEventId());
+                WriteBatch batch = db.batch();
 
-                        String eventId = entry.getEventId();
-                        if (eventId == null) continue;
+                // For each of the waitlist entries for each user, also remove the waitlist entries for that event
+                for (WaitlistEntry entry : waitlists) {
+                    Log.d("Waitlist", "Deleting waitlist entry for event ID: " + entry.getEventId());
 
-                        DocumentReference eventWaitlistDocRef = db.collection(EVENTS)
-                                .document(eventId)
-                                .collection(WAITLIST)
-                                .document(uid);
+                    String eventId = entry.getEventId();
+                    if (eventId == null) continue;
 
-                        DocumentReference entrantWaitlistDocRef = db.collection(ENTRANT_WAITLISTS)
-                                .document(uid)
-                                .collection(EVENTS)
-                                .document(eventId);
+                    DocumentReference eventWaitlistDocRef = db.collection(EVENTS)
+                        .document(eventId)
+                        .collection(WAITLIST)
+                        .document(uid);
 
-                        batch.delete(eventWaitlistDocRef);
-                        batch.delete(entrantWaitlistDocRef);
-                    }
+                    DocumentReference entrantWaitlistDocRef = db.collection(ENTRANT_WAITLISTS)
+                        .document(uid)
+                        .collection(EVENTS)
+                        .document(eventId);
 
-                    // Finally, remove the user's waitlist doc itself
-                    DocumentReference entrantWaitlistDocRef = db.collection(ENTRANT_WAITLISTS).document(uid);
+                    batch.delete(eventWaitlistDocRef);
                     batch.delete(entrantWaitlistDocRef);
+                }
 
-                    // Commit the batch
-                    return batch.commit();
-                });
+                // Finally, remove the user's waitlist entries
+                DocumentReference entrantWaitlistDocRef = db.collection(ENTRANT_WAITLISTS).document(uid);
+                batch.delete(entrantWaitlistDocRef);
+
+                // Commit the batch
+                return batch.commit();
+        });
     }
 
     // ---------------------------------------------------------------------

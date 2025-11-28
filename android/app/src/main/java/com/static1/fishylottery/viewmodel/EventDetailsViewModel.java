@@ -13,6 +13,8 @@ import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.model.logic.JoinWaitlistRules;
+import com.static1.fishylottery.model.repositories.IProfileRepository;
+import com.static1.fishylottery.model.repositories.IWaitlistRepository;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
 import com.static1.fishylottery.model.repositories.WaitlistRepository;
 import com.static1.fishylottery.services.AuthManager;
@@ -25,8 +27,8 @@ import java.util.Locale;
 
 public class EventDetailsViewModel extends ViewModel {
 
-    private WaitlistRepository waitlistRepository;
-    private ProfileRepository profileRepository;
+    private IWaitlistRepository waitlistRepository;
+    private IProfileRepository profileRepository;
     private MutableLiveData<Event> event = new MutableLiveData<>();
     private MutableLiveData<String> message = new MutableLiveData<>();
     private MutableLiveData<Boolean> loading = new MutableLiveData<>();
@@ -41,6 +43,11 @@ public class EventDetailsViewModel extends ViewModel {
     public EventDetailsViewModel() {
         waitlistRepository = new WaitlistRepository();
         profileRepository = new ProfileRepository();
+    }
+
+    public EventDetailsViewModel(IWaitlistRepository waitlistRepository, IProfileRepository profileRepository) {
+        this.waitlistRepository = waitlistRepository;
+        this.profileRepository = profileRepository;
     }
 
     public LiveData<String> getMessage() { return message; }
