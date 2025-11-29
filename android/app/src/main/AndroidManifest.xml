@@ -27,6 +27,8 @@
             android:name=".view.events.QrScanActivity"
             android:theme="@style/Theme.FishyLottery"/>
 
+        <activity android:name=".view.TermsActivity"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}"/>
