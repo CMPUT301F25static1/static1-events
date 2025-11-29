@@ -61,8 +61,7 @@ public class EventRepository implements IEventRepository {
     }
 
     @Override
-    public Task<Void> deleteEvent(Event event) {
-        String eventId = event.getEventId();
+    public Task<Void> deleteEvent(String eventId) {
         if (eventId == null) {
             throw new IllegalArgumentException("Event missing eventId");
         }
