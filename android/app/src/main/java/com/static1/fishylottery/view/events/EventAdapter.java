@@ -27,6 +27,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     private final LayoutInflater inflater;
     private OnEventClickListener onEventClickListener;
     private OnDeleteClickListener onDeleteClickListener;
+    private final boolean showDeleteButton;
 
     // formatting
     private final SimpleDateFormat dateFmt = new SimpleDateFormat("EEE, MMM d", Locale.getDefault());
@@ -34,8 +35,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     private Context context;
 
     public EventAdapter(Context context) {
+        this(context, false);
+    }
+
+    public EventAdapter(Context context, boolean showDeleteButton) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
+        this.showDeleteButton = showDeleteButton;
     }
 
     public interface OnEventClickListener {
@@ -112,6 +118,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         }
 
         void bind(Event ev) {
+            buttonDelete.setVisibility(showDeleteButton ? View.VISIBLE : View.GONE);
+
             // Title
             tvTitle.setText(ev != null && ev.getTitle() != null ? ev.getTitle() : "Untitled event");
 

@@ -42,7 +42,7 @@ public class AdminAllEventsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_all_events);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new EventAdapter(requireContext());
+        adapter = new EventAdapter(requireContext(), true);
         adapter.setOnEventClickListener(event -> {
             Bundle bundle = new Bundle();
             bundle.putSerializable("event", event);
