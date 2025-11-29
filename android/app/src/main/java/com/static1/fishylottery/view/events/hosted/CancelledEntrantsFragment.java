@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.model.repositories.IEventRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,17 @@ import java.util.List;
 public class CancelledEntrantsFragment extends Fragment {
 
     private Event event;
-    private final EventRepository eventRepository = new EventRepository();
+    private final IEventRepository eventRepository;
+
+    // Default constructor used by the real app
+    public CancelledEntrantsFragment() {
+        this(new EventRepository());
+    }
+
+    // Testing constructor so we can inject a fake repo
+    public CancelledEntrantsFragment(IEventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
 
     private RecyclerView recycler;
     private View emptyView;
@@ -59,7 +70,9 @@ public class CancelledEntrantsFragment extends Fragment {
                 .addOnFailureListener(err ->
                         Snackbar.make(
                                 v,
-                                (err != null && err.getMessage() != null) ? err.getMessage() : "Failed to load cancelled entrants.",
+                                (err != null && err.getMessage() != null)
+                                        ? err.getMessage()
+                                        : "Failed to load cancelled entrants.",
                                 Snackbar.LENGTH_LONG
                         ).show()
                 );
@@ -103,7 +116,3 @@ public class CancelledEntrantsFragment extends Fragment {
         }
     }
 }
-
-
-
-
