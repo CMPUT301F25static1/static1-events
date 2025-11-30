@@ -16,6 +16,7 @@ import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
