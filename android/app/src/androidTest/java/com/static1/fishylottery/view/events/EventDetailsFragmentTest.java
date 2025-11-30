@@ -34,6 +34,10 @@ import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EventDetailsFragmentTest {
     static class TestFragmentFactory extends FragmentFactory {
@@ -216,5 +220,37 @@ public class EventDetailsFragmentTest {
 
         event.setEventEndDate(cal.getTime());
         return event;
+    }
+    private static WaitlistEntry makeEntry(String uid) {
+        Profile profile = new Profile();
+        profile.setUid(uid);
+
+        WaitlistEntry entry = new WaitlistEntry();
+        entry.setProfile(profile);
+        entry.setStatus("waiting");
+        return entry;
+    }
+    @Test
+    public void joinButtonDisabled_whenWaitlistIsFull() {
+        // Event with a waitlist limit of 2
+        Event event = createTestEvent();
+        event.setWaitlistLimited(true);
+        event.setWaitlistLimit(2);
+
+        // Pre-populate the fake waitlist with 2 waiting entries for this event
+        Map<String, List<WaitlistEntry>> initial = new HashMap<>();
+        List<WaitlistEntry> entries = new ArrayList<>();
+        entries.add(makeEntry("u1"));
+        entries.add(makeEntry("u2"));
+        initial.put(event.getEventId(), entries);
+
+        FakeWaitlistRepository waitlistRepo = new FakeWaitlistRepository(initial);
+        FakeProfileRepository profileRepo = new FakeProfileRepository();
+
+        // Launch EventDetailsFragment with this event + fake repos
+        launch(waitlistRepo, profileRepo, event);
+
+        // Because the waitlist is already at the limit, the Join button should be disabled
+        onView(withId(R.id.button_join_waitlist)).check(matches(not(isEnabled())));
     }
 }

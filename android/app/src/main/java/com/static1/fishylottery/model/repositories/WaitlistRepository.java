@@ -342,4 +342,5 @@ public class WaitlistRepository implements IWaitlistRepository {
             return count < event.getWaitlistLimit();
         });
     }
+
 }
