@@ -156,13 +156,13 @@ public class CreateEventViewModel extends ViewModel {
         e.setRegistrationOpens(now);
         e.setStatus("Open");
 
-
+        Uri uri = imageUri.getValue();
 
         // No image, upload the event as is
-        if (imageUri == null) {
+        if (uri == null) {
             eventsRepository.addEvent(e);
         } else {
-            uploadImage(imageUri.getValue(), imageUrl -> {
+            uploadImage(uri, imageUrl -> {
                 if (imageUrl != null) {
                     e.setImageUrl(imageUrl);
                 }
@@ -177,13 +177,47 @@ public class CreateEventViewModel extends ViewModel {
 
     private boolean editEvent(@NonNull Event e)  {
         Date now = new Date();
-
         e.setUpdatedAt(now);
 
-        // TODO: Handle updating the image poster
+        // Handle updating or removing the image poster
+        final String oldImageUrl = e.getImageUrl();      // what is currently stored
+        final Uri newImageUri = imageUri.getValue();     // what user selected in this session (if any)
 
-        eventsRepository.updateEvent(e);
+        if (newImageUri != null) {
+            // Organizer selected a NEW poster:
+            // 1) upload new poster
+            // 2) update event.imageUrl
+            // 3) update Firestore
+            // 4) delete old poster from Storage (cleanup)
+            uploadImage(newImageUri, newImageUrl -> {
+                if (newImageUrl != null) {
+                    e.setImageUrl(newImageUrl);
+                }
 
+                eventsRepository.updateEvent(e);
+
+                // If we successfully got a new URL and there was an old poster, delete old file
+                if (oldImageUrl != null && !oldImageUrl.isEmpty()
+                        && newImageUrl != null && !newImageUrl.isEmpty()) {
+                    StorageManager.deleteImage(oldImageUrl);
+                }
+            });
+
+        } else {
+            // No new image selected. Two possibilities:
+            // 1) Organizer kept the old poster  -> e.getImageUrl() is still oldImageUrl.
+            // 2) Organizer removed the poster   -> UI set e.setImageUrl(null) or "".
+
+            eventsRepository.updateEvent(e);
+
+            // If poster was removed (field changed from non-empty to empty), delete old file.
+            if (oldImageUrl != null && !oldImageUrl.isEmpty()
+                    && (e.getImageUrl() == null || e.getImageUrl().isEmpty())) {
+                StorageManager.deleteImage(oldImageUrl);
+            }
+        }
+
+        validationError.setValue(null);
         return true;
     }
 
