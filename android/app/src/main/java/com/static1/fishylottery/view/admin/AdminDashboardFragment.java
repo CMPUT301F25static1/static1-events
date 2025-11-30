@@ -33,17 +33,23 @@ public class AdminDashboardFragment extends Fragment {
     }
 
     private void setupRowLabels() {
-        setRowTitle(rowAllEvents, "All Events");
-        setRowTitle(rowProfiles, "Profiles");
-        setRowTitle(rowOrganizers, "Organizers");
-        setRowTitle(rowImages, "Uploaded Images");
-        setRowTitle(rowNotificationLogs, "Notification Logs");
+        setRowTitle(rowAllEvents, "All Events", R.drawable.ic_all_events);
+        setRowTitle(rowProfiles, "Profiles", R.drawable.ic_profiles);
+        setRowTitle(rowOrganizers, "Organizers", R.drawable.ic_organizers);
+        setRowTitle(rowImages, "Uploaded Images", R.drawable.ic_images);
+        setRowTitle(rowNotificationLogs, "Notification Logs", R.drawable.ic_notification_logs);
     }
 
-    private void setRowTitle(View view, String title) {
-        TextView textRowTitle = view.findViewById(R.id.text_row_title);
+
+    private void setRowTitle(View row, String title, int drawableRes) {
+        TextView textRowTitle = row.findViewById(R.id.text_row_title);
         textRowTitle.setText(title);
+
+        // Set the image
+        android.widget.ImageView imageIcon = row.findViewById(R.id.item_icon);
+        imageIcon.setImageResource(drawableRes);
     }
+
 
     private void setupListeners() {
         rowAllEvents.setOnClickListener(v -> navigateTo(v, R.id.action_adminDashboard_to_allEvents));
@@ -56,4 +62,5 @@ public class AdminDashboardFragment extends Fragment {
     private void navigateTo(View view, @IdRes int id) {
         Navigation.findNavController(view).navigate(id);
     }
+
 }

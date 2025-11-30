@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/light_blue_7"
+    android:background="@drawable/light_blue_10"
     android:padding="16dp">
 
     <LinearLayout
@@ -24,11 +24,12 @@
             android:hint="Event Title"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            app:boxBackgroundColor="#e4fdfd"
+            android:layout_height="55dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_event_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="50dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -44,6 +45,7 @@
             android:hint="Event Type"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginTop="8dp"
+            app:boxBackgroundColor="#e4fdfd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <AutoCompleteTextView
@@ -59,6 +61,7 @@
             android:hint="Interests"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginTop="8dp"
+            app:boxBackgroundColor="#e4fdfd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <AutoCompleteTextView
@@ -85,6 +88,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"
+            app:boxBackgroundColor="#e4fdfd"
             android:layout_height="wrap_content">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_event_description"
@@ -120,6 +124,7 @@
                 android:hint="Start Date"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_weight="1"
+                app:boxBackgroundColor="#e4fdfd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content">
                 <com.google.android.material.textfield.TextInputEditText
@@ -137,8 +142,10 @@
                 android:hint="Start Time"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_weight="1"
+                app:boxBackgroundColor="#e4fdfd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_start_time"
                     android:focusable="false"
@@ -166,6 +173,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_weight="1"
                 android:layout_width="0dp"
+                app:boxBackgroundColor="#e4fdfd"
                 android:layout_height="wrap_content">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_end_date"
@@ -183,6 +191,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_weight="1"
                 android:layout_width="0dp"
+                app:boxBackgroundColor="#e4fdfd"
                 android:layout_height="wrap_content">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_end_time"
@@ -206,6 +215,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"
+            app:boxBackgroundColor="#e4fdfd"
             android:layout_height="wrap_content">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_location"
@@ -227,6 +237,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"
+            app:boxBackgroundColor="#e4fdfd"
             android:layout_height="wrap_content">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_hosted_by"
@@ -247,6 +258,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:boxBackgroundColor="#e4fdfd"
             android:layout_marginTop="8dp"
             android:hint="Event Capacity (none if blank)">
 
@@ -291,7 +303,8 @@
             android:id="@+id/layout_waitlist_max"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            app:boxBackgroundColor="#e4fdfd"
             android:layout_marginTop="8dp"
             android:hint="Waitlist maximum"
             android:enabled="false"
@@ -330,6 +343,7 @@
                 android:hint="Date"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_weight="1"
+                app:boxBackgroundColor="#e4fdfd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content">
                 <com.google.android.material.textfield.TextInputEditText
@@ -347,6 +361,7 @@
                 android:hint="Time"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_weight="1"
+                app:boxBackgroundColor="#e4fdfd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content">
                 <com.google.android.material.textfield.TextInputEditText

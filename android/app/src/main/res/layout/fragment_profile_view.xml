@@ -110,6 +110,7 @@
                 android:id="@+id/text_terms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="14dp"
                 android:text="@string/terms_of_service"
                 android:textColor="#03A9F4" />
 
@@ -123,6 +124,7 @@
                 android:id="@+id/text_privacy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="14dp"
                 android:text="@string/privacy_policy"
                 android:textColor="#03A9F4" />
         </LinearLayout>

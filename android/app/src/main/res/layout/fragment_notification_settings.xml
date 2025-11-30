@@ -18,7 +18,7 @@
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="#333"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="6dp" />
 
         <!-- Notification Setting Card -->
         <LinearLayout
