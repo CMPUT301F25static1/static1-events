@@ -66,16 +66,4 @@ public interface IWaitlistRepository {
     Task<Void> deleteFromWaitlistByUser(@NonNull String uid);
 
     Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry);
-
-}
-
-    /**
-     * Marks an invited entrant as declined for the given event, and if possible
-     * draws a replacement entrant from the remaining waitlist.
-     *
-     * @param event The event whose waitlist is being updated.
-     * @param uid   The UID of the entrant who is declining the invitation.
-     * @return A task indicating success or failure.
-     */
-    Task<Void> declineInvitationAndDrawReplacement(@NonNull Event event, @NonNull String uid);
 }

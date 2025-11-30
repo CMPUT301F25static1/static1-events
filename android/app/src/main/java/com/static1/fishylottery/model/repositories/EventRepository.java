@@ -263,14 +263,21 @@ public class EventRepository implements IEventRepository {
      * - Save selectedEntrants: [profileId, ...] on the event document.
      */
     // ---------- Lottery draw ----------
-
+    // Package-private helper for unit tests
+    public static int computeRemainingSlots(Integer capacity, int acceptedCount) {
+        int n = (capacity == null) ? 0 : capacity;
+        int remaining = n - acceptedCount;
+        return Math.max(0, remaining);
+    }
     @Override
     public Task<Void> drawEntrants(String eventId) {
         if (eventId == null) {
             return Tasks.forException(new IllegalArgumentException("eventId is null"));
         }
+
         DocumentReference eventRef = eventsRef.document(eventId);
 
+        // 1. Load the event to read capacity
         return eventRef.get().continueWithTask(eventTask -> {
             if (!eventTask.isSuccessful()) {
                 throw eventTask.getException();
@@ -287,53 +294,94 @@ public class EventRepository implements IEventRepository {
             Integer capacity = event.getCapacity();
             int n = (capacity == null) ? 0 : capacity;
             if (n <= 0) {
-                return Tasks.forException(new IllegalStateException("capacity must be > 0 to run draw"));
+                return Tasks.forException(
+                        new IllegalStateException("capacity must be > 0 to run draw")
+                );
             }
 
-            CollectionReference waitlistRef = eventRef.collection("waitlist");
-            return waitlistRef.get().continueWithTask(waitTask -> {
-                if (!waitTask.isSuccessful()) {
-                    throw waitTask.getException();
-                }
-                QuerySnapshot qs = waitTask.getResult();
-                List<DocumentSnapshot> docs = qs.getDocuments();
-                if (docs.isEmpty()) {
-                    return Tasks.forException(new IllegalStateException("No entrants on waitlist"));
-                }
+            // 2. How many people have already ACCEPTED?
+            return getWaitlistCountByStatus(eventId, "accepted")
+                    .continueWithTask(countTask -> {
+                        if (!countTask.isSuccessful()) {
+                            throw countTask.getException();
+                        }
+                        int acceptedCount = countTask.getResult();
+                        int remainingSlots = n - acceptedCount;
 
-                Collections.shuffle(docs);
-                int limit = Math.min(n, docs.size());
+                        if (remainingSlots <= 0) {
+                            // Event is already full – nothing to draw.
+                            return Tasks.forException(
+                                    new IllegalStateException("Event is already full")
+                            );
+                        }
 
-                WriteBatch batch = db.batch();
-                CollectionReference selectedRef = eventRef.collection("selectedEntrants");
-                List<String> selectedIds = new ArrayList<>();
+                        // 3. Load waitlist and build candidates list (status == "waiting")
+                        CollectionReference waitlistRef = eventRef.collection("waitlist");
+                        return waitlistRef.get().continueWithTask(waitTask -> {
+                            if (!waitTask.isSuccessful()) {
+                                throw waitTask.getException();
+                            }
 
-                for (int i = 0; i < limit; i++) {
-                    DocumentSnapshot d = docs.get(i);
-                    String profileId = d.getId();
-                    selectedIds.add(profileId);
+                            QuerySnapshot qs = waitTask.getResult();
+                            List<DocumentSnapshot> docs = qs.getDocuments();
+                            if (docs.isEmpty()) {
+                                return Tasks.forException(
+                                        new IllegalStateException("No entrants on waitlist")
+                                );
+                            }
 
-                    DocumentReference selDoc = selectedRef.document(profileId);
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("profileId", profileId);
-                    data.put("selectedAt", FieldValue.serverTimestamp());
-                    batch.set(selDoc, data, SetOptions.merge());
+                            List<DocumentSnapshot> candidates = new ArrayList<>();
+                            for (DocumentSnapshot d : docs) {
+                                String status = d.getString("status");
+                                if ("waiting".equals(status)) {
+                                    candidates.add(d);
+                                }
+                            }
 
-                    Map<String, Object> mark = new HashMap<>();
-                    mark.put("selected", true);
-                    mark.put("status", "invited");
-                    mark.put("invitedAt", new Date());
-                    batch.set(d.getReference(), mark, SetOptions.merge());
-                }
+                            if (candidates.isEmpty()) {
+                                return Tasks.forException(
+                                        new IllegalStateException("No waiting entrants remaining")
+                                );
+                            }
 
-                Map<String, Object> update = new HashMap<>();
-                update.put("selectedEntrants", selectedIds);
-                batch.set(eventRef, update, SetOptions.merge());
+                            // Shuffle and respect remainingSlots so we never exceed capacity
+                            Collections.shuffle(candidates);
+                            int limit = Math.min(remainingSlots, candidates.size());
 
-                return batch.commit();
-            });
+                            WriteBatch batch = db.batch();
+                            CollectionReference selectedRef = eventRef.collection("selectedEntrants");
+                            List<String> selectedIds = new ArrayList<>();
+
+                            for (int i = 0; i < limit; i++) {
+                                DocumentSnapshot d = candidates.get(i);
+                                String profileId = d.getId();
+                                selectedIds.add(profileId);
+
+                                // record selected entrant
+                                DocumentReference selDoc = selectedRef.document(profileId);
+                                Map<String, Object> data = new HashMap<>();
+                                data.put("profileId", profileId);
+                                data.put("selectedAt", FieldValue.serverTimestamp());
+                                batch.set(selDoc, data, SetOptions.merge());
+
+                                // update waitlist entry
+                                Map<String, Object> mark = new HashMap<>();
+                                mark.put("selected", true);
+                                mark.put("status", "invited");
+                                mark.put("invitedAt", new Date());
+                                batch.set(d.getReference(), mark, SetOptions.merge());
+                            }
+
+                            Map<String, Object> update = new HashMap<>();
+                            update.put("selectedEntrants", selectedIds);
+                            batch.set(eventRef, update, SetOptions.merge());
+
+                            return batch.commit();
+                        });
+                    });
         });
     }
+
 
 
     /**
