@@ -45,6 +45,7 @@ public class AdminAllEventsAdapter extends RecyclerView.Adapter<AdminAllEventsAd
         return eventList.size();
     }
 
+
     public void setOnDeleteClickListener(OnDeleteClickListener listener) {
         this.onDeleteClickListener = listener;
     }
