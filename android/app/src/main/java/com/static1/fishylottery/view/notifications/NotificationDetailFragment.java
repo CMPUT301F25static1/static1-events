@@ -72,6 +72,25 @@ public class NotificationDetailFragment extends Fragment {
         if (createdAt != null) {
             tvDate.setText(DateFormat.getDateTimeInstance().format(createdAt));
         }
+
+        LinearLayout cardInnerLayout = v.findViewById(R.id.notification_background);
+
+        // Array of drawable resources for backgrounds
+        int[] cardBackgrounds = {
+                R.drawable.img_14,
+                R.drawable.img_15,
+                R.drawable.img_16,
+                R.drawable.img_17,
+                R.drawable.img_18,
+                R.drawable.img_19
+        };
+
+        // Pick one randomly
+        int randomBackground = cardBackgrounds[new java.util.Random().nextInt(cardBackgrounds.length)];
+
+        // Set it as background
+        cardInnerLayout.setBackgroundResource(randomBackground);
+
     }
 
     private void navigateToEventDetail(@NonNull String eventId) {
@@ -90,4 +109,5 @@ public class NotificationDetailFragment extends Fragment {
                 Toast.makeText(requireContext(), "Could not get event", Toast.LENGTH_SHORT).show();
             });
     }
+
 }

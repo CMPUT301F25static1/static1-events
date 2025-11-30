@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@drawable/img_13"
     android:padding="16dp">
 
     <TextView
@@ -13,7 +14,7 @@
         android:text="Filter by interests"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:textColor="@color/grey"
+        android:textColor="@color/black"
         android:layout_marginBottom="8dp" />
 
     <Spinner
@@ -31,7 +32,7 @@
         android:text="Filter by availability"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:textColor="@color/grey"
+        android:textColor="@color/black"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp" />
 

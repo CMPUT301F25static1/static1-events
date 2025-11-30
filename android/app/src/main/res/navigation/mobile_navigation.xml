@@ -5,6 +5,8 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@id/navigation_profile">
 
+
+
     <!-- CREATE EVENT -->
     <include app:graph="@navigation/create_event_graph" />
 

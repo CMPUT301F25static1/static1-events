@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.IdRes;
@@ -58,11 +59,12 @@ public class ProfileViewFragment extends Fragment {
     }
 
     private void setupRowLabels(View root) {
-        setRowTitle(root, R.id.row_edit_profile, "Edit Profile");
-        setRowTitle(root, R.id.row_notifications, "Notifications");
-        setRowTitle(root, R.id.row_event_history, "Event History");
-        setRowTitle(root, R.id.row_admin_login, "Admin Login");
+        setRow(root, R.id.row_edit_profile, "Edit Profile", R.drawable.ic_edit_profile);
+        setRow(root, R.id.row_notifications, "Notifications", R.drawable.ic_notifications);
+        setRow(root, R.id.row_event_history, "Event History", R.drawable.ic_event_history);
+        setRow(root, R.id.row_admin_login, "Admin Login", R.drawable.ic_admin_login);
     }
+
 
     private void setRowTitle(View root, int rowId, String title) {
         View row = root.findViewById(rowId);
@@ -80,4 +82,15 @@ public class ProfileViewFragment extends Fragment {
     private void navigateWithAction(View view, @IdRes int action) {
         Navigation.findNavController(view).navigate(action);
     }
+
+    private void setRow(View root, int rowId, String title, int drawableRes) {
+        View row = root.findViewById(rowId);
+        TextView textRowTitle = row.findViewById(R.id.text_row_title);
+        ImageView imageIcon = row.findViewById(R.id.item_icon);
+
+        textRowTitle.setText(title);
+        imageIcon.setImageResource(drawableRes);
+    }
+
+
 }
