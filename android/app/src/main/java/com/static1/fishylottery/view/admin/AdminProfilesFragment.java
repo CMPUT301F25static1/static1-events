@@ -26,12 +26,24 @@ public class AdminProfilesFragment extends Fragment {
     private ProgressBar progressBar;
     private TextView textEmpty;
 
+    // Default constructor (required by Android)
+    public AdminProfilesFragment() {
+    }
+
+    // Constructor for testing - allows injecting a custom ViewModel
+    public AdminProfilesFragment(AdminProfilesViewModel viewModel) {
+        this.viewModel = viewModel;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_profiles, container, false);
 
-        viewModel = new ViewModelProvider(this).get(AdminProfilesViewModel.class);
+        // Only create ViewModel if not already provided (for testing)
+        if (viewModel == null) {
+            viewModel = new ViewModelProvider(this).get(AdminProfilesViewModel.class);
+        }
 
         recyclerView = view.findViewById(R.id.recycler_view_all_profiles);
         progressBar = view.findViewById(R.id.progress_bar);
@@ -39,7 +51,7 @@ public class AdminProfilesFragment extends Fragment {
 
         BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
         navView.post(() -> {
-           recyclerView.setPadding(0, 0, 0, navView.getHeight());
+            recyclerView.setPadding(0, 0, 0, navView.getHeight());
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));

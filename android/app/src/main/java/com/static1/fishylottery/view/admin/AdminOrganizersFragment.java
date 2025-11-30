@@ -25,12 +25,24 @@ public class AdminOrganizersFragment extends Fragment {
     private ProgressBar progressBar;
     private TextView textEmpty;
 
+    // Default constructor (required by Android)
+    public AdminOrganizersFragment() {
+    }
+
+    // Constructor for testing - allows injecting a custom ViewModel
+    public AdminOrganizersFragment(AdminOrganizersViewModel viewModel) {
+        this.viewModel = viewModel;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_organizers, container, false);
 
-        viewModel = new ViewModelProvider(this).get(AdminOrganizersViewModel.class);
+        // Only create ViewModel if not already provided (for testing)
+        if (viewModel == null) {
+            viewModel = new ViewModelProvider(this).get(AdminOrganizersViewModel.class);
+        }
 
         recyclerView = view.findViewById(R.id.recycler_organizers);
         progressBar = view.findViewById(R.id.progress_bar);
