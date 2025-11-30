@@ -67,6 +67,8 @@ public interface IWaitlistRepository {
 
     Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry);
 
+}
+
     /**
      * Marks an invited entrant as declined for the given event, and if possible
      * draws a replacement entrant from the remaining waitlist.

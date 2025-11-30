@@ -3,6 +3,7 @@ package com.static1.fishylottery;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -31,6 +32,7 @@ import com.static1.fishylottery.databinding.ActivityMainBinding;
 import com.static1.fishylottery.model.repositories.EventRepository;
 import com.static1.fishylottery.model.repositories.IEventRepository;
 import com.static1.fishylottery.services.AuthManager;
+import com.static1.fishylottery.view.TermsActivity;
 import com.static1.fishylottery.view.events.QrScanActivity;
 
 import java.util.Objects;
@@ -48,10 +50,22 @@ public class MainActivity extends AppCompatActivity {
     private boolean locationEnabled = false;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final String PREFS_NAME = "FishyLotterySettings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check the terms and conditions
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean accepted = prefs.getBoolean("accepted_terms", false);
+
+        if (!accepted) {
+            startActivity(new Intent(this, TermsActivity.class));
+            finish();
+            return;
+        }
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
