@@ -206,15 +206,22 @@ public class HostedEventDetailsViewModel extends ViewModel {
 
         // Start the update
         loading.setValue(true);
-        waitlistRepository.addToWaitlist(e, entry)
-                .addOnSuccessListener(a -> {
+        waitlistRepository.addToWaitlistRespectingLimit(e, entry)
+                .addOnSuccessListener(v -> {
                     loading.setValue(false);
                     message.setValue("Update entrant on waitlist");
                 })
                 .addOnFailureListener(exception -> {
                     loading.setValue(false);
-                    message.setValue("Failed to update entrant");
-                    Log.e("Waitlist", "Failed to update entrant", exception);
+
+                    // If the waitlist is full, surface a specific message
+                    if (exception instanceof IllegalStateException
+                            && "Waitlist is full".equals(exception.getMessage())) {
+                        message.setValue("Waitlist is full; cannot add more entrants.");
+                    } else {
+                        message.setValue("Failed to update entrant");
+                        Log.e("Waitlist", "Failed to update entrant", exception);
+                    }
                 });
     }
 
