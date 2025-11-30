@@ -21,6 +21,8 @@ public class FakeEventRepository implements IEventRepository {
         return Tasks.forResult(null);
     }
 
+
+
     @Override
     public Task<Void> deleteEvent(Event event) {
         events.remove(event);

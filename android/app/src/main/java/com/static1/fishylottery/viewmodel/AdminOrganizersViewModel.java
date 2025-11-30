@@ -119,7 +119,7 @@ public class AdminOrganizersViewModel extends ViewModel {
 
                     final int[] deletedEvents = {0};
                     for (Event event : events) {
-                        eventRepository.deleteEvent(event.getEventId())
+                        eventRepository.deleteEvent(event)
                                 .addOnSuccessListener(aVoid -> {
                                     deletedEvents[0]++;
                                     if (deletedEvents[0] == totalEvents) {

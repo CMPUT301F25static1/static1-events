@@ -61,11 +61,11 @@ public class EventRepository implements IEventRepository {
     }
 
     @Override
-    public Task<Void> deleteEvent(String eventId) {
-        if (eventId == null) {
+    public Task<Void> deleteEvent(Event event) {
+        if (event == null) {
             throw new IllegalArgumentException("Event missing eventId");
         }
-        return eventsRef.document(eventId).delete();
+        return eventsRef.document(event.getEventId()).delete();
     }
 
     @Override

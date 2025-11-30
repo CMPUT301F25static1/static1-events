@@ -10,7 +10,7 @@ import java.util.List;
 public interface IEventRepository {
     Task<Event> addEvent(Event event);
     Task<Void> updateEvent(Event event);
-    Task<Void> deleteEvent(String eventId);
+    Task<Void> deleteEvent(Event event);
     Task<Event> getEventById(String eventId);
     Task<List<Event>> fetchAllEvents();
     Task<List<Event>> fetchEventsByOrganizerId(String uid);

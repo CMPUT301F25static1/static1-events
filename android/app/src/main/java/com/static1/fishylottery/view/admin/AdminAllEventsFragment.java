@@ -30,6 +30,11 @@ public class AdminAllEventsFragment extends Fragment {
 
     private List<Event> allEvents = new ArrayList<>();
 
+    public AdminAllEventsFragment(IEventRepository eventsRepo) {
+        this.eventsRepo = eventsRepo;
+    }
+
+
     public AdminAllEventsFragment() {
         this.eventsRepo = new EventRepository();
     }
@@ -79,7 +84,7 @@ public class AdminAllEventsFragment extends Fragment {
     }
 
     private void deleteEvent(Event event) {
-        eventsRepo.deleteEvent(event.getEventId()).addOnSuccessListener(aVoid -> {
+        eventsRepo.deleteEvent(event).addOnSuccessListener(aVoid -> {
             Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_SHORT).show();
             getEvents();
         }).addOnFailureListener(e -> {
