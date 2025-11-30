@@ -103,7 +103,7 @@ public class HostedEventDetailsViewModel extends ViewModel {
      * Method to export the current final list of entrants to a selected file.
      *
      * @param context The application context which comes from the activity or fragment.
-     * @param uri     The file URI from the create document action intent.
+     * @param uri The file URI from the create document action intent.
      */
     public void exportCsv(Context context, Uri uri) {
         List<WaitlistEntry> acceptedEntrants = waitlist.getValue()
@@ -182,8 +182,7 @@ public class HostedEventDetailsViewModel extends ViewModel {
 
     /**
      * Manually update the waitlist status for an entrant on the waiting list.
-     *
-     * @param entry  The entry to update.
+     * @param entry The entry to update.
      * @param status The new status to change to.
      */
     public void updateEntrantStatus(@NonNull WaitlistEntry entry, @NonNull String status) {
@@ -199,24 +198,16 @@ public class HostedEventDetailsViewModel extends ViewModel {
 
         // Start the update
         loading.setValue(true);
-        waitlistRepository.addToWaitlistRespectingLimit(e, entry)
-                .addOnSuccessListener(v -> {
+        waitlistRepository.addToWaitlist(e, entry)
+                .addOnSuccessListener(a -> {
                     loading.setValue(false);
                     message.setValue("Update entrant on waitlist");
                 })
                 .addOnFailureListener(exception -> {
                     loading.setValue(false);
-
-                    // If the waitlist is full, surface a specific message
-                    if (exception instanceof IllegalStateException
-                            && "Waitlist is full".equals(exception.getMessage())) {
-                        message.setValue("Waitlist is full; cannot add more entrants.");
-                    } else {
-                        message.setValue("Failed to update entrant");
-                        Log.e("Waitlist", "Failed to update entrant", exception);
-                    }
+                    message.setValue("Failed to update entrant");
+                    Log.e("Waitlist", "Failed to update entrant", exception);
                 });
-
     }
 
     /**

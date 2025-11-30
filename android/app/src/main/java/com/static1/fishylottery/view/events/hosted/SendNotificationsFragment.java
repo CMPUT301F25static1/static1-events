@@ -45,6 +45,8 @@ public class SendNotificationsFragment extends Fragment {
         }
 
         RadioGroup rg = v.findViewById(R.id.rgAudience);
+        RadioButton rbEveryone = v.findViewById(R.id.rbEverone);
+        RadioButton rbAccepted = v.findViewById(R.id.rbAccepted);
         RadioButton rbSelected = v.findViewById(R.id.rbSelected);
         RadioButton rbWait = v.findViewById(R.id.rbWaitlist);
         RadioButton rbCancel = v.findViewById(R.id.rbCancelled);
@@ -52,7 +54,7 @@ public class SendNotificationsFragment extends Fragment {
         EditText etMsg = v.findViewById(R.id.etMessage);
         Button btnSend = v.findViewById(R.id.btnSend);
 
-        rbSelected.setChecked(true); // default
+        rbEveryone.setChecked(true); // default
 
         vm.getError().observe(getViewLifecycleOwner(), err -> {
             if (err != null) Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show();
@@ -72,8 +74,11 @@ public class SendNotificationsFragment extends Fragment {
             SendNotificationsViewModel.Audience audience;
             if (rbWait.isChecked()) audience = SendNotificationsViewModel.Audience.WAITLIST;
             else if (rbCancel.isChecked()) audience = SendNotificationsViewModel.Audience.CANCELLED;
+            else if (rbEveryone.isChecked()) audience = SendNotificationsViewModel.Audience.EVERYONE;
+            else if (rbAccepted.isChecked()) audience = SendNotificationsViewModel.Audience.ACCEPTED;
             else audience = SendNotificationsViewModel.Audience.SELECTED;
 
+            // Send the notification
             vm.sendCustomNotification(
                     event,
                     audience,

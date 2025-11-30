@@ -66,11 +66,13 @@ public class SendNotificationsViewModel extends ViewModel {
             notification.setCreatedAt(new Date());
             notification.setSenderId(senderId);
 
-
-
             for (WaitlistEntry entry : waitlist) {
-                // TODO: Filter by audience
                 String uid = entry.getProfile().getUid();
+
+                // Ensure that the entry is part of the target audience for the notification
+                if (!isEntrantInAudience(entry, audience)) {
+                    continue;
+                }
 
                 // Send the notification to the user
                 notificationRepository.addNotification(uid, notification)
@@ -87,7 +89,7 @@ public class SendNotificationsViewModel extends ViewModel {
         });
     }
 
-    public enum Audience { SELECTED, WAITLIST, CANCELLED }
+    public enum Audience { SELECTED, WAITLIST, CANCELLED, EVERYONE, ACCEPTED }
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -112,5 +114,23 @@ public class SendNotificationsViewModel extends ViewModel {
             batch.set(ref, data, SetOptions.merge());
         }
         return batch.commit();
+    }
+
+    private boolean isEntrantInAudience(@NonNull WaitlistEntry entry, Audience audience) {
+        String status = entry.getStatus();
+        switch (audience) {
+            case ACCEPTED:
+                return "accepted".equals(status);
+            case SELECTED:
+                return "accepted".equals(status) || "invited".equals(status);
+            case WAITLIST:
+                return "waiting".equals(status);
+            case CANCELLED:
+                return "cancelled".equals(status) || "declined".equals(status);
+            case EVERYONE:
+                return true;
+            default:
+                return false;
+        }
     }
 }
