@@ -253,4 +253,36 @@ public class EventDetailsFragmentTest {
         // Because the waitlist is already at the limit, the Join button should be disabled
         onView(withId(R.id.button_join_waitlist)).check(matches(not(isEnabled())));
     }
+    /**
+     * when the current user is INVITED, the Accept + Decline buttons
+     * are shown and the join/leave buttons are hidden.
+     */
+    @Test
+    public void showsCorrectButtons_whenInvited() {
+        FakeProfileRepository fakeProfileRepository = new FakeProfileRepository();
+        FakeWaitlistRepository fakeWaitlistRepository = new FakeWaitlistRepository();
+        Event event = createTestEvent();
+
+        // Current user (matches FakeAuthManager above)
+        Profile profile = new Profile();
+        profile.setUid("user123");
+
+        WaitlistEntry invited = new WaitlistEntry();
+        invited.setProfile(profile);
+        invited.setStatus("invited");
+        invited.setEventId("event1");
+
+        // Pre-populate repos so the fragment sees the user as invited
+        fakeWaitlistRepository.addToWaitlist(event, invited);
+        fakeProfileRepository.addProfile(profile);
+
+        launch(fakeWaitlistRepository, fakeProfileRepository, event);
+
+        // Join & Leave hidden
+        onView(withId(R.id.button_join_waitlist)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.button_leave_waitlist)).check(matches(not(isDisplayed())));
+        // Accept & Decline visible
+        onView(withId(R.id.button_accept_invite)).check(matches(isDisplayed()));
+        onView(withId(R.id.button_decline_invite)).check(matches(isDisplayed()));
+    }
 }
