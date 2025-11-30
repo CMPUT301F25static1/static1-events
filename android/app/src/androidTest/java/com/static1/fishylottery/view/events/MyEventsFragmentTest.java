@@ -190,6 +190,8 @@ public class MyEventsFragmentTest {
         event.setEventStartDate(next);
         event.setEventEndDate(next);
         event.setRegistrationCloses(next);
+        event.setTitle("title123");
+        event.setLocation("location123");
         return event;
     }
 

@@ -80,11 +80,10 @@ public class EventRepository implements IEventRepository {
 
     @Override
     public Task<Void> deleteEvent(Event event) {
-        String eventId = event.getEventId();
-        if (eventId == null) {
+        if (event == null) {
             throw new IllegalArgumentException("Event missing eventId");
         }
-        return eventsRef.document(eventId).delete();
+        return eventsRef.document(event.getEventId()).delete();
     }
     /**
      * Get a single event by the ID.
