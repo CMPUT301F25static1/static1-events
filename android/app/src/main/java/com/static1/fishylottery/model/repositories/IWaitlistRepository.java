@@ -76,4 +76,12 @@ public interface IWaitlistRepository {
      * @return A task indicating success or failure.
      */
     Task<Void> declineInvitationAndDrawReplacement(@NonNull Event event, @NonNull String uid);
+
+    /**
+     * Update multiple entries in Firebase based on a list of waitlist entries.
+     *
+     * @param entries The list of waitlist entries.
+     * @return A task indicating success or failure.
+     */
+    Task<Void> updateMultipleEntries(List<WaitlistEntry> entries);
 }

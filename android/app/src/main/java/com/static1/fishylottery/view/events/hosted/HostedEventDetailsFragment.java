@@ -86,6 +86,8 @@ public class HostedEventDetailsFragment extends Fragment {
         TextView textEventTime  = eventDetailsCard.findViewById(R.id.eventTime);
         TextView textEventLocation = eventDetailsCard.findViewById(R.id.eventLocation);
         ImageView imageView     = eventDetailsCard.findViewById(R.id.eventImage);
+        ImageView deleteButton = eventDetailsCard.findViewById(R.id.button_event_delete);
+        deleteButton.setVisibility(View.GONE);
 
         // Add padding to the event details screen
 

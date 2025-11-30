@@ -24,6 +24,20 @@
             android:layout_height="wrap_content">
 
             <RadioButton
+                android:id="@+id/rbEverone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17dp"
+                android:text="Everyone" />
+
+            <RadioButton
+                android:id="@+id/rbAccepted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17dp"
+                android:text="Accepted (Final)" />
+
+            <RadioButton
                 android:id="@+id/rbSelected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

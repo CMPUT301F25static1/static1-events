@@ -323,11 +323,6 @@ public class EventDetailsViewModel extends ViewModel {
             return;
         }
 
-        if (!"invited".equals(currentEntry.getStatus())) {
-            message.setValue("No invitation to decline");
-            return;
-        }
-
         // Get the entrant's UID (needed for repository call)
         Profile profile = currentEntry.getProfile();
         if (profile == null || profile.getUid() == null) {

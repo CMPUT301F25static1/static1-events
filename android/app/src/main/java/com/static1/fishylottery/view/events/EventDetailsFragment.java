@@ -132,6 +132,10 @@ public class EventDetailsFragment extends Fragment {
                 return;
             }
 
+            if (hasEventPassed(event)) {
+                hideButtons();
+            }
+
             tvTitle.setText(nullTo(event.getTitle(), "(untitled)"));
             tvDesc.setText(nullTo(event.getDescription(), "—"));
             tvWhere.setText(nullTo(event.getLocation(), "—"));
@@ -202,9 +206,24 @@ public class EventDetailsFragment extends Fragment {
             case "invited":
                 buttonAcceptInvite.setVisibility(View.VISIBLE);
                 buttonDeclineInvite.setVisibility(View.VISIBLE);
+                break;
+            case "accepted":
+                buttonDeclineInvite.setVisibility(View.VISIBLE);
+                break;
             default:
                 break;
         }
+    }
+
+    private void hideButtons() {
+        buttonJoinWaitlist.setVisibility(View.GONE);
+        buttonDeclineInvite.setVisibility(View.GONE);
+        buttonLeaveWaitlist.setVisibility(View.GONE);
+        buttonAcceptInvite.setVisibility(View.GONE);
+    }
+
+    private boolean hasEventPassed(Event event) {
+        return event.getEventStartDate().before(new Date());
     }
 }
 

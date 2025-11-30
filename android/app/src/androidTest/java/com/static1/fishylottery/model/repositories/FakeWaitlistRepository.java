@@ -186,4 +186,9 @@ public class FakeWaitlistRepository implements IWaitlistRepository {
         return Tasks.forResult(null);
     }
 
+    @Override
+    public Task<Void> updateMultipleEntries(List<WaitlistEntry> entries) {
+        return null;
+    }
+
 }

@@ -29,14 +29,6 @@ public class WaitlistRepository implements IWaitlistRepository {
     private static final String WAITLIST = "waitlist";
     private static final String ENTRANT_WAITLISTS = "entrantWaitlists";
 
-    /**
-     * An entrant can join a waitlist with the event and the created waitlist entry containing the
-     * profile of who is joining the waitlist.
-     *
-     * @param event The event the waitlist belongs to.
-     * @param entry Information about the entrant profile and status.
-     * @return A task indicating success or failure.
-     */
     @Override
     public Task<Void> addToWaitlist(@NonNull Event event, @NonNull WaitlistEntry entry) {
         String eventId = event.getEventId();
@@ -78,12 +70,6 @@ public class WaitlistRepository implements IWaitlistRepository {
         return batch.commit();
     }
 
-    /**
-     * Get the full waitlist of everyone on it for a specified event.
-     *
-     * @param event The event object.
-     * @return A list of waitlist entries.
-     */
     @Override
     public Task<List<WaitlistEntry>> getWaitlist(@NonNull Event event) {
 
@@ -165,13 +151,6 @@ public class WaitlistRepository implements IWaitlistRepository {
                 });
     }
 
-    /**
-     * Deletes a waitlist entry from the Firebase references to event waitlist and entrant waitlists.
-     *
-     * @param event The event for which the user is on the waitlist.
-     * @param uid The uid of the user for which they are on the waitlist.
-     * @return A task indicating success or failure.
-     */
     @Override
     public Task<Void> deleteFromWaitlist(@NonNull Event event, @NonNull String uid) {
         WriteBatch batch = db.batch();
@@ -204,9 +183,6 @@ public class WaitlistRepository implements IWaitlistRepository {
         return batch.commit();
     }
 
-    /**
-     * Delete all waitlist entries for a user (from both sides) when the user is removed.
-     */
     public Task<Void> deleteFromWaitlistByUser(@NonNull String uid) {
         return db.collection(ENTRANT_WAITLISTS)
             .document(uid)
@@ -479,5 +455,22 @@ public class WaitlistRepository implements IWaitlistRepository {
                         });
             });
         });
+    }
+
+    @Override
+    public Task<Void> updateMultipleEntries(List<WaitlistEntry> entries) {
+        WriteBatch batch = db.batch();
+
+        for (WaitlistEntry entry : entries) {
+            String eventId = entry.getEventId();
+            String uid = entry.getProfile().getUid();
+
+            DocumentReference eventWaitlistEntryRef = db.collection(EVENTS).document(eventId).collection(WAITLIST).document(uid);
+            DocumentReference entrantWaitlistRef = db.collection(ENTRANT_WAITLISTS).document(uid).collection(EVENTS).document(eventId);
+
+            batch.set(eventWaitlistEntryRef, entry, SetOptions.merge());
+            batch.set(entrantWaitlistRef, entry, SetOptions.merge());
+        }
+        return batch.commit();
     }
 }
