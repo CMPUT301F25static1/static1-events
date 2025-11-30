@@ -195,7 +195,8 @@ public class EventDetailsViewModel extends ViewModel {
                             entry.setStatus("waiting");
                             entry.setJoinLocation(joinLocation);
 
-                            waitlistRepository.addToWaitlist(e, entry)
+                            // *** changed here ***
+                            waitlistRepository.addToWaitlistRespectingLimit(e, entry)
                                     .addOnSuccessListener(unused -> {
                                         loading.setValue(false);
                                         message.setValue("Joined waitlist!");
@@ -290,7 +291,8 @@ public class EventDetailsViewModel extends ViewModel {
 
         loading.setValue(true);
 
-        waitlistRepository.addToWaitlist(event.getValue(), currentEntry)
+        // *** changed here ***
+        waitlistRepository.addToWaitlistRespectingLimit(event.getValue(), currentEntry)
                 .addOnSuccessListener(unused -> {
                     loading.setValue(false);
                     message.setValue("Successfully accepted invite!");
@@ -326,17 +328,29 @@ public class EventDetailsViewModel extends ViewModel {
             return;
         }
 
-        // Update status and timestamp
+        // Get the entrant's UID (needed for repository call)
+        Profile profile = currentEntry.getProfile();
+        if (profile == null || profile.getUid() == null) {
+            message.setValue("Could not identify entrant");
+            return;
+        }
+        String uid = profile.getUid();
+
+        // Update local model for UI
         currentEntry.setStatus("declined");
         currentEntry.setDeclinedAt(new Date());
 
         loading.setValue(true);
 
-        waitlistRepository.addToWaitlist(currentEvent, currentEntry)
+        // Use the new repository method that also draws a replacement entrant
+        waitlistRepository.declineInvitationAndDrawReplacement(currentEvent, uid)
                 .addOnSuccessListener(unused -> {
                     loading.setValue(false);
                     message.setValue("Successfully declined invite!");
+                    // Update LiveData so UI shows declined state
                     waitlistEntry.setValue(currentEntry);
+                    // Reload waitlist count – someone else may have just been invited
+                    loadWaitlistCount(currentEvent);
                 })
                 .addOnFailureListener(exception -> {
                     loading.setValue(false);

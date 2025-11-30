@@ -35,6 +35,12 @@ public class EventRepository implements IEventRepository {
         this.db = db;
         this.eventsRef = db.collection("events");
     }
+    /**
+     * Adds a new event to the events collection in Firestore.
+     *
+     * @param event The event to add to the Firebase.
+     * @return Returns the event with the new ID.
+     */
 
     // ---------- CRUD ----------
 
@@ -50,6 +56,12 @@ public class EventRepository implements IEventRepository {
                     return event;
                 });
     }
+    /**
+     * Updates an event in Firebase by overriding the document.
+     *
+     * @param event The new event object to update with.
+     * @return A task indicating success or failure.
+     */
 
     @Override
     public Task<Void> updateEvent(Event event) {
@@ -59,15 +71,26 @@ public class EventRepository implements IEventRepository {
         }
         return eventsRef.document(eventId).set(event);
     }
+    /**
+     * Deletes an event from the Firestore.
+     *
+     * @param event The event object, only the ID is needed.
+     * @return A task indicating success or failure.
+     */
 
     @Override
     public Task<Void> deleteEvent(Event event) {
-        String eventId = event.getEventId();
-        if (eventId == null) {
+        if (event == null) {
             throw new IllegalArgumentException("Event missing eventId");
         }
-        return eventsRef.document(eventId).delete();
+        return eventsRef.document(event.getEventId()).delete();
     }
+    /**
+     * Get a single event by the ID.
+     *
+     * @param eventId The ID for the event.
+     * @return A task containing an event. Event is null if does not exist.
+     */
 
     @Override
     public Task<Event> getEventById(String eventId) {
@@ -90,6 +113,11 @@ public class EventRepository implements IEventRepository {
             }
         });
     }
+    /**
+     * Fetch all of the events from the database as is (so search criteria)
+     *
+     * @return Returns a task containing a list of events
+     */
 
     @Override
     public Task<List<Event>> fetchAllEvents() {
@@ -110,6 +138,12 @@ public class EventRepository implements IEventRepository {
             return fetchWaitlistCountsForEvents(events);
         });
     }
+    /**
+     * Fetch all of the events that are hosted by a particular user given their uid.
+     *
+     * @param uid The Firebase UID of the authenticated organizer user.
+     * @return A task containing the list of events.
+     */
 
     @Override
     public Task<List<Event>> fetchEventsByOrganizerId(String uid) {
@@ -215,16 +249,34 @@ public class EventRepository implements IEventRepository {
                     return 0;
                 });
     }
-
+    /**
+     * System chooses a specified number of entrants for the event.
+     * Logic:
+     * - Read event.capacity from the event document.
+     * - If selectCount <= 0 -> error (cannot draw).
+     * - Read events/{eventId}/waitlist/*
+     * - Shuffle and select min(capacity, waitlistSize).
+     * - For each selected:
+     *      - Write events/{eventId}/selectedEntrants/{profileId}
+     *      - Mark their waitlist doc with selected = true
+     * - Save selectedEntrants: [profileId, ...] on the event document.
+     */
     // ---------- Lottery draw ----------
-
+    // Package-private helper for unit tests
+    public static int computeRemainingSlots(Integer capacity, int acceptedCount) {
+        int n = (capacity == null) ? 0 : capacity;
+        int remaining = n - acceptedCount;
+        return Math.max(0, remaining);
+    }
     @Override
     public Task<Void> drawEntrants(String eventId) {
         if (eventId == null) {
             return Tasks.forException(new IllegalArgumentException("eventId is null"));
         }
+
         DocumentReference eventRef = eventsRef.document(eventId);
 
+        // 1. Load the event to read capacity
         return eventRef.get().continueWithTask(eventTask -> {
             if (!eventTask.isSuccessful()) {
                 throw eventTask.getException();
@@ -241,59 +293,101 @@ public class EventRepository implements IEventRepository {
             Integer capacity = event.getCapacity();
             int n = (capacity == null) ? 0 : capacity;
             if (n <= 0) {
-                return Tasks.forException(new IllegalStateException("capacity must be > 0 to run draw"));
+                return Tasks.forException(
+                        new IllegalStateException("capacity must be > 0 to run draw")
+                );
             }
 
-            CollectionReference waitlistRef = eventRef.collection("waitlist");
-            return waitlistRef.get().continueWithTask(waitTask -> {
-                if (!waitTask.isSuccessful()) {
-                    throw waitTask.getException();
-                }
-                QuerySnapshot qs = waitTask.getResult();
-                List<DocumentSnapshot> docs = qs.getDocuments();
-                if (docs.isEmpty()) {
-                    return Tasks.forException(new IllegalStateException("No entrants on waitlist"));
-                }
+            // 2. How many people have already ACCEPTED?
+            return getWaitlistCountByStatus(eventId, "accepted")
+                    .continueWithTask(countTask -> {
+                        if (!countTask.isSuccessful()) {
+                            throw countTask.getException();
+                        }
+                        int acceptedCount = countTask.getResult();
+                        int remainingSlots = n - acceptedCount;
 
-                Collections.shuffle(docs);
-                int limit = Math.min(n, docs.size());
+                        if (remainingSlots <= 0) {
+                            // Event is already full – nothing to draw.
+                            return Tasks.forException(
+                                    new IllegalStateException("Event is already full")
+                            );
+                        }
 
-                WriteBatch batch = db.batch();
-                CollectionReference selectedRef = eventRef.collection("selectedEntrants");
-                List<String> selectedIds = new ArrayList<>();
+                        // 3. Load waitlist and build candidates list (status == "waiting")
+                        CollectionReference waitlistRef = eventRef.collection("waitlist");
+                        return waitlistRef.get().continueWithTask(waitTask -> {
+                            if (!waitTask.isSuccessful()) {
+                                throw waitTask.getException();
+                            }
 
-                for (int i = 0; i < limit; i++) {
-                    DocumentSnapshot d = docs.get(i);
-                    String profileId = d.getId();
-                    selectedIds.add(profileId);
+                            QuerySnapshot qs = waitTask.getResult();
+                            List<DocumentSnapshot> docs = qs.getDocuments();
+                            if (docs.isEmpty()) {
+                                return Tasks.forException(
+                                        new IllegalStateException("No entrants on waitlist")
+                                );
+                            }
 
-                    DocumentReference selDoc = selectedRef.document(profileId);
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("profileId", profileId);
-                    data.put("selectedAt", FieldValue.serverTimestamp());
-                    batch.set(selDoc, data, SetOptions.merge());
+                            List<DocumentSnapshot> candidates = new ArrayList<>();
+                            for (DocumentSnapshot d : docs) {
+                                String status = d.getString("status");
+                                if ("waiting".equals(status)) {
+                                    candidates.add(d);
+                                }
+                            }
 
-                    Map<String, Object> mark = new HashMap<>();
-                    mark.put("selected", true);
-                    mark.put("status", "invited");
-                    mark.put("invitedAt", new Date());
-                    batch.set(d.getReference(), mark, SetOptions.merge());
-                }
+                            if (candidates.isEmpty()) {
+                                return Tasks.forException(
+                                        new IllegalStateException("No waiting entrants remaining")
+                                );
+                            }
 
-                Map<String, Object> update = new HashMap<>();
-                update.put("selectedEntrants", selectedIds);
-                batch.set(eventRef, update, SetOptions.merge());
+                            // Shuffle and respect remainingSlots so we never exceed capacity
+                            Collections.shuffle(candidates);
+                            int limit = Math.min(remainingSlots, candidates.size());
 
-                return batch.commit();
-            });
+                            WriteBatch batch = db.batch();
+                            CollectionReference selectedRef = eventRef.collection("selectedEntrants");
+                            List<String> selectedIds = new ArrayList<>();
+
+                            for (int i = 0; i < limit; i++) {
+                                DocumentSnapshot d = candidates.get(i);
+                                String profileId = d.getId();
+                                selectedIds.add(profileId);
+
+                                // record selected entrant
+                                DocumentReference selDoc = selectedRef.document(profileId);
+                                Map<String, Object> data = new HashMap<>();
+                                data.put("profileId", profileId);
+                                data.put("selectedAt", FieldValue.serverTimestamp());
+                                batch.set(selDoc, data, SetOptions.merge());
+
+                                // update waitlist entry
+                                Map<String, Object> mark = new HashMap<>();
+                                mark.put("selected", true);
+                                mark.put("status", "invited");
+                                mark.put("invitedAt", new Date());
+                                batch.set(d.getReference(), mark, SetOptions.merge());
+                            }
+
+                            Map<String, Object> update = new HashMap<>();
+                            update.put("selectedEntrants", selectedIds);
+                            batch.set(eventRef, update, SetOptions.merge());
+
+                            return batch.commit();
+                        });
+                    });
         });
     }
+
 
 
     /**
      * Return the list of profile IDs that have cancelled their participation for this event.
      * We model this as waitlist documents whose "status" == "cancelled".
      */
+    @Override
     public Task<List<String>> fetchCancelledEntrantIds(String eventId) {
         if (eventId == null) {
             return Tasks.forException(new IllegalArgumentException("eventId is null"));
@@ -319,6 +413,7 @@ public class EventRepository implements IEventRepository {
      * Mark a selected entrant as cancelled and (optionally) backfill from waitlist.
      * Also appends the cancelled record under events/{eventId}/cancelledEntrants/{profileId}.
      */
+    @Override
     public Task<Void> cancelSelectedEntrant(String eventId, String profileId) {
         if (eventId == null || profileId == null) {
             return Tasks.forException(new IllegalArgumentException("eventId or profileId is null"));

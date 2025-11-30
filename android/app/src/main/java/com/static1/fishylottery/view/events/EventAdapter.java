@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,14 +21,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Adapter for displaying a list of Event objects using fragment_browse_events card layout.
- */
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
 
     private final List<Event> items = new ArrayList<>();
     private final LayoutInflater inflater;
     private OnEventClickListener onEventClickListener;
+    private OnDeleteClickListener onDeleteClickListener;
+    private final boolean showDeleteButton;
 
     // formatting
     private final SimpleDateFormat dateFmt = new SimpleDateFormat("EEE, MMM d", Locale.getDefault());
@@ -35,16 +35,29 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     private Context context;
 
     public EventAdapter(Context context) {
+        this(context, false);
+    }
+
+    public EventAdapter(Context context, boolean showDeleteButton) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
+        this.showDeleteButton = showDeleteButton;
     }
 
     public interface OnEventClickListener {
         void onEventClick(Event event);
     }
 
+    public interface OnDeleteClickListener {
+        void onDeleteClick(Event event);
+    }
+
     public void setOnEventClickListener(OnEventClickListener l) {
         this.onEventClickListener = l;
+    }
+
+    public void setOnDeleteClickListener(OnDeleteClickListener l) {
+        this.onDeleteClickListener = l;
     }
 
     public void submitList(List<Event> newItems) {
@@ -78,6 +91,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivImage;
         TextView tvDate, tvTitle, tvTime, tvLocation;
+        ImageButton buttonDelete;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -86,6 +100,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             tvTitle = itemView.findViewById(R.id.eventTitle);
             tvTime = itemView.findViewById(R.id.eventTime);
             tvLocation = itemView.findViewById(R.id.eventLocation);
+            buttonDelete = itemView.findViewById(R.id.button_event_delete);
 
             itemView.setOnClickListener(v -> {
                 int pos = getAdapterPosition();
@@ -93,9 +108,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                     onEventClickListener.onEventClick(items.get(pos));
                 }
             });
+
+            buttonDelete.setOnClickListener(v -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && onDeleteClickListener != null) {
+                    onDeleteClickListener.onDeleteClick(items.get(pos));
+                }
+            });
         }
 
         void bind(Event ev) {
+            buttonDelete.setVisibility(showDeleteButton ? View.VISIBLE : View.GONE);
+
             // Title
             tvTitle.setText(ev != null && ev.getTitle() != null ? ev.getTitle() : "Untitled event");
 

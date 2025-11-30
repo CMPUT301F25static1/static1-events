@@ -23,10 +23,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
-
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
@@ -76,6 +78,9 @@ public class CreateEventDetailsFragment extends Fragment {
     private AutoCompleteTextView eventTypeDropdown, eventInterestsDropdown;
     private CreateEventViewModel vm;
 
+    // UI for optional waitlist limit
+    private MaterialCheckBox checkLimitWaitlist;
+    private TextInputLayout tilWaitlistMax;
 
     private boolean[] selectedInterests;
     private boolean geolocationEnabled = false;
@@ -202,7 +207,11 @@ public class CreateEventDetailsFragment extends Fragment {
         textInputLocation = view.findViewById(R.id.input_location);
         textInputHost = view.findViewById(R.id.input_hosted_by);
         textInputCapacity = view.findViewById(R.id.input_capacity);
+
+        // Waitlist (existing input) +  controls
         textInputWaitlistMaximum = view.findViewById(R.id.input_waitlist_max);
+        checkLimitWaitlist      = view.findViewById(R.id.checkbox_limit_waitlist);
+        tilWaitlistMax          = view.findViewById(R.id.layout_waitlist_max);
 
         switchGeolocation = view.findViewById(R.id.switch_geolocation);
         textInputLatitude = view.findViewById(R.id.input_latitude);
@@ -234,7 +243,7 @@ public class CreateEventDetailsFragment extends Fragment {
 
         ArrayAdapter<String> eventTypeAdapter = new ArrayAdapter<>(
                 requireContext(),
-                android.R.layout.simple_dropdown_item_1line,
+                android.R.layout.simple_dropdown_item_1line, // use android built-in
                 eventTypes
         );
 
@@ -295,11 +304,21 @@ public class CreateEventDetailsFragment extends Fragment {
         endTime.setOnClickListener(v -> showTimePicker(endTime));
         deadlineTime.setOnClickListener(v -> showTimePicker(deadlineTime));
 
+        // NEW: toggle waitlist limit UI
+        checkLimitWaitlist.setOnCheckedChangeListener((btn, checked) -> {
+            tilWaitlistMax.setEnabled(checked);
+            tilWaitlistMax.setVisibility(checked ? View.VISIBLE : View.GONE);
+            if (!checked) {
+                textInputWaitlistMaximum.setText(null);
+            }
+        });
 
         nextButton.setOnClickListener(v -> {
             updateDetails();
             NavHostFragment.findNavController(this).navigate(R.id.action_eventDetails_to_eventPoster);
         });
+
+        setupLocationSwitch();
 
         return view;
     }
@@ -323,9 +342,19 @@ public class CreateEventDetailsFragment extends Fragment {
         event.setDescription(textInputDescription.getText().toString());
         event.setLocation(textInputLocation.getText().toString());
         event.setHostedBy(textInputHost.getText().toString());
+        event.setEventType(eventTypeDropdown.getText().toString());
         event.setInterests(new ArrayList<>(selectedItems));
         event.setCapacity(safeParse(textInputCapacity.getText().toString()));
-        event.setMaxWaitlistSize(safeParse(textInputWaitlistMaximum.getText().toString()));
+
+        // NEW: wire into model
+        boolean limitEnabled = checkLimitWaitlist.isChecked();
+        event.setWaitlistLimited(limitEnabled);
+        event.setMaxWaitlistSize( // keep your existing field updated
+                limitEnabled ? safeParse(textInputWaitlistMaximum.getText().toString()) : null
+        );
+        event.setWaitlistLimit(   // new explicit field if you added it in Event.java
+                limitEnabled ? safeParse(textInputWaitlistMaximum.getText().toString()) : null
+        );
 
         String eventType = eventTypeDropdown.getText().toString();
 
@@ -477,12 +506,13 @@ public class CreateEventDetailsFragment extends Fragment {
                     double lng = bundle.getDouble("lng");
                     double radius = bundle.getDouble("radius");
 
-                    selectedLat = lat;
                     selectedLng = lng;
+                    selectedLat = lat;
                     selectedRadius = radius;
 
                     setGeolocationEnabled(true);
                 });
+
     }
 
     private void setLatLonRadius(boolean showing) {

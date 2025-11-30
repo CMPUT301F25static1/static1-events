@@ -199,8 +199,11 @@
         android:id="@+id/navigation_admin_all_events"
         android:name="com.static1.fishylottery.view.admin.AdminAllEventsFragment"
         android:label="All Events"
-        tools:layout="@layout/fragment_admin_all_events"
-        />
+        tools:layout="@layout/fragment_admin_all_events" >
+        <action
+            android:id="@+id/action_admin_all_events_to_eventDetails"
+            app:destination="@id/navigation_event_details" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_admin_profiles"

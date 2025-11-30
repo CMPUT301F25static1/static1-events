@@ -15,4 +15,6 @@ public interface IEventRepository {
     Task<List<Event>> fetchAllEvents();
     Task<List<Event>> fetchEventsByOrganizerId(String uid);
     public Task<Void> drawEntrants(String eventId);
+    Task<List<String>> fetchCancelledEntrantIds(String eventId);
+    Task<Void> cancelSelectedEntrant(String eventId, String profileId);
 }

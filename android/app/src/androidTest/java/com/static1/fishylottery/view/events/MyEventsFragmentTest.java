@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentFactory;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.matcher.ViewMatchers;
 
+import com.google.android.gms.tasks.Task;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
@@ -102,7 +103,12 @@ public class MyEventsFragmentTest {
     public void noEventsMessageIsVisibleWhenNoEvents() {
         // Arrange: fake repos with empty lists
         IEventRepository fakeEventRepo = new FakeEventRepository();
-        IWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository();
+        IWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository() {
+            @Override
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+                return null;
+            }
+        };
 
         FragmentScenario<MyEventsFragment> scenario =
                 FragmentScenario.launchInContainer(
@@ -123,7 +129,12 @@ public class MyEventsFragmentTest {
         IEventRepository fakeEventRepo = new FakeEventRepository();
         fakeEventRepo.addEvent(createFakeEvent("event1"));
 
-        IWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository();
+        IWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository() {
+            @Override
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+                return null;
+            }
+        };
         fakeWaitlistRepo.addToWaitlist(createFakeEvent("event1"), createFakeWaitlistEntry("user123", "event1"));
 
         FragmentScenario<MyEventsFragment> scenario =
@@ -140,7 +151,12 @@ public class MyEventsFragmentTest {
     }
 
     private FakeWaitlistRepository createFakeWaitlist() {
-        FakeWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository();
+        FakeWaitlistRepository fakeWaitlistRepo = new FakeWaitlistRepository() {
+            @Override
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+                return null;
+            }
+        };
 
         Profile profile = new Profile();
         profile.setUid("user123");
@@ -174,6 +190,8 @@ public class MyEventsFragmentTest {
         event.setEventStartDate(next);
         event.setEventEndDate(next);
         event.setRegistrationCloses(next);
+        event.setTitle("title123");
+        event.setLocation("location123");
         return event;
     }
 
