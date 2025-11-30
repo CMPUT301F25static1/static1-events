@@ -170,10 +170,49 @@ android:layout_height="match_parent">
         android:text="Max Waitlist: None"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F9FFFFFF"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="10dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="20dp"
+                android:text="Lottery Guidelines"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Our lottery system ensures a fair and transparent selection process for all participants. Once the entry period closes, all eligible submissions are entered into a randomized draw. Winners are then selected entirely at random, with no preference given to entry time or user activity.
+
+If a selected entrant cannot be contacted, does not meet the event requirements, or fails to confirm within the specified time, the system will automatically draw a replacement from the remaining pool of entrants using the same random method. This process continues until all available spots for the event are filled.
+
+All draws are final, and the system is designed to ensure equal opportunity, fairness, and consistency for every participant."
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="10dp"
         android:layout_margin="16dp"
         android:layout_marginBottom="30dp"
         >
