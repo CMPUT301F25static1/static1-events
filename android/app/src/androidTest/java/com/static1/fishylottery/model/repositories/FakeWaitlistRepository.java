@@ -144,5 +144,46 @@ public class FakeWaitlistRepository implements IWaitlistRepository {
         }
         return Tasks.forResult(null);
     }
+    @Override
+    public Task<Void> declineInvitationAndDrawReplacement(@NonNull Event event,
+                                                          @NonNull String uid) {
+        String eventId = event.getEventId();
+        if (eventId == null) {
+            return Tasks.forException(
+                    new IllegalArgumentException("Event ID cannot be null"));
+        }
+
+        List<WaitlistEntry> list = eventWaitlists.get(eventId);
+        if (list == null) {
+            return Tasks.forResult(null);
+        }
+
+        WaitlistEntry declining = null;
+        for (WaitlistEntry e : list) {
+            if (e != null && e.getProfile() != null
+                    && uid.equals(e.getProfile().getUid())) {
+                declining = e;
+                break;
+            }
+        }
+
+        if (declining == null) {
+            return Tasks.forResult(null);
+        }
+
+        String previousStatus = declining.getStatus();
+        declining.setStatus("declined");
+
+        if ("invited".equals(previousStatus)) {
+            for (WaitlistEntry e : list) {
+                if (e != null && "waiting".equals(e.getStatus())) {
+                    e.setStatus("invited");
+                    break;
+                }
+            }
+        }
+
+        return Tasks.forResult(null);
+    }
 
 }
