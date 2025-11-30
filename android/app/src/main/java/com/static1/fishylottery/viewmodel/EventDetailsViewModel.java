@@ -195,7 +195,8 @@ public class EventDetailsViewModel extends ViewModel {
                             entry.setStatus("waiting");
                             entry.setJoinLocation(joinLocation);
 
-                            waitlistRepository.addToWaitlist(e, entry)
+                            // *** changed here ***
+                            waitlistRepository.addToWaitlistRespectingLimit(e, entry)
                                     .addOnSuccessListener(unused -> {
                                         loading.setValue(false);
                                         message.setValue("Joined waitlist!");
@@ -290,7 +291,8 @@ public class EventDetailsViewModel extends ViewModel {
 
         loading.setValue(true);
 
-        waitlistRepository.addToWaitlist(event.getValue(), currentEntry)
+        // *** changed here ***
+        waitlistRepository.addToWaitlistRespectingLimit(event.getValue(), currentEntry)
                 .addOnSuccessListener(unused -> {
                     loading.setValue(false);
                     message.setValue("Successfully accepted invite!");
@@ -332,7 +334,8 @@ public class EventDetailsViewModel extends ViewModel {
 
         loading.setValue(true);
 
-        waitlistRepository.addToWaitlist(currentEvent, currentEntry)
+        // *** changed here ***
+        waitlistRepository.addToWaitlistRespectingLimit(currentEvent, currentEntry)
                 .addOnSuccessListener(unused -> {
                     loading.setValue(false);
                     message.setValue("Successfully declined invite!");

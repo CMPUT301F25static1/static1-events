@@ -64,4 +64,7 @@ public interface IWaitlistRepository {
      * @return A tasks indicating success of failure.
      */
     Task<Void> deleteFromWaitlistByUser(@NonNull String uid);
+
+    Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry);
+
 }

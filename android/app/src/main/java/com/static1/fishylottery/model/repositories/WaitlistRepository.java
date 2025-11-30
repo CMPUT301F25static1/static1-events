@@ -28,6 +28,14 @@ public class WaitlistRepository implements IWaitlistRepository {
     private static final String WAITLIST = "waitlist";
     private static final String ENTRANT_WAITLISTS = "entrantWaitlists";
 
+    /**
+     * An entrant can join a waitlist with the event and the created waitlist entry containing the
+     * profile of who is joining the waitlist.
+     *
+     * @param event The event the waitlist belongs to.
+     * @param entry Information about the entrant profile and status.
+     * @return A task indicating success or failure.
+     */
     @Override
     public Task<Void> addToWaitlist(@NonNull Event event, @NonNull WaitlistEntry entry) {
         String eventId = event.getEventId();
@@ -69,6 +77,12 @@ public class WaitlistRepository implements IWaitlistRepository {
         return batch.commit();
     }
 
+    /**
+     * Get the full waitlist of everyone on it for a specified event.
+     *
+     * @param event The event object.
+     * @return A list of waitlist entries.
+     */
     @Override
     public Task<List<WaitlistEntry>> getWaitlist(@NonNull Event event) {
 
@@ -150,6 +164,13 @@ public class WaitlistRepository implements IWaitlistRepository {
                 });
     }
 
+    /**
+     * Deletes a waitlist entry from the Firebase references to event waitlist and entrant waitlists.
+     *
+     * @param event The event for which the user is on the waitlist.
+     * @param uid The uid of the user for which they are on the waitlist.
+     * @return A task indicating success or failure.
+     */
     @Override
     public Task<Void> deleteFromWaitlist(@NonNull Event event, @NonNull String uid) {
         WriteBatch batch = db.batch();
@@ -182,6 +203,9 @@ public class WaitlistRepository implements IWaitlistRepository {
         return batch.commit();
     }
 
+    /**
+     * Delete all waitlist entries for a user (from both sides) when the user is removed.
+     */
     public Task<Void> deleteFromWaitlistByUser(@NonNull String uid) {
         return db.collection(ENTRANT_WAITLISTS)
             .document(uid)
@@ -227,4 +251,96 @@ public class WaitlistRepository implements IWaitlistRepository {
                 return batch.commit();
         });
     }
+
+    // ---------------------------------------------------------------------
+    // limit-enforcing helpers
+    // ---------------------------------------------------------------------
+
+    /**
+     * Adds/updates the entrant on the waitlist, but first enforces the event’s optional
+     * waitlist limit if it’s enabled (Event.waitlistLimited == true and waitlistLimit != null).
+     * If the entrant is already on the waitlist, it updates/merges without checking the limit.
+     */
+    public Task<Void> addToWaitlistRespectingLimit(@NonNull Event event, @NonNull WaitlistEntry entry) {
+        String eventId = event.getEventId();
+        String profileId = entry.getProfile().getUid();
+
+        if (eventId == null) {
+            return Tasks.forException(new Exception("Event ID cannot be null"));
+        }
+        if (profileId == null) {
+            return Tasks.forException(new Exception("UID cannot be null"));
+        }
+
+        // If no limit is enabled, just use the normal path.
+        if (!(Boolean.TRUE.equals(event.getWaitlistLimited()) && event.getWaitlistLimit() != null)) {
+            return addToWaitlist(event, entry);
+        }
+
+        // If already present, allow update (idempotent) without limit check.
+        DocumentReference docRef = db.collection(EVENTS)
+                .document(eventId)
+                .collection(WAITLIST)
+                .document(profileId);
+
+        return docRef.get().continueWithTask(getTask -> {
+            if (!getTask.isSuccessful()) throw getTask.getException();
+
+            DocumentSnapshot doc = getTask.getResult();
+            if (doc != null && doc.exists()) {
+                // Already on the waitlist → merge/update as usual.
+                return addToWaitlist(event, entry);
+            }
+
+            // Not on the list yet → enforce limit.
+            return getWaitlistCount(event).continueWithTask(countTask -> {
+                if (!countTask.isSuccessful()) throw countTask.getException();
+
+                long current = countTask.getResult() != null ? countTask.getResult() : 0L;
+                int limit = event.getWaitlistLimit() != null ? event.getWaitlistLimit() : Integer.MAX_VALUE;
+
+                if (current >= limit) {
+                    return Tasks.forException(new IllegalStateException("Waitlist is full"));
+                }
+                return addToWaitlist(event, entry);
+            });
+        });
+    }
+
+    /**
+     * Returns the current number of entries in the event’s waitlist.
+     * (Simple query-size count; acceptable for small/medium lists.)
+     */
+    public Task<Long> getWaitlistCount(@NonNull Event event) {
+        String eventId = event.getEventId();
+        if (eventId == null) {
+            return Tasks.forException(new Exception("Event ID cannot be null"));
+        }
+
+        return db.collection(EVENTS)
+                .document(eventId)
+                .collection(WAITLIST)
+                .get()
+                .continueWith(t -> {
+                    if (!t.isSuccessful()) throw t.getException();
+                    QuerySnapshot qs = t.getResult();
+                    return qs != null ? (long) qs.size() : 0L;
+                });
+    }
+
+    /**
+     * Convenience helper that can be called from UI to decide if the “Join waitlist” button
+     * should be enabled. If limit not enabled, returns true.
+     */
+    public Task<Boolean> isWaitlistAcceptingMore(@NonNull Event event) {
+        if (!(Boolean.TRUE.equals(event.getWaitlistLimited()) && event.getWaitlistLimit() != null)) {
+            return Tasks.forResult(true);
+        }
+        return getWaitlistCount(event).continueWith(t -> {
+            if (!t.isSuccessful()) throw t.getException();
+            long count = t.getResult() != null ? t.getResult() : 0L;
+            return count < event.getWaitlistLimit();
+        });
+    }
+
 }

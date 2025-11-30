@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentFactory;
 import androidx.fragment.app.testing.FragmentScenario;
 
+import com.google.android.gms.tasks.Task;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
@@ -33,6 +34,10 @@ import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EventDetailsFragmentTest {
     static class TestFragmentFactory extends FragmentFactory {
@@ -66,7 +71,12 @@ public class EventDetailsFragmentTest {
     }
 
     private void launchWithEmptyRepos(Event event) {
-        FakeWaitlistRepository waitlistRepo = new FakeWaitlistRepository();
+        FakeWaitlistRepository waitlistRepo = new FakeWaitlistRepository() {
+            @Override
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+                return null;
+            }
+        };
         FakeProfileRepository profileRepo = new FakeProfileRepository();
         launch(waitlistRepo, profileRepo, event);
     }
@@ -85,7 +95,12 @@ public class EventDetailsFragmentTest {
                 "End: Jan 1, 2025 1:00 AM\n" +
                 "Registration closes: Jan 1, 2025 12:00 AM";
 
-        FakeWaitlistRepository waitlistRepo = new FakeWaitlistRepository();
+        FakeWaitlistRepository waitlistRepo = new FakeWaitlistRepository() {
+            @Override
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+                return null;
+            }
+        };
         FakeProfileRepository profileRepo = new FakeProfileRepository();
         launch(waitlistRepo, profileRepo, event);
 
@@ -147,7 +162,12 @@ public class EventDetailsFragmentTest {
     @Test
     public void showsCorrectButtons_whenOnWaitlist() {
         FakeProfileRepository fakeProfileRepository = new FakeProfileRepository();
-        FakeWaitlistRepository fakeWaitlistRepository = new FakeWaitlistRepository();
+        FakeWaitlistRepository fakeWaitlistRepository = new FakeWaitlistRepository() {
+            @Override
+            public Task<Void> addToWaitlistRespectingLimit(Event e, WaitlistEntry entry) {
+                return null;
+            }
+        };
         Event event = createTestEvent();
 
         WaitlistEntry entry = new WaitlistEntry();
@@ -200,5 +220,37 @@ public class EventDetailsFragmentTest {
 
         event.setEventEndDate(cal.getTime());
         return event;
+    }
+    private static WaitlistEntry makeEntry(String uid) {
+        Profile profile = new Profile();
+        profile.setUid(uid);
+
+        WaitlistEntry entry = new WaitlistEntry();
+        entry.setProfile(profile);
+        entry.setStatus("waiting");
+        return entry;
+    }
+    @Test
+    public void joinButtonDisabled_whenWaitlistIsFull() {
+        // Event with a waitlist limit of 2
+        Event event = createTestEvent();
+        event.setWaitlistLimited(true);
+        event.setWaitlistLimit(2);
+
+        // Pre-populate the fake waitlist with 2 waiting entries for this event
+        Map<String, List<WaitlistEntry>> initial = new HashMap<>();
+        List<WaitlistEntry> entries = new ArrayList<>();
+        entries.add(makeEntry("u1"));
+        entries.add(makeEntry("u2"));
+        initial.put(event.getEventId(), entries);
+
+        FakeWaitlistRepository waitlistRepo = new FakeWaitlistRepository(initial);
+        FakeProfileRepository profileRepo = new FakeProfileRepository();
+
+        // Launch EventDetailsFragment with this event + fake repos
+        launch(waitlistRepo, profileRepo, event);
+
+        // Because the waitlist is already at the limit, the Join button should be disabled
+        onView(withId(R.id.button_join_waitlist)).check(matches(not(isEnabled())));
     }
 }
