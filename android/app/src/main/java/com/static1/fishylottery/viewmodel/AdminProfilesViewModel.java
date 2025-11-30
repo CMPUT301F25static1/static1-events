@@ -5,16 +5,27 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.static1.fishylottery.model.entities.Profile;
+import com.static1.fishylottery.model.repositories.IProfileRepository;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AdminProfilesViewModel extends ViewModel {
-    private final ProfileRepository repository = new ProfileRepository();
+    private final IProfileRepository repository;
     private final MutableLiveData<List<Profile>> profiles = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
     private final MutableLiveData<String> message = new MutableLiveData<>();
+
+    // Default constructor - uses real repository
+    public AdminProfilesViewModel() {
+        this.repository = new ProfileRepository();
+    }
+
+    // Constructor for testing - accepts fake repository
+    public AdminProfilesViewModel(IProfileRepository repository) {
+        this.repository = repository;
+    }
 
     public LiveData<List<Profile>> getProfiles() {
         return profiles;

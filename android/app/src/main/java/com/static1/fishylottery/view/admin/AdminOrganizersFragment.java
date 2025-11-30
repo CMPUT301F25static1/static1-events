@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,12 +26,24 @@ public class AdminOrganizersFragment extends Fragment {
     private ProgressBar progressBar;
     private TextView textEmpty;
 
+    // Default constructor (required by Android)
+    public AdminOrganizersFragment() {
+    }
+
+    // Constructor for testing - allows injecting a custom ViewModel
+    public AdminOrganizersFragment(AdminOrganizersViewModel viewModel) {
+        this.viewModel = viewModel;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_organizers, container, false);
 
-        viewModel = new ViewModelProvider(this).get(AdminOrganizersViewModel.class);
+        // Only create ViewModel if not already provided (for testing)
+        if (viewModel == null) {
+            viewModel = new ViewModelProvider(this).get(AdminOrganizersViewModel.class);
+        }
 
         recyclerView = view.findViewById(R.id.recycler_organizers);
         progressBar = view.findViewById(R.id.progress_bar);
@@ -51,10 +64,16 @@ public class AdminOrganizersFragment extends Fragment {
         });
         recyclerView.setAdapter(adapter);
 
-        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
-        navView.post(() -> {
-            recyclerView.setPadding(0, 0, 0, navView.getHeight());
-        });
+        FragmentActivity activity = getActivity();
+
+        if (activity != null) {
+            BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
+            if (navView != null) {
+                navView.post(() -> {
+                    recyclerView.setPadding(0, 0, 0, navView.getHeight());
+                });
+            }
+        }
 
         viewModel.getOrganizers().observe(getViewLifecycleOwner(), organizers -> {
             adapter.submitList(organizers);

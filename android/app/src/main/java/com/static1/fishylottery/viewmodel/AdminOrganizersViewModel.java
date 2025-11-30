@@ -9,6 +9,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.Profile;
 import com.static1.fishylottery.model.repositories.EventRepository;
+import com.static1.fishylottery.model.repositories.IEventRepository;
+import com.static1.fishylottery.model.repositories.IProfileRepository;
 import com.static1.fishylottery.model.repositories.ProfileRepository;
 import com.static1.fishylottery.view.admin.AdminOrganizerAdapter;
 
@@ -18,13 +20,25 @@ import java.util.List;
 import java.util.Map;
 
 public class AdminOrganizersViewModel extends ViewModel {
-    private final EventRepository eventRepository = new EventRepository();
-    private final ProfileRepository profileRepository = new ProfileRepository();
+    private final IEventRepository eventRepository;
+    private final IProfileRepository profileRepository;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private final MutableLiveData<List<AdminOrganizerAdapter.OrganizerInfo>> organizers = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
     private final MutableLiveData<String> message = new MutableLiveData<>();
+
+    // Default constructor - uses real repositories
+    public AdminOrganizersViewModel() {
+        this.eventRepository = new EventRepository();
+        this.profileRepository = new ProfileRepository();
+    }
+
+    // Constructor for testing - accepts fake repositories
+    public AdminOrganizersViewModel(IEventRepository eventRepository, IProfileRepository profileRepository) {
+        this.eventRepository = eventRepository;
+        this.profileRepository = profileRepository;
+    }
 
     public LiveData<List<AdminOrganizerAdapter.OrganizerInfo>> getOrganizers() {
         return organizers;
