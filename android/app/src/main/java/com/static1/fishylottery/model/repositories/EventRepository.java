@@ -387,6 +387,7 @@ public class EventRepository implements IEventRepository {
      * Return the list of profile IDs that have cancelled their participation for this event.
      * We model this as waitlist documents whose "status" == "cancelled".
      */
+    @Override
     public Task<List<String>> fetchCancelledEntrantIds(String eventId) {
         if (eventId == null) {
             return Tasks.forException(new IllegalArgumentException("eventId is null"));
@@ -412,6 +413,7 @@ public class EventRepository implements IEventRepository {
      * Mark a selected entrant as cancelled and (optionally) backfill from waitlist.
      * Also appends the cancelled record under events/{eventId}/cancelledEntrants/{profileId}.
      */
+    @Override
     public Task<Void> cancelSelectedEntrant(String eventId, String profileId) {
         if (eventId == null || profileId == null) {
             return Tasks.forException(new IllegalArgumentException("eventId or profileId is null"));
