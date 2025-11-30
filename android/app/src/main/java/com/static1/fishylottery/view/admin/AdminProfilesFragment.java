@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,10 +50,16 @@ public class AdminProfilesFragment extends Fragment {
         progressBar = view.findViewById(R.id.progress_bar);
         textEmpty = view.findViewById(R.id.text_empty);
 
-        BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
-        navView.post(() -> {
-            recyclerView.setPadding(0, 0, 0, navView.getHeight());
-        });
+        FragmentActivity activity = getActivity();
+
+        if (activity != null) {
+            BottomNavigationView navView = activity.findViewById(R.id.nav_view);
+            if (navView != null) {
+                navView.post(() -> {
+                    recyclerView.setPadding(0, 0, 0, navView.getHeight());
+                });
+            }
+        }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new AdminProfileAdapter(profile -> {
