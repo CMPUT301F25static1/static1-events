@@ -80,10 +80,10 @@ public class CancelledEntrantsFragment extends Fragment {
         return v;
     }
 
-    private static class IdAdapter extends RecyclerView.Adapter<IdAdapter.VH> {
+    static class IdAdapter extends RecyclerView.Adapter<IdAdapter.VH> {
         private final List<String> items = new ArrayList<>();
 
-        void setItems(List<String> list) {
+        public void setItems(List<String> list) {
             items.clear();
             if (list != null) items.addAll(list);
             notifyDataSetChanged();
