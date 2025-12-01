@@ -16,24 +16,56 @@ import com.static1.fishylottery.model.entities.WaitlistEntry;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
-
+/**
+ * RecyclerView adapter for displaying and managing waitlist entries
+ * for a hosted event.
+ *
+ * <p>Each row shows the entrant name, status, join date, and a menu
+ * of actions such as inviting, accepting, cancelling, or deleting
+ * the entrant.</p>
+ */
 public class WaitlistEntryAdapter extends RecyclerView.Adapter<WaitlistEntryAdapter.ViewHolder> {
 
     private List<WaitlistEntry> waitlistEntries;
     private OnItemClickListener listener;
-
+    /**
+     * Listener interface for handling actions on a single waitlist entry.
+     *
+     * <p>Implemented by the hosting screen to react when the user selects
+     * one of the actions from the row's popup menu.</p>
+     */
     public interface OnItemClickListener {
+        /**
+         * Called when the host chooses to delete the given entrant.
+         */
         void onDeleteEntrant(WaitlistEntry entry);
+        /**
+         * Called when the host chooses to cancel the given entrant.
+         */
         void onCancelEntrant(WaitlistEntry entry);
+        /**
+         * Called when the host chooses to mark the given entrant as accepted.
+         */
         void onAcceptEntrant(WaitlistEntry entry);
+        /**
+         * Called when the host chooses to invite the given entrant.
+         */
         void onInviteEntrant(WaitlistEntry entry);
     }
-
+    /**
+     * Creates a new adapter instance with the initial list of waitlist entries
+     * and a listener for row actions.
+     *
+     * <p>The list reference is kept and may later be replaced via
+     * {@link #updateData(List)}.</p>
+     */
     public WaitlistEntryAdapter(List<WaitlistEntry> waitlistEntries, OnItemClickListener listener) {
         this.waitlistEntries = waitlistEntries;
         this.listener = listener;
     }
-
+    /**
+     * Inflates the entrant row layout and wraps it in a {@link ViewHolder}.
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,18 +73,28 @@ public class WaitlistEntryAdapter extends RecyclerView.Adapter<WaitlistEntryAdap
                 .inflate(R.layout.item_entrant, parent, false);
         return new ViewHolder(view);
     }
-
+    /**
+     * Binds a {@link WaitlistEntry} at the given position to the provided holder,
+     * wiring up its text fields and action menu.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         WaitlistEntry entry = waitlistEntries.get(position);
         holder.bind(entry, listener);
     }
-
+    /**
+     * Returns the number of waitlist entries currently displayed by the adapter.
+     */
     @Override
     public int getItemCount() {
         return waitlistEntries != null ? waitlistEntries.size() : 0;
     }
-
+    /**
+     * Replaces the current list of waitlist entries and refreshes the RecyclerView.
+     *
+     * <p>The adapter notifies that the entire data set has changed so the UI
+     * reflects the new list.</p>
+     */
     public void updateData(List<WaitlistEntry> newEntries) {
         this.waitlistEntries = newEntries;
         notifyDataSetChanged();

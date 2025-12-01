@@ -1,6 +1,3 @@
-
-
-
 package com.static1.fishylottery.view.events.hosted;
 
 import android.app.Activity;
@@ -34,7 +31,14 @@ import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.model.entities.WaitlistEntry;
 import com.static1.fishylottery.services.DateUtils;
 import com.static1.fishylottery.viewmodel.HostedEventDetailsViewModel;
-
+/**
+ * Fragment that shows details and management actions for a hosted event.
+ *
+ * <p>This screen displays the event summary, waitlist stats, and provides
+ * controls for hosts to view the waitlist, run the lottery, export enrolled
+ * entrants as CSV, send notifications, view the map/QR code, edit the event,
+ * and inspect cancelled entrants.</p>
+ */
 public class HostedEventDetailsFragment extends Fragment {
     private Event event;
     private HostedEventDetailsViewModel viewModel;
@@ -48,7 +52,25 @@ public class HostedEventDetailsFragment extends Fragment {
                     }
                 }
             });
-
+    /**
+     * Inflates the hosted event details layout, binds UI components, and wires
+     * them to the {@link HostedEventDetailsViewModel}.
+     *
+     * <p>This method:
+     * <ul>
+     *     <li>Retrieves the {@link Event} argument and hands it to the view model.</li>
+     *     <li>Displays event metadata and poster image.</li>
+     *     <li>Configures navigation buttons for waitlist, notifications, QR code,
+     *     map, cancelled entrants, and editing.</li>
+     *     <li>Enables CSV export of enrolled entrants via a create-document intent.</li>
+     *     <li>Observes waitlist data to compute and display waiting, enrolled,
+     *     and invited counts.</li>
+     *     <li>Observes loading state and messages to update button state and show toasts.</li>
+     * </ul>
+     * </p>
+     *
+     * @return the root view for the hosted event details screen
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,

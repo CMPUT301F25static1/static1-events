@@ -29,7 +29,27 @@ public class CreateEventPosterFragment extends Fragment {
 
     private ActivityResultLauncher<Intent> imagePickerLauncher;
     private ImageView imagePreview;
-
+    /**
+     * Inflates the poster selection layout, initializes UI components, and wires up
+     * the image picker and navigation to the next step of event creation.
+     *
+     * <p>The method:
+     * <ul>
+     *     <li>Inflates {@code fragment_create_event_poster}.</li>
+     *     <li>Initializes the shared {@link CreateEventViewModel} scoped to the
+     *     create event navigation graph.</li>
+     *     <li>Registers an {@link ActivityResultLauncher} for picking an image.</li>
+     *     <li>Observes the selected image URI from the view model and updates the
+     *     preview image when it changes.</li>
+     *     <li>Configures the "Next" button to navigate to the event preview fragment.</li>
+     * </ul>
+     * </p>
+     *
+     * @param inflater           the {@link LayoutInflater} used to inflate the layout
+     * @param container          the parent view that the fragment's UI should attach to
+     * @param savedInstanceState previously saved state, or {@code null}
+     * @return the root view for this fragment's layout
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

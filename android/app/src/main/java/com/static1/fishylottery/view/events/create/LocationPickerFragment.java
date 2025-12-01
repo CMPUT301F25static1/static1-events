@@ -28,7 +28,14 @@ import com.static1.fishylottery.R;
 import com.static1.fishylottery.services.LocationService;
 
 import java.lang.reflect.Method;
-
+/**
+ * Fragment that lets organizers pick a geographic location and radius on a map.
+ *
+ * <p>It displays a Google Map centered on the user's current location, allows
+ * dragging a marker to set the event location, and uses a seek bar to adjust
+ * the radius of the surrounding geofence circle. The chosen location and radius
+ * are returned to the parent via a fragment result.</p>
+ */
 public class LocationPickerFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     private Marker centerMarker;
@@ -42,7 +49,14 @@ public class LocationPickerFragment extends Fragment implements OnMapReadyCallba
     private TextView radiusLabel;
     private static final int MIN_RADIUS = 1000;
     private static final int MAX_RADIUS = 1_000_000;
-
+    /**
+     * Inflates the location picker layout, wires up the radius seek bar, and initializes
+     * the embedded map fragment and save button.
+     *
+     * <p>When the save button is pressed, the currently selected latitude, longitude,
+     * and radius are packaged into a fragment result ({@code locationPickerResult})
+     * and returned to the parent before navigating up.</p>
+     */
     @Nullable
     @Override
     public View onCreateView(
@@ -99,7 +113,13 @@ public class LocationPickerFragment extends Fragment implements OnMapReadyCallba
 
         return view;
     }
-
+    /**
+     * Called when the Google Map is ready to be used.
+     *
+     * <p>This centers the camera on the user's current location, adds a draggable marker
+     * to represent the event location, draws the initial radius circle, and sets up
+     * marker drag listeners so that the circle stays aligned with the chosen center.</p>
+     */
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;

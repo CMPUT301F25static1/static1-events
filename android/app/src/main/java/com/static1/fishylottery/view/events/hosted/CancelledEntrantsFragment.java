@@ -29,7 +29,12 @@ public class CancelledEntrantsFragment extends Fragment {
     public CancelledEntrantsFragment() {
         this(new WaitlistRepository());
     }
-
+    /**
+     * Constructor used primarily for testing, allowing injection of a fake repository.
+     *
+     * <p>This makes it possible to provide a mock or stub {@link IEventRepository}
+     * when unit testing the fragment behavior.</p>
+     */
     // Testing constructor so we can inject a fake repo
     public CancelledEntrantsFragment(IWaitlistRepository waitlistRepository) {
         this.waitlistRepository = waitlistRepository;

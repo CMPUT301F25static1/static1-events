@@ -20,17 +20,43 @@ import androidx.navigation.Navigation;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
 import com.static1.fishylottery.viewmodel.SendNotificationsViewModel;
-
+/**
+ * Fragment that lets an organizer send custom notifications to different
+ * subsets of entrants for a hosted event.
+ *
+ * <p>The organizer can compose a title and message, choose an audience
+ * (everyone, accepted, selected, waitlist, or cancelled entrants), and trigger
+ * sending via the {@link SendNotificationsViewModel}.</p>
+ */
 public class SendNotificationsFragment extends Fragment {
     private SendNotificationsViewModel vm;
     private Event event;
-
+    /**
+     * Inflates the notification composition layout.
+     *
+     * <p>The actual view wiring and observers are set up in
+     * {@link #onViewCreated(View, Bundle)}.</p>
+     *
+     * @return the root view of the send notifications screen
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_send_notifications, container, false);
     }
-
+    /**
+     * Initializes the view model, extracts the event argument, and wires up the UI.
+     *
+     * <p>This method:
+     * <ul>
+     *     <li>Retrieves the {@link Event} to send notifications for.</li>
+     *     <li>Sets up radio buttons for selecting the audience.</li>
+     *     <li>Observes error/success messages from the view model and shows toasts.</li>
+     *     <li>Sends the composed notification when the user taps the send button,
+     *     and navigates back on success.</li>
+     * </ul>
+     * </p>
+     */
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle s) {
         super.onViewCreated(v, s);

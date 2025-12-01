@@ -29,7 +29,23 @@ import com.static1.fishylottery.services.DateUtils;
 public class CreateEventPreviewFragment extends Fragment {
 
     CreateEventViewModel vm;
-
+    /**
+     * Inflates the event preview layout, binds UI elements to the {@link CreateEventViewModel},
+     * and wires up the create/update button.
+     *
+     * <p>This method:
+     * <ul>
+     *     <li>Initializes the view model scoped to the create event navigation graph.</li>
+     *     <li>Subscribes to validation error messages and shows them as toasts.</li>
+     *     <li>Observes the event data and populates the preview fields.</li>
+     *     <li>Observes the image URI and toggles the poster preview visibility.</li>
+     *     <li>Handles submission, showing success feedback and navigating back to
+     *     the events list when creation or update succeeds.</li>
+     * </ul>
+     * </p>
+     *
+     * @return the root view of the event preview screen
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

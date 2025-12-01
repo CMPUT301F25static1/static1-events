@@ -33,11 +33,27 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-
+/**
+ * Fragment that displays a map of where entrants joined the signup.
+ *
+ * <p>It observes the waitlist for a hosted event, plots each entry with a
+ * recorded join location as a marker, and centers the map around the host's
+ * current location. Marker snippets show when each entrant joined.</p>
+ */
 public class SignupMapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap map;
     private List<WaitlistEntry> pendingEntries;
-
+    /**
+     * Inflates the signup map layout, initializes the embedded map fragment,
+     * and attaches an observer to the waitlist.
+     *
+     * <p>When waitlist entries are loaded, their locations are added to the map
+     * as markers once the map is ready. If entries arrive before the map is
+     * initialized, they are temporarily stored and processed later in
+     * {@link #onMapReady(GoogleMap)}.</p>
+     *
+     * @return the root view for the signup map screen
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,7 +78,14 @@ public class SignupMapFragment extends Fragment implements OnMapReadyCallback {
 
         return view;
     }
-
+    /**
+     * Called when the Google Map is ready to be used.
+     *
+     * <p>This configures basic map UI (zoom controls, padding for the bottom
+     * navigation bar), centers the camera on the current device location, and
+     * adds markers for any waitlist entries that were loaded before the map
+     * was ready.</p>
+     */
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
