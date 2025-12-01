@@ -15,8 +15,20 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.static1.fishylottery.R;
 
+/**
+ * Fragment that hosts a ViewPager2 with tabs for navigating between event-related fragments.
+ * Displays "My Events", "Browse", and "Hosted" tabs.
+ */
 public class EventsFragment extends Fragment {
 
+    /**
+     * Inflates the fragment's layout and sets up the ViewPager2 with tabs.
+     *
+     * @param inflater           the LayoutInflater to inflate the layout
+     * @param container          the parent ViewGroup
+     * @param savedInstanceState the saved instance state, if any
+     * @return the inflated View
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -40,6 +52,9 @@ public class EventsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Cleans up resources when the fragment's view is destroyed.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

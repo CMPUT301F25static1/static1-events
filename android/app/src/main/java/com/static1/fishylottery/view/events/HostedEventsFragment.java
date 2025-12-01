@@ -26,22 +26,48 @@ import com.static1.fishylottery.services.AuthManager;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Fragment that displays a list of events hosted by the current user.
+ * Allows navigation to event details and creation of new events.
+ */
+
 public class HostedEventsFragment extends Fragment {
 
+    /** Repository for accessing event data. */
     private IEventRepository eventsRepo;
+    /** RecyclerView for displaying the list of hosted events. */
     private RecyclerView recyclerView;
+    /** Adapter for managing event data in the RecyclerView. */
     private EventAdapter adapter;
+    /** TextView displayed when there are no hosted events. */
     private TextView textNoEventsMessage;
+    /** Tag for logging purposes. */
     private final static String TAG = "HostedEvents";
 
+    /**
+     * Default constructor that initializes the event repository.
+     */
     public HostedEventsFragment() {
         this.eventsRepo = new EventRepository();
     }
 
+    /**
+     * Constructor that allows injection of a custom event repository.
+     *
+     * @param eventRepository the event repository to use
+     */
     public HostedEventsFragment(IEventRepository eventRepository) {
         this.eventsRepo = eventRepository;
     }
 
+    /**
+     * Inflates the fragment's layout and sets up the RecyclerView, navigation, and event creation button.
+     *
+     * @param inflater           the LayoutInflater to inflate the layout
+     * @param container          the parent ViewGroup
+     * @param savedInstanceState the saved instance state, if any
+     * @return the inflated View
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -85,6 +111,9 @@ public class HostedEventsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Fetches events hosted by the current user and updates the UI.
+     */
     private void getEvents() {
         String uid = AuthManager.getInstance().getUserId();
 
@@ -106,6 +135,11 @@ public class HostedEventsFragment extends Fragment {
         }
     }
 
+    /**
+     * Sorts the list of events by their end date in descending order.
+     *
+     * @param events the list of events to sort
+     */
     private void sortEventsByDate(List<Event> events) {
         events.sort(Comparator.comparing(Event::getEventEndDate, Comparator.reverseOrder()));
     }

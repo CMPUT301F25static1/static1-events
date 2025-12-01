@@ -24,14 +24,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/** Shows one event and lets an entrant join the waitlist. */
+/**
+ * Fragment that displays the details of a single event and allows users to join or manage their waitlist status.
+ */
 public class EventDetailsFragment extends Fragment {
-
+    /** Key for the event argument in the fragment's bundle. */
     public static final String ARG_EVENT = "event";
-
+    /** Date format for displaying event dates and times. */
     private final SimpleDateFormat df =
             new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
 
+    /** TextView for the event title. TextView for the event description. TextView for the event location. TextView for the event date and time. TextView for the event host. TextView for the maximum number of attendees. TextView for the maximum waitlist size. TextView for the current waitlist count. */
     private TextView tvTitle,
             tvDesc,
             tvWhere,
@@ -40,18 +43,39 @@ public class EventDetailsFragment extends Fragment {
             tvMaxAttendees,
             tvMaxWaitlist,
             tvWaitlistCount;
+    /** ImageView for the event poster. */
     private ImageView ivEventPoster;
+
+    /** Button to join the waitlist. Button to leave the waitlist. Button to accept an invitation. Button to decline an invitation. */
     private Button buttonJoinWaitlist,
             buttonLeaveWaitlist,
             buttonAcceptInvite,
             buttonDeclineInvite;
+    /** ViewModel for managing event data and waitlist actions. */
     private EventDetailsViewModel viewModel;
 
+    /**
+     * Default constructor.
+     */
     public EventDetailsFragment() {}
+
+    /**
+     * Constructor that allows injection of a custom ViewModel.
+     *
+     * @param viewModel the ViewModel to use
+     */
     public EventDetailsFragment(EventDetailsViewModel viewModel) {
         this.viewModel = viewModel;
     }
 
+    /**
+     * Inflates the fragment's layout, initializes views, and sets up event data and listeners.
+     *
+     * @param inflater           the LayoutInflater to inflate the layout
+     * @param container          the parent ViewGroup
+     * @param savedInstanceState the saved instance state, if any
+     * @return the inflated View
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -183,7 +207,14 @@ public class EventDetailsFragment extends Fragment {
 
         return v;
     }
-
+    /**
+     * Formats the event's start, end, and registration close dates into a display string.
+     *
+     * @param start     the event start date
+     * @param end       the event end date
+     * @param regClose  the registration close date
+     * @return the formatted string
+     */
     private String formatWindow(Date start, Date end, Date regClose) {
         String s = (start == null) ? "—" : df.format(start);
         String e = (end   == null) ? "—" : df.format(end);
@@ -191,10 +222,21 @@ public class EventDetailsFragment extends Fragment {
         return "Start: " + s + "\nEnd: " + e + "\nRegistration closes: " + r;
     }
 
+    /**
+     * Returns a fallback value if the input is null.
+     *
+     * @param s        the input value
+     * @param fallback the fallback value
+     * @param <T>      the type of the value
+     * @return the input value or the fallback if null
+     */
     private static <T> T nullTo(T s, T fallback) {
         return s == null ? fallback : s;
     }
 
+    /**
+     * Sets up click listeners for the action buttons.
+     */
     private void setupListeners() {
         buttonJoinWaitlist.setOnClickListener(v -> viewModel.joinWaitlist(requireContext()));
         buttonLeaveWaitlist.setOnClickListener(v -> viewModel.leaveWaitlist());
@@ -202,6 +244,11 @@ public class EventDetailsFragment extends Fragment {
         buttonDeclineInvite.setOnClickListener(v -> viewModel.declineInvite());
     }
 
+    /**
+     * Updates the visibility of action buttons based on the waitlist status.
+     *
+     * @param status the waitlist status ("no_waitlist", "waiting", "invited", "accepted")
+     */
     private void updateButtons(String status) {
         buttonJoinWaitlist.setVisibility(View.GONE);
         buttonDeclineInvite.setVisibility(View.GONE);
@@ -227,6 +274,9 @@ public class EventDetailsFragment extends Fragment {
         }
     }
 
+    /**
+     * Hides all action buttons.
+     */
     private void hideButtons() {
         buttonJoinWaitlist.setVisibility(View.GONE);
         buttonDeclineInvite.setVisibility(View.GONE);
@@ -234,6 +284,12 @@ public class EventDetailsFragment extends Fragment {
         buttonAcceptInvite.setVisibility(View.GONE);
     }
 
+    /**
+     * Checks if the event has already started.
+     *
+     * @param event the event to check
+     * @return true if the event has started, false otherwise
+     */
     private boolean hasEventPassed(Event event) {
         return event.getEventStartDate().before(new Date());
     }
