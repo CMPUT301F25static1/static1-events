@@ -17,17 +17,38 @@ import com.static1.fishylottery.model.entities.Event;
 import java.util.List;
 
 /**
- * RecyclerView adapter for displaying event poster images for admin.
+ * RecyclerView adapter used on the admin screen to display event posters.
+ * <p>
+ * Responsibilities:
+ * <ul>
+ *     <li>Display a grid/list of event posters that have associated image URLs.</li>
+ *     <li>Show each event’s title and image thumbnail.</li>
+ *     <li>Provide a delete button that allows administrators to remove an event's poster.</li>
+ * </ul>
  */
 public class AdminImagesAdapter extends RecyclerView.Adapter<AdminImagesAdapter.ImageViewHolder> {
 
+    /**
+     * Listener interface used to notify when the admin clicks the delete icon for an event.
+     */
     public interface OnImageActionListener {
+        /**
+         * Called when the delete image button is pressed for a specific event.
+         *
+         * @param event the event whose poster should be deleted.
+         */
         void onDeleteImageClicked(Event event);
     }
 
     private final List<Event> items;
     private final OnImageActionListener listener;
 
+    /**
+     * Creates an adapter for displaying admin poster items.
+     *
+     * @param items    list of events that contain poster images
+     * @param listener listener handling delete actions for each event
+     */
     public AdminImagesAdapter(List<Event> items, OnImageActionListener listener) {
         this.items = items;
         this.listener = listener;
@@ -41,22 +62,47 @@ public class AdminImagesAdapter extends RecyclerView.Adapter<AdminImagesAdapter.
         return new ImageViewHolder(view);
     }
 
+    /**
+     * Binds a single event to the ViewHolder at the given position.
+     *
+     * @param holder   holder containing UI references
+     * @param position position in the adapter list
+     */
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         Event event = items.get(position);
         holder.bind(event, listener);
     }
 
+    /**
+     * @return the number of poster items displayed in the list.
+     */
     @Override
     public int getItemCount() {
         return items.size();
     }
 
+    /**
+     * ViewHolder representing a single event poster item.
+     * <p>
+     * Contains:
+     * <ul>
+     *     <li>Poster thumbnail</li>
+     *     <li>Event title</li>
+     *     <li>Delete button</li>
+     * </ul>
+     */
     static class ImageViewHolder extends RecyclerView.ViewHolder {
+
         ImageView ivPoster;
         TextView tvTitle;
         ImageButton btnDelete;
 
+        /**
+         * Constructs a ViewHolder for an admin poster item.
+         *
+         * @param itemView root view of the poster item layout
+         */
         ImageViewHolder(@NonNull View itemView) {
             super(itemView);
             ivPoster = itemView.findViewById(R.id.admin_image_poster);
@@ -64,6 +110,17 @@ public class AdminImagesAdapter extends RecyclerView.Adapter<AdminImagesAdapter.
             btnDelete = itemView.findViewById(R.id.admin_image_delete);
         }
 
+        /**
+         * Binds the UI components to the given {@link Event}, including:
+         * <ul>
+         *     <li>Loading the image via Glide</li>
+         *     <li>Displaying title text</li>
+         *     <li>Setting delete button behavior</li>
+         * </ul>
+         *
+         * @param event    the event being displayed
+         * @param listener the listener handling delete button presses
+         */
         void bind(Event event, OnImageActionListener listener) {
             String title = event != null && event.getTitle() != null
                     ? event.getTitle()
