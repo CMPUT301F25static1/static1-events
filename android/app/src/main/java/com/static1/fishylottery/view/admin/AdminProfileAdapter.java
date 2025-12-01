@@ -15,19 +15,40 @@ import com.static1.fishylottery.model.entities.Profile;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link RecyclerView.Adapter} that displays a list of user profiles in the admin panel.
+ * Each item shows the user's name, email, phone, initials, and a delete button.
+ */
 public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapter.ViewHolder> {
-
+    /**
+     * Listener interface for handling delete button clicks on profile items.
+     */
     public interface OnDeleteClickListener {
+        /**
+         * Called when the delete button is clicked for a profile.
+         *
+         * @param profile the profile to be deleted
+         */
         void onDeleteClick(Profile profile);
     }
 
     private List<Profile> profiles = new ArrayList<>();
     private final OnDeleteClickListener deleteListener;
 
+    /**
+     * Creates a new adapter with the specified delete listener.
+     *
+     * @param deleteListener listener to be notified when delete is clicked
+     */
     public AdminProfileAdapter(OnDeleteClickListener deleteListener) {
         this.deleteListener = deleteListener;
     }
 
+    /**
+     * Replaces the current list of profiles with a new list and notifies the adapter.
+     *
+     * @param newProfiles the new list of profiles; may be null to clear the list
+     */
     public void submitList(List<Profile> newProfiles) {
         profiles.clear();
         if (newProfiles != null) {
@@ -55,6 +76,9 @@ public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapte
         return profiles.size();
     }
 
+    /**
+     * ViewHolder for displaying a single user profile with a delete action.
+     */
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textName, textEmail, textPhone, textInitials;
         ImageButton buttonDelete;
@@ -68,6 +92,12 @@ public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapte
             buttonDelete = itemView.findViewById(R.id.button_profile_delete);
         }
 
+        /**
+         * Binds profile data to the views and sets up the delete button listener.
+         *
+         * @param profile  the user profile to display
+         * @param listener the listener to notify when delete is clicked
+         */
         void bind(Profile profile, OnDeleteClickListener listener) {
             textName.setText(profile.getFullName());
             textEmail.setText(profile.getEmail());

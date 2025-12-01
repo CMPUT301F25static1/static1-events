@@ -15,15 +15,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * A {@link RecyclerView.Adapter} that displays a list of notification logs in the admin panel.
+ * Each item shows recipient information, notification title, message, type, and timestamp.
+ */
 public class NotificationLogAdapter extends RecyclerView.Adapter<NotificationLogAdapter.ViewHolder> {
 
+    /**
+     * Represents a single notification log entry.
+     */
     public static class NotificationLog {
+        /** The name of the recipient */
         public String recipientName;
+        /** The email address of the recipient */
         public String recipientEmail;
+        /** The title of the notification */
         public String title;
+        /** The body message of the notification */
         public String message;
+        /** The type of notification (e.g., "email", "push", "system") */
         public String type;
+        /** The timestamp when the notification was sent (in milliseconds since epoch) */
         public long timestamp;
+
+        /**
+         * Creates a new notification log entry.
+         *
+         * @param recipientName  name of the recipient
+         * @param recipientEmail email of the recipient
+         * @param title          notification title
+         * @param message        notification message body
+         * @param type           type of notification
+         * @param timestamp      time the notification was sent
+         */
 
         public NotificationLog(String recipientName, String recipientEmail, String title,
                                String message, String type, long timestamp) {
@@ -39,6 +63,11 @@ public class NotificationLogAdapter extends RecyclerView.Adapter<NotificationLog
     private List<NotificationLog> logs = new ArrayList<>();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
 
+    /**
+     * Replaces the current list of notification logs with a new list and notifies the adapter.
+     *
+     * @param newLogs the new list of notification logs; may be null to clear the list
+     */
     public void submitList(List<NotificationLog> newLogs) {
         logs.clear();
         if (newLogs != null) {
@@ -66,6 +95,10 @@ public class NotificationLogAdapter extends RecyclerView.Adapter<NotificationLog
         return logs.size();
     }
 
+    /**
+     * ViewHolder for displaying a single notification log item.
+     */
+
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView textRecipient, textTitle, textMessage, textType, textDate;
 
@@ -77,6 +110,12 @@ public class NotificationLogAdapter extends RecyclerView.Adapter<NotificationLog
             textType = itemView.findViewById(R.id.text_type);
             textDate = itemView.findViewById(R.id.text_date);
         }
+
+        /**
+         * Binds the notification log data to the view elements.
+         *
+         * @param log the notification log to display
+         */
 
         void bind(NotificationLog log) {
             textRecipient.setText(log.recipientName + " (" + log.recipientEmail + ")");
