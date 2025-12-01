@@ -152,6 +152,14 @@ public class EventDetailsViewModel extends ViewModel {
             return;
         }
 
+        Integer maxWaitlist = e.getMaxWaitlistSize();
+        Integer current = waitlistCount.getValue();
+
+        if (maxWaitlist != null && current != null && current >= maxWaitlist) {
+            message.setValue("Waitlist is full");
+            return;
+        }
+
         String uid = AuthManager.getInstance().getUserId();
 
         if (uid == null) {
@@ -162,6 +170,13 @@ public class EventDetailsViewModel extends ViewModel {
         loading.setValue(true);
 
         LocationService locationService = LocationService.create(context);
+
+        if (uid == null) {
+            message.setValue("Please sign in first");
+            return;
+        }
+
+        loading.setValue(true);
 
         locationService.getCurrentLocation(new LocationService.LocationCallback() {
             @Override

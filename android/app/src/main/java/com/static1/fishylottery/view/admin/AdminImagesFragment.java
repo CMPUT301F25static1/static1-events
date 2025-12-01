@@ -25,10 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Admin screen for browsing and deleting event poster images.
- * Implements:
- * - US 03.06.01 (browse images)
- * - US 03.03.01 (remove images)
+ * Fragment that allows administrators to browse all event poster images and delete them.
+ * <p>
+ * Implements the following user stories:
+ * <ul>
+ *     <li><b>US 03.06.01:</b> Admin browses poster images in a grid view.</li>
+ *     <li><b>US 03.03.01:</b> Admin removes an event’s poster image.</li>
+ * </ul>
+ * <p>
+ * This screen retrieves all events from Firestore, filters those with image URLs,
+ * displays them in a grid, and supports deletion from both Firebase Storage and Firestore.
  */
 public class AdminImagesFragment extends Fragment implements AdminImagesAdapter.OnImageActionListener {
 
@@ -40,6 +46,15 @@ public class AdminImagesFragment extends Fragment implements AdminImagesAdapter.
     private AdminImagesAdapter adapter;
     private EventRepository eventRepository;
 
+    /**
+     * Inflates the admin poster management layout, initializes UI components,
+     * sets up the RecyclerView, and loads all poster images.
+     *
+     * @param inflater  inflater used to inflate the fragment layout
+     * @param container optional parent container
+     * @param savedInstanceState saved state bundle (unused)
+     * @return the root view for this fragment
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -60,15 +75,22 @@ public class AdminImagesFragment extends Fragment implements AdminImagesAdapter.
         return view;
     }
 
+    /**
+     * Configures the RecyclerView to display event posters in a grid layout
+     * and initializes the adapter.
+     */
     private void setupRecyclerView() {
-        // Grid layout to satisfy "grid view of images"
-        int spanCount = 2; // change to 3 if you prefer smaller tiles
+        int spanCount = 2; // grid column count
         recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), spanCount));
 
         adapter = new AdminImagesAdapter(eventsWithImages, this);
         recyclerView.setAdapter(adapter);
     }
 
+    /**
+     * Loads all events from Firestore, filters the ones containing image URLs,
+     * and updates the grid UI. Displays loading indicators and handles failure cases.
+     */
     private void loadImages() {
         showLoading(true);
         emptyText.setVisibility(View.GONE);
@@ -103,6 +125,11 @@ public class AdminImagesFragment extends Fragment implements AdminImagesAdapter.
         });
     }
 
+    /**
+     * Shows or hides the loading spinner and the RecyclerView content.
+     *
+     * @param loading true to show the loading indicator, false to show content
+     */
     private void showLoading(boolean loading) {
         progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
         recyclerView.setVisibility(loading ? View.INVISIBLE : View.VISIBLE);
@@ -110,6 +137,12 @@ public class AdminImagesFragment extends Fragment implements AdminImagesAdapter.
 
     // ===== AdminImagesAdapter.OnImageActionListener =====
 
+    /**
+     * Called when the admin presses the delete button on a poster.
+     * Opens a confirmation dialog to prevent accidental deletion.
+     *
+     * @param event the event whose poster is being deleted
+     */
     @Override
     public void onDeleteImageClicked(Event event) {
         if (event == null) return;
@@ -125,13 +158,15 @@ public class AdminImagesFragment extends Fragment implements AdminImagesAdapter.
     }
 
     /**
-     * Deletes the image from Firebase Storage and clears the imageUrl in Firestore.
+     * Deletes an event poster from Firebase Storage and then clears
+     * its associated imageUrl field from Firestore.
+     *
+     * @param event the event whose poster should be deleted
      */
     private void deletePosterForEvent(Event event) {
         String imageUrl = event.getImageUrl();
 
         if (imageUrl == null || imageUrl.isEmpty()) {
-            // Nothing in storage, just clear Firestore
             clearImageUrlOnEvent(event);
             return;
         }
@@ -147,11 +182,16 @@ public class AdminImagesFragment extends Fragment implements AdminImagesAdapter.
                 return;
             }
 
-            // Now clear image URL in Firestore
             clearImageUrlOnEvent(event);
         });
     }
 
+    /**
+     * Clears the image URL reference from the event in Firestore
+     * and updates the local UI by removing the poster from the list.
+     *
+     * @param event the event whose image URL is being cleared
+     */
     private void clearImageUrlOnEvent(Event event) {
         event.setImageUrl(null);
 
@@ -165,13 +205,11 @@ public class AdminImagesFragment extends Fragment implements AdminImagesAdapter.
                 return;
             }
 
-            // Remove from local list / grid view
             int idx = eventsWithImages.indexOf(event);
             if (idx >= 0) {
                 eventsWithImages.remove(idx);
                 adapter.notifyItemRemoved(idx);
             } else {
-                // fallback
                 eventsWithImages.remove(event);
                 adapter.notifyDataSetChanged();
             }

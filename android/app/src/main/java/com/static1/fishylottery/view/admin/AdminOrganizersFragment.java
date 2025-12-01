@@ -19,6 +19,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.viewmodel.AdminOrganizersViewModel;
 
+/**
+ * A {@link Fragment} that displays a list of all event organizers in the admin panel.
+ * Allows administrators to remove organizers (and all their associated events) with confirmation.
+ * Observes the {@link AdminOrganizersViewModel} for data and state changes.
+ */
 public class AdminOrganizersFragment extends Fragment {
     private AdminOrganizersViewModel viewModel;
     private RecyclerView recyclerView;
@@ -26,11 +31,18 @@ public class AdminOrganizersFragment extends Fragment {
     private ProgressBar progressBar;
     private TextView textEmpty;
 
-    // Default constructor (required by Android)
+    /**
+     * Default constructor required by the Android Fragment system.
+     */
     public AdminOrganizersFragment() {
     }
 
-    // Constructor for testing - allows injecting a custom ViewModel
+    /**
+     * Constructor used for dependency injection during testing.
+     * Allows injecting a mock or test {@link AdminOrganizersViewModel}.
+     *
+     * @param viewModel the ViewModel to be used instead of creating a new one
+     */
     public AdminOrganizersFragment(AdminOrganizersViewModel viewModel) {
         this.viewModel = viewModel;
     }
