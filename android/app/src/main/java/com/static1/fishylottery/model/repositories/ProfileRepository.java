@@ -20,22 +20,48 @@ import java.util.List;
 public class ProfileRepository implements IProfileRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference profilesRef = db.collection("profiles");
-
+    /**
+     * Creates or overwrites a profile document in Firestore.
+     *
+     * @param profile the {@link Profile} to store; its {@code uid} is used
+     *                as the document ID in the {@code "profiles"} collection
+     * @return a {@link Task} that completes when the write has been committed
+     */
     @Override
     public Task<Void> addProfile(Profile profile) {
         return profilesRef.document(profile.getUid()).set(profile);
     }
-
+    /**
+     * Updates an existing profile document in Firestore.
+     * <p>
+     * This uses the profile's {@code uid} as the document ID and overwrites
+     * the document with the new values.
+     *
+     * @param profile the updated {@link Profile} data
+     * @return a {@link Task} that completes when the update has been committed
+     */
     @Override
     public Task<Void> updateProfile(Profile profile) {
         return profilesRef.document(profile.getUid()).set(profile);
     }
-
+    /**
+     * Deletes a profile document from Firestore.
+     *
+     * @param profile the {@link Profile} whose document should be removed;
+     *                its {@code uid} is used as the document ID
+     * @return a {@link Task} that completes when the document has been deleted
+     */
     @Override
     public Task<Void> deleteProfile(Profile profile) {
         return profilesRef.document(profile.getUid()).delete();
     }
-
+    /**
+     * Loads all profiles from the {@code "profiles"} collection.
+     *
+     * @return a {@link Task} that resolves to a list of all
+     *         {@link Profile} objects in Firestore; the list is empty if
+     *         there are no profiles or if the collection cannot be read
+     */
     @Override
     public Task<List<Profile>> getAllProfiles() {
         return profilesRef.get()
@@ -59,7 +85,13 @@ public class ProfileRepository implements IProfileRepository {
                     return profiles;
                 });
     }
-
+    /**
+     * Retrieves a single profile by its unique user ID.
+     *
+     * @param uid the user ID / document ID of the profile to fetch
+     * @return a {@link Task} that resolves to the {@link Profile} with the
+     *         given ID, or {@code null} if no matching document exists
+     */
     @Override
     public Task<Profile> getProfileById(String uid) {
         return profilesRef
@@ -74,7 +106,19 @@ public class ProfileRepository implements IProfileRepository {
                     }
                 });
     }
-
+    /**
+     * Fetches multiple profiles for a list of user IDs.
+     * <p>
+     * Firestore {@code whereIn} queries are limited to 10 values per call,
+     * so this method automatically splits the ID list into chunks of at most
+     * 10 IDs and runs multiple queries when necessary.
+     *
+     * @param uids list of user IDs / document IDs to look up; if {@code null}
+     *             or empty an empty list is returned
+     * @return a {@link Task} that resolves to a list of {@link Profile}
+     *         objects for all IDs that could be found; the list may be
+     *         smaller than {@code uids} if some documents do not exist
+     */
     @Override
     public Task<List<Profile>> fetchProfilesByIds(List<String> uids) {
         if (uids == null || uids.isEmpty()) {

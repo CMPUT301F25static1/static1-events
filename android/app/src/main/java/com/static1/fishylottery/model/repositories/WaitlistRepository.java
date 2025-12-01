@@ -28,7 +28,16 @@ public class WaitlistRepository implements IWaitlistRepository {
     private static final String EVENTS = "events";
     private static final String WAITLIST = "waitlist";
     private static final String ENTRANT_WAITLISTS = "entrantWaitlists";
-
+    /**
+     * Adds an entrant to the waitlist for the given event and mirrors the entry
+     * under {@code entrantWaitlists/{uid}/events/{eventId}}.
+     * <p>
+     * Both documents are written in a single Firestore batch.
+     *
+     * @param event the event whose waitlist is being joined; its {@code eventId} is used
+     * @param entry the {@link WaitlistEntry} containing profile and status information
+     * @return a {@link Task} that completes when the batch write is committed
+     */
     @Override
     public Task<Void> addToWaitlist(@NonNull Event event, @NonNull WaitlistEntry entry) {
         String eventId = event.getEventId();
@@ -69,7 +78,14 @@ public class WaitlistRepository implements IWaitlistRepository {
         // Batch commit
         return batch.commit();
     }
-
+    /**
+     * Loads all waitlist entries for a specific event.
+     *
+     * @param event the event whose waitlist should be read
+     * @return a {@link Task} that resolves to a list of {@link WaitlistEntry} objects;
+     *         the list is empty if no entries exist
+     * @throws IllegalArgumentException if the event has a {@code null} {@code eventId}
+     */
     @Override
     public Task<List<WaitlistEntry>> getWaitlist(@NonNull Event event) {
 
@@ -103,7 +119,14 @@ public class WaitlistRepository implements IWaitlistRepository {
                     return list;
                 });
     }
-
+    /**
+     * Retrieves a single waitlist entry for the given event and user ID.
+     *
+     * @param event the event whose waitlist entry is requested
+     * @param uid   the profile ID / document ID of the entrant
+     * @return a {@link Task} that resolves to the {@link WaitlistEntry} or {@code null}
+     *         if no corresponding document exists
+     */
     @Override
     public Task<WaitlistEntry> getWaitlistEntry(@NonNull Event event, String uid) {
         return db.collection(EVENTS)
@@ -124,7 +147,15 @@ public class WaitlistRepository implements IWaitlistRepository {
                     return doc.toObject(WaitlistEntry.class);
                 });
     }
-
+    /**
+     * Retrieves all waitlist entries for a user across all events.
+     * <p>
+     * Reads documents from {@code entrantWaitlists/{uid}/events} and sets the
+     * {@code eventId} field on each entry using the document ID.
+     *
+     * @param uid the profile ID of the user
+     * @return a {@link Task} that resolves to a list of {@link WaitlistEntry} objects
+     */
     @Override
     public Task<List<WaitlistEntry>> getEventWaitlistEntriesByUser(@NonNull String uid) {
         return db.collection(ENTRANT_WAITLISTS)
@@ -150,7 +181,16 @@ public class WaitlistRepository implements IWaitlistRepository {
                     return list;
                 });
     }
-
+    /**
+     * Removes a single entrant from the waitlist for an event and deletes the
+     * mirrored document under {@code entrantWaitlists}.
+     * <p>
+     * Both deletions are performed in a single Firestore batch.
+     *
+     * @param event the event from which the entrant is removed
+     * @param uid   the profile ID / document ID of the entrant
+     * @return a {@link Task} that completes when the batch delete is committed
+     */
     @Override
     public Task<Void> deleteFromWaitlist(@NonNull Event event, @NonNull String uid) {
         WriteBatch batch = db.batch();
@@ -182,7 +222,16 @@ public class WaitlistRepository implements IWaitlistRepository {
         // Batch commit
         return batch.commit();
     }
-
+    /**
+     * Deletes all waitlist references for a given user across all events.
+     * <p>
+     * For each event listed under {@code entrantWaitlists/{uid}/events}, the corresponding
+     * {@code events/{eventId}/waitlist/{uid}} document is also removed. Finally, the
+     * {@code entrantWaitlists/{uid}} document itself is deleted.
+     *
+     * @param uid the profile ID of the user whose waitlist entries should be removed
+     * @return a {@link Task} that completes when all delete operations have been committed
+     */
     public Task<Void> deleteFromWaitlistByUser(@NonNull String uid) {
         return db.collection(ENTRANT_WAITLISTS)
             .document(uid)
@@ -456,7 +505,14 @@ public class WaitlistRepository implements IWaitlistRepository {
             });
         });
     }
-
+    /**
+     * Writes multiple waitlist entries in a single batch operation, updating both
+     * the event-side and entrant-side documents for each entry.
+     *
+     * @param entries a list of {@link WaitlistEntry} objects to write; each must have
+     *                a non-null {@code eventId} and {@link WaitlistEntry#getProfile()} UID
+     * @return a {@link Task} that completes when the batch has been committed
+     */
     @Override
     public Task<Void> updateMultipleEntries(List<WaitlistEntry> entries) {
         WriteBatch batch = db.batch();

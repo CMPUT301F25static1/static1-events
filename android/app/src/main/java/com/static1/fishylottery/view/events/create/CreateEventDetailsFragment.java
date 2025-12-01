@@ -45,7 +45,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
+/**
+ * Fragment for creating or editing the core details of an {@link Event}.
+ * <p>
+ * Handles:
+ * <ul>
+ *   <li>Basic event metadata (title, description, host, location, capacity).</li>
+ *   <li>Date and time pickers for start, end, and registration deadline.</li>
+ *   <li>Event type and interest selection via dropdowns and a multi-select dialog.</li>
+ *   <li>Optional waitlist limit controls.</li>
+ *   <li>Optional geolocation requirement (lat/lon/radius) via a separate picker
+ *       fragment.</li>
+ * </ul>
+ * The fragment reads and writes its data through a shared
+ * {@link CreateEventViewModel} scoped to the create-event navigation graph.
+ */
 public class CreateEventDetailsFragment extends Fragment {
 
 
@@ -109,7 +123,27 @@ public class CreateEventDetailsFragment extends Fragment {
     );
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm a", Locale.getDefault());
-
+    /**
+     * Inflates the event details layout, wires up all input fields, and connects them
+     * to the {@link CreateEventViewModel}.
+     * <p>
+     * Behaviour:
+     * <ul>
+     *   <li>Initialises the shared view model (scoped to the create-event graph).</li>
+     *   <li>If an existing {@link Event} is supplied in the arguments, populates the
+     *       UI for editing mode; otherwise configures the UI for creation.</li>
+     *   <li>Sets up dropdowns for event type and interests.</li>
+     *   <li>Sets up date/time picker fields and geolocation switch behaviour.</li>
+     *   <li>Configures the optional waitlist-limit checkbox and input field.</li>
+     *   <li>On "Next" click, calls {@link #updateDetails()} and navigates to the
+     *       poster step.</li>
+     * </ul>
+     *
+     * @param inflater  layout inflater used to inflate the fragment view
+     * @param container optional parent view group
+     * @param savedInstanceState previously saved state, or {@code null}
+     * @return the inflated root view for this fragment
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -322,7 +356,15 @@ public class CreateEventDetailsFragment extends Fragment {
 
         return view;
     }
-
+    /**
+     * Called after the view hierarchy has been created.
+     * <p>
+     * Ensures the geolocation switch is fully wired so that toggling it can
+     * launch the location picker and respond to the result.
+     *
+     * @param view               the root view returned by {@link #onCreateView}
+     * @param savedInstanceState previously saved state, or {@code null}
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -439,6 +481,13 @@ public class CreateEventDetailsFragment extends Fragment {
 
 
     // TimePicker
+    /**
+     * Called after the view hierarchy has been created.
+     * <p>
+     * Ensures the geolocation switch is fully wired so that toggling it can
+     * launch the location picker and respond to the result.
+
+     */
     private void showTimePicker(final EditText target) {
         final Calendar c = Calendar.getInstance();
 
@@ -472,7 +521,13 @@ public class CreateEventDetailsFragment extends Fragment {
         tp.show();
     }
 
-
+    /**
+     * Safely parses an integer value from a string.
+     *
+     * @param s the input string, which may be {@code null} or empty
+     * @return the parsed {@link Integer}, or {@code null} if the string is
+     *         {@code null}, blank, or not a valid integer
+     */
     private Integer safeParse(String s) {
         try {
             if (s == null) return null;
@@ -483,7 +538,21 @@ public class CreateEventDetailsFragment extends Fragment {
             return null;
         }
     }
-
+    /**
+     * Configures the geolocation switch and result handling for the location
+     * picker.
+     * <p>
+     * Behaviour:
+     * <ul>
+     *   <li>When the switch is turned on by user interaction, navigates to the
+     *       location picker fragment.</li>
+     *   <li>When turned off, clears any stored latitude/longitude/radius and
+     *       disables the geolocation UI.</li>
+     *   <li>Registers a fragment result listener for {@code "locationPickerResult"}
+     *       to receive the selected latitude, longitude, and radius and update
+     *       the UI and internal state.</li>
+     * </ul>
+     */
     private void setupLocationSwitch() {
         switchGeolocation.setOnCheckedChangeListener((button, isChecked) -> {
             if (isChecked && button.isPressed() && !geolocationEnabled) {
@@ -514,7 +583,14 @@ public class CreateEventDetailsFragment extends Fragment {
                 });
 
     }
-
+    /**
+     * Shows or hides the latitude, longitude, and radius fields and populates
+     * them with the currently selected geolocation values if available.
+     *
+     * @param showing {@code true} to display the fields and fill them from
+     *                {@link #selectedLat}, {@link #selectedLng}, and
+     *                {@link #selectedRadius}; {@code false} to hide them
+     */
     private void setLatLonRadius(boolean showing) {
         if (showing) {
 
@@ -542,7 +618,16 @@ public class CreateEventDetailsFragment extends Fragment {
             textInputLatitude.setVisibility(View.GONE);
         }
     }
-
+    /**
+     * Enables or disables the geolocation requirement UI.
+     * <p>
+     * This updates the internal {@link #geolocationEnabled} flag, syncs the
+     * state of the geolocation switch, and shows or hides the lat/lon/radius
+     * display fields.
+     *
+     * @param enabled {@code true} to enable geolocation, {@code false} to
+     *                disable it
+     */
     private void setGeolocationEnabled(boolean enabled) {
         if (enabled) {
             geolocationEnabled = true;
@@ -554,13 +639,30 @@ public class CreateEventDetailsFragment extends Fragment {
             setLatLonRadius(false);
         }
     }
-
+    /**
+     * Synchronises the {@link #selectedInterests} boolean array with the
+     * {@link #selectedItems} list.
+     * <p>
+     * For each entry in {@link #interests}, the corresponding boolean is set
+     * to {@code true} if that interest is currently selected.
+     * This keeps the multi-choice dialog state consistent when reopened.
+     */
     private void syncBooleanArray() {
         for (int i = 0; i < interests.size(); i++) {
             selectedInterests[i] = selectedItems.contains(interests.get(i));
         }
     }
-
+    /**
+     * Creates and returns the {@link CreateEventViewModel} scoped to the
+     * create-event navigation graph.
+     * <p>
+     * Scoping the view model to {@code R.id.create_event_graph} allows the
+     * same {@link Event} state to be shared across all steps of the event
+     * creation/editing flow (details, poster, and any additional screens),
+     * while being cleared once the flow is finished.
+     *
+     * @return the shared {@link CreateEventViewModel} instance for this flow
+     */
     private CreateEventViewModel initViewModel() {
         // Create the view model, but scope it to the create event navigation graph so that it
         // only lives the lifetime of the 3 views used to create or edit the event.
