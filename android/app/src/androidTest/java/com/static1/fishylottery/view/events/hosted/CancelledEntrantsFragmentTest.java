@@ -4,7 +4,6 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.not;
 
 import android.os.Bundle;
@@ -13,15 +12,15 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentFactory;
 import androidx.fragment.app.testing.FragmentScenario;
+import androidx.test.espresso.matcher.ViewMatchers;
 
 import com.static1.fishylottery.R;
 import com.static1.fishylottery.model.entities.Event;
-import com.static1.fishylottery.model.repositories.FakeEventRepository;
-import com.static1.fishylottery.model.repositories.IEventRepository;
+import com.static1.fishylottery.model.entities.WaitlistEntry;
+import com.static1.fishylottery.model.repositories.FakeWaitlistRepository;
+import com.static1.fishylottery.model.repositories.IWaitlistRepository;
 
 import org.junit.Test;
-
-import java.util.Arrays;
 
 public class CancelledEntrantsFragmentTest {
 
@@ -30,9 +29,9 @@ public class CancelledEntrantsFragmentTest {
      */
     static class TestFragmentFactory extends FragmentFactory {
 
-        private final IEventRepository repo;
+        private final IWaitlistRepository repo;
 
-        TestFragmentFactory(IEventRepository repo) {
+        TestFragmentFactory(IWaitlistRepository repo) {
             this.repo = repo;
         }
 
@@ -47,7 +46,7 @@ public class CancelledEntrantsFragmentTest {
     }
 
     private FragmentScenario<CancelledEntrantsFragment> launchWith(
-            IEventRepository repo,
+            IWaitlistRepository repo,
             Event event
     ) {
         Bundle args = new Bundle();
@@ -69,30 +68,31 @@ public class CancelledEntrantsFragmentTest {
     }
 
     @Test
-    public void showsCancelledIds_whenRepositoryReturnsData() {
-        FakeEventRepository fakeRepo = new FakeEventRepository();
+    public void showsCancelled_whenRepositoryReturnsData() {
+        FakeWaitlistRepository fakeWaitlistRepository = new FakeWaitlistRepository();
         Event event = createTestEvent("event1");
-        fakeRepo.addEvent(event);
-        fakeRepo.setCancelledIds("event1", Arrays.asList("userA", "userB"));
+        WaitlistEntry entry = new WaitlistEntry();
+        entry.setEventId("event1");
+        entry.setStatus("cancelled");
+        fakeWaitlistRepository.addToWaitlist(event, entry);
 
-        launchWith(fakeRepo, event);
+        launchWith(fakeWaitlistRepository, event);
 
         // empty message hidden
         onView(withId(R.id.text_empty)).check(matches(not(isDisplayed())));
         // list is shown and contains both IDs
         onView(withId(R.id.recycler_cancelled_entrants)).check(matches(isDisplayed()));
-        onView(withText("userA")).check(matches(isDisplayed()));
-        onView(withText("userB")).check(matches(isDisplayed()));
+        onView(withId(R.id.recycler_cancelled_entrants))
+                .check(matches(ViewMatchers.hasChildCount(1)));
     }
 
     @Test
     public void showsEmptyMessage_whenNoCancelledEntrants() {
-        FakeEventRepository fakeRepo = new FakeEventRepository();
+        FakeWaitlistRepository fakeWaitlistRepository = new FakeWaitlistRepository();
         Event event = createTestEvent("event2");
-        fakeRepo.addEvent(event);
         // no cancelled IDs set for this event
 
-        launchWith(fakeRepo, event);
+        launchWith(fakeWaitlistRepository, event);
 
         // Empty text visible when there are no items
         onView(withId(R.id.text_empty)).check(matches(isDisplayed()));
