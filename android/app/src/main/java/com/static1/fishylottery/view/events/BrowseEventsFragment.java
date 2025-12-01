@@ -41,24 +41,60 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Fragment that displays a list of events available for browsing.
+ * Supports filtering by interest and date range, with navigation to event details.
+ */
 public class BrowseEventsFragment extends Fragment {
+
+    /** Repository for accessing event data. */
     private IEventRepository eventsRepo;
+
+    /** RecyclerView for displaying the list of events. */
     private RecyclerView recyclerView;
+
+    /** Adapter for managing event data in the RecyclerView. */
     private EventAdapter adapter;
+
+    /** Spinner for selecting event interests. */
     private Spinner spinnerInterests;
-    private EditText etStartDate, etEndDate;
+
+    /** EditText for selecting the start date filter. */
+    private EditText etStartDate;
+
+    /** EditText for selecting the end date filter. */
+    private EditText etEndDate;
+
+    /** Date format for parsing and displaying dates. */
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
 
+    /** List of all events fetched from the repository. */
     private List<Event> allEvents = new ArrayList<>(); // Store all events
 
+    /**
+     * Default constructor that initializes the event repository.
+     */
     public BrowseEventsFragment() {
         this.eventsRepo = new EventRepository();
     }
 
+    /**
+     * Constructor that allows injection of a custom event repository.
+     *
+     * @param eventRepository the event repository to use
+     */
     public BrowseEventsFragment(IEventRepository eventRepository) {
         this.eventsRepo = eventRepository;
     }
 
+    /**
+     * Inflates the fragment's layout and sets up the RecyclerView, filters, and navigation.
+     *
+     * @param inflater           the LayoutInflater to inflate the layout
+     * @param container          the parent ViewGroup
+     * @param savedInstanceState the saved instance state, if any
+     * @return the inflated View
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -102,7 +138,6 @@ public class BrowseEventsFragment extends Fragment {
             sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         });
 
-
         getEvents(); // load
 
         FragmentActivity activity = getActivity();
@@ -137,6 +172,9 @@ public class BrowseEventsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Sets up the interests spinner with available options from resources.
+     */
     private void setupInterestsSpinner() {
         String[] interestsArray = getResources().getStringArray(R.array.interests_array);
         ArrayAdapter<String> interestsAdapter = new ArrayAdapter<>(
@@ -156,14 +194,22 @@ public class BrowseEventsFragment extends Fragment {
         });
     }
 
-    /** Prevent soft keyboard. allow click to open pickers. */
+    /**
+     * Configures an EditText to prevent soft keyboard input and allow date picker clicks.
+     *
+     * @param et the EditText to configure
+     */
     private void setupPickerField(EditText et) {
         et.setFocusable(false);
         et.setClickable(true);
         et.setInputType(InputType.TYPE_NULL);
     }
 
-    /** Opens a DatePickerDialog, initializing from current value if present. */
+    /**
+     * Displays a DatePickerDialog for the specified EditText, initializing with the current value if set.
+     *
+     * @param target the EditText to update with the selected date
+     */
     private void showDatePicker(final EditText target) {
         final Calendar c = Calendar.getInstance();
 
@@ -182,30 +228,26 @@ public class BrowseEventsFragment extends Fragment {
         DatePickerDialog dp = new DatePickerDialog(
                 requireContext(),
                 (view, year, month, dayOfMonth) -> {
-                    Calendar chosen = Calendar.getInstance();
-                    chosen.set(year, month, dayOfMonth);
-                    target.setText(dateFormat.format(chosen.getTime()));
-                },
-                y, m, d
-        );
-
+                    Calendar selected = Calendar.getInstance();
+                    selected.set(year, month, dayOfMonth);
+                    target.setText(dateFormat.format(selected.getTime()));
+                }, y, m, d);
         dp.show();
     }
 
+    /**
+     * Filters the event list based on selected interest and date range, then updates the UI.
+     */
     private void filterEvents() {
-        // Create a copy of all events to filter
         List<Event> filteredEvents = new ArrayList<>(allEvents);
-
-        // Apply all filters
         applyFilters(filteredEvents);
-
-        // Sort filtered events
         sortEventsByStartDate(filteredEvents);
-
-        // Update the adapter with filtered list
         adapter.submitList(filteredEvents);
     }
 
+    /**
+     * Fetches all events from the repository and applies initial filters.
+     */
     private void getEvents() {
         eventsRepo.fetchAllEvents().addOnSuccessListener(events -> {
             // Store all events
@@ -222,6 +264,11 @@ public class BrowseEventsFragment extends Fragment {
         });
     }
 
+    /**
+     * Applies interest and date range filters to the event list.
+     *
+     * @param events the list of events to filter
+     */
     private void applyFilters(List<Event> events) {
         // Filter by interest
         if (spinnerInterests != null && spinnerInterests.getSelectedItemPosition() > 0) {
@@ -342,6 +389,11 @@ public class BrowseEventsFragment extends Fragment {
         }
     }
 
+    /**
+     * Removes events whose registration period is closed.
+     *
+     * @param events the list of events to filter
+     */
     private void removeClosedEvents(List<Event> events) {
         Date now = new Date();
 
@@ -354,6 +406,11 @@ public class BrowseEventsFragment extends Fragment {
                 event.getRegistrationOpens() != null && event.getRegistrationOpens().after(now));
     }
 
+    /**
+     * Sorts the list of events by their start date in ascending order.
+     *
+     * @param events the list of events to sort
+     */
     private void sortEventsByStartDate(List<Event> events) {
         events.sort(Comparator.comparing(Event::getEventStartDate));
     }

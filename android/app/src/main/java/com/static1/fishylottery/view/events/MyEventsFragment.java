@@ -34,24 +34,57 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Fragment that displays a list of events the current user is registered for.
+ * Allows navigation to event details.
+ */
 public class MyEventsFragment extends Fragment {
+
+    /** TextView displayed when there are no events. */
     private TextView textNoEventsMessage;
+
+    /** RecyclerView for displaying the list of events. */
     private RecyclerView myEventsRecycler;
+
+    /** Repository for accessing event data. */
     private IEventRepository eventsRepo;
+
+    /** Repository for accessing waitlist data. */
     private IWaitlistRepository waitlistRepo;
+
+    /** Adapter for managing event data in the RecyclerView. */
     private EventAdapter adapter;
+
+    /** Tag for logging purposes. */
     private final static String TAG = "MyEvents";
 
+    /**
+     * Default constructor that initializes the event and waitlist repositories.
+     */
     public MyEventsFragment() {
         this.eventsRepo = new EventRepository();
         this.waitlistRepo = new WaitlistRepository();
     }
 
+    /**
+     * Constructor that allows injection of custom event and waitlist repositories.
+     *
+     * @param eventRepository   the event repository to use
+     * @param waitlistRepository the waitlist repository to use
+     */
     public MyEventsFragment(IEventRepository eventRepository, IWaitlistRepository waitlistRepository) {
         this.eventsRepo = eventRepository;
         this.waitlistRepo = waitlistRepository;
     }
 
+    /**
+     * Inflates the fragment's layout and sets up the RecyclerView and navigation.
+     *
+     * @param inflater           the LayoutInflater to inflate the layout
+     * @param container          the parent ViewGroup
+     * @param savedInstanceState the saved instance state, if any
+     * @return the inflated View
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -76,7 +109,7 @@ public class MyEventsFragment extends Fragment {
             BottomNavigationView navView = requireActivity().findViewById(R.id.nav_view);
             if (navView != null) {
                 navView.post(() -> {
-                    myEventsRecycler.setPadding(0, 0,0, navView.getHeight());
+                    myEventsRecycler.setPadding(0, 0, 0, navView.getHeight());
                 });
             }
         }
@@ -86,42 +119,52 @@ public class MyEventsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Fetches the user's registered events and updates the UI.
+     */
     private void getMyEvents() {
         String uid = AuthManager.getInstance().getUserId();
 
         if (uid == null) {
             textNoEventsMessage.setVisibility(View.VISIBLE);
             return;
-        };
+        }
 
         Task<List<WaitlistEntry>> myWaitlistsTask = waitlistRepo.getEventWaitlistEntriesByUser(uid);
         Task<List<Event>> allEventsTask = eventsRepo.fetchAllEvents();
 
         Tasks.whenAllSuccess(myWaitlistsTask, allEventsTask)
-            .addOnSuccessListener(results -> {
-                List<WaitlistEntry> myWaitlists = (List<WaitlistEntry>) results.get(0);
-                List<Event> allEvents = (List<Event>) results.get(1);
+                .addOnSuccessListener(results -> {
+                    List<WaitlistEntry> myWaitlists = (List<WaitlistEntry>) results.get(0);
+                    List<Event> allEvents = (List<Event>) results.get(1);
 
-                List<Event> myEvents = computeMyEvents(allEvents, myWaitlists);
+                    List<Event> myEvents = computeMyEvents(allEvents, myWaitlists);
 
-                // Filter my events (remove old events)
-                removePastEvents(myEvents);
+                    // Filter my events (remove old events)
+                    removePastEvents(myEvents);
 
-                // Sort the remaining events by date
-                sortEventsByDate(myEvents);
+                    // Sort the remaining events by date
+                    sortEventsByDate(myEvents);
 
-                // Update the list with adapter
-                adapter.submitList(myEvents);
+                    // Update the list with adapter
+                    adapter.submitList(myEvents);
 
-                // Set the no events text
-                textNoEventsMessage.setVisibility(myEvents.isEmpty() ? View.VISIBLE : View.GONE);
-            })
-            .addOnFailureListener(e -> {
-                Log.e(TAG, "Unable to get my events", e);
-                Toast.makeText(requireContext(), "Unable to get my events", Toast.LENGTH_LONG).show();
-            });
+                    // Set the no events text
+                    textNoEventsMessage.setVisibility(myEvents.isEmpty() ? View.VISIBLE : View.GONE);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Unable to get my events", e);
+                    Toast.makeText(requireContext(), "Unable to get my events", Toast.LENGTH_LONG).show();
+                });
     }
 
+    /**
+     * Computes the list of events the user is registered for by matching waitlist entries.
+     *
+     * @param allEvents   the list of all events
+     * @param myWaitlists the user's waitlist entries
+     * @return the list of events the user is registered for
+     */
     private List<Event> computeMyEvents(List<Event> allEvents, List<WaitlistEntry> myWaitlists) {
         // Build a fast lookup set of eventIds that the user is on the waitlist for
         Set<String> waitlistedEventIds = new HashSet<>();
@@ -140,6 +183,11 @@ public class MyEventsFragment extends Fragment {
         return result;
     }
 
+    /**
+     * Removes events that have already ended.
+     *
+     * @param events the list of events to filter
+     */
     private void removePastEvents(List<Event> events) {
         Date now = new Date();
 
@@ -147,9 +195,13 @@ public class MyEventsFragment extends Fragment {
         events.removeIf(event -> event.getEventEndDate().before(now));
     }
 
+    /**
+     * Sorts the list of events by their start date in ascending order.
+     *
+     * @param events the list of events to sort
+     */
     private void sortEventsByDate(List<Event> events) {
         // Sort events by event date, soonest first
         events.sort(Comparator.comparing(Event::getEventStartDate));
     }
-
 }
