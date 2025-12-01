@@ -20,14 +20,26 @@ import java.util.Random;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.VH> {
 
     public interface OnNotificationClick {
+
+        /**
+         * Called when the user taps a notification item.
+         *
+         * @param n The clicked {@link AppNotification}.
+         */
         void onClick(AppNotification n);
     }
 
+    /** Listener triggered when an item is clicked. */
     private OnNotificationClick clickListener;
+
+    /** Internal list of notifications displayed by the adapter. */
     private final List<AppNotification> items = new ArrayList<>();
+
+    /** Formats notification dates based on system locale. */
     private final DateFormat fmt = DateFormat.getDateTimeInstance();
 
     // 🐟 Random fish images
+    /** Array of drawable resources for random fish images. */
     private final int[] fishImages = {
             R.drawable.fish_1,
             R.drawable.fish_2,
@@ -53,15 +65,31 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     private final Random random = new Random();
 
+    /**
+     * Returns the current click listener. (Required for automated tests.)
+     *
+     * @return The notification click listener, or null if not set.
+     */
     // Required by test
     public OnNotificationClick getClickListener() {
         return clickListener;
     }
 
+    /**
+     * Assigns a click listener for notification item click events.
+     *
+     * @param l The listener to set.
+     */
     public void setOnNotificationClick(OnNotificationClick l) {
         this.clickListener = l;
     }
 
+    /**
+     * Replaces the current list of notifications with a new one.
+     * The adapter will immediately refresh the list.
+     *
+     * @param newItems List of new notifications. Can be null.
+     */
     public void submit(List<AppNotification> newItems) {
         items.clear();
         if (newItems != null) items.addAll(newItems);
@@ -100,10 +128,21 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return items.size();
     }
 
+    /**
+     * ViewHolder class that stores references to views inside each
+     * notification list item for performance.
+     */
+
     static class VH extends RecyclerView.ViewHolder {
 
         TextView title, message, date;
         ImageView randomFish;   // <-- added ImageView reference
+
+        /**
+         * Creates a new ViewHolder instance and binds its child views.
+         *
+         * @param v The inflated item view.
+         */
 
         VH(@NonNull View v) {
             super(v);
