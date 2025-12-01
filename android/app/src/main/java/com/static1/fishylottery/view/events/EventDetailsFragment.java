@@ -160,6 +160,18 @@ public class EventDetailsFragment extends Fragment {
                 ivEventPoster.setVisibility(View.GONE);
             }
 
+            Integer maxWaitlist = event.getMaxWaitlistSize();
+            Integer currentWaitlistCount = event.countEntries(); // how many are currently on waitlist
+
+            boolean waitlistFull = maxWaitlist != null
+                    && currentWaitlistCount != null
+                    && currentWaitlistCount >= maxWaitlist;
+
+            if (waitlistFull) {
+                buttonJoinWaitlist.setEnabled(false);
+                buttonJoinWaitlist.setText("Waitlist Full");
+            }
+
             // Enable only if registration deadline is in the future (or not set)
             Date deadline = event.getRegistrationCloses();
             boolean canJoin = (deadline == null) || deadline.after(new Date());
